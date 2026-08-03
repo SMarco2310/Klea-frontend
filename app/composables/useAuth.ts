@@ -1,18 +1,81 @@
 // app/composables/useAuth.ts
-const user = ref<{ name: string; email: string } | null>(null)
+interface LaravelUser {
+  id: number
+  name: string
+  email: string
+  current_tenant_id: number | null
+}
+
+interface AuthResponse {
+  data: {
+    user: LaravelUser
+    token: string
+  }
+  success: boolean
+  message: string
+}
+
+const user = ref<LaravelUser | null>(null)
 
 export function useAuth() {
-  const isLoggedIn = computed(() => user.value !== null)
+  const token = useCookie<string | null>('auth_token', { default: () => null })
+  const config = useRuntimeConfig()
 
-  function login(email: string, _password: string) {
-    user.value = { name: email.split('@')[0], email }
+  const isSignedIn = computed(() => !!token.value)
+
+  function authHeaders(): Record<string, string> {
+    return token.value ? { Authorization: `Bearer ${token.value}` } : {}
   }
-  function signup(name: string, email: string, _password: string) {
-    user.value = { name, email }
+
+  async function login(email: string, password: string) {
+    const res = await $fetch<AuthResponse>(`${config.public.apiBaseUrl}/api/login`, {
+      method: 'POST',
+      body: { email, password },
+    })
+    token.value = res.data.token
+    user.value = res.data.user
   }
-  function logout() {
+
+  async function register(name: string, email: string, password: string) {
+    const res = await $fetch<AuthResponse>(`${config.public.apiBaseUrl}/api/register`, {
+      method: 'POST',
+      body: { name, email, password },
+    })
+    token.value = res.data.token
+    user.value = res.data.user
+  }
+
+  async function loginWithClerkToken(sessionToken: string) {
+    const res = await $fetch<AuthResponse>(`${config.public.apiBaseUrl}/api/auth/clerk`, {
+      method: 'POST',
+      body: { session_token: sessionToken },
+    })
+    token.value = res.data.token
+    user.value = res.data.user
+  }
+
+  async function fetchCurrentUser() {
+    if (!token.value) return
+    user.value = await $fetch<LaravelUser>(`${config.public.apiBaseUrl}/api/me`, {
+      headers: authHeaders(),
+    })
+  }
+
+  async function logout() {
+    if (token.value) {
+      await $fetch(`${config.public.apiBaseUrl}/api/logout`, {
+        method: 'POST',
+        headers: authHeaders(),
+      }).catch(() => {})
+    }
+    token.value = null
     user.value = null
   }
 
-  return { user, isLoggedIn, login, signup, logout }
+  return { user, isSignedIn, login, register, loginWithClerkToken, fetchCurrentUser, logout }
+}
+
+export function extractAuthErrorMessage(err: unknown): string {
+  const fetchError = err as { data?: { message?: string } }
+  return fetchError?.data?.message || 'Something went wrong. Please try again.'
 }
