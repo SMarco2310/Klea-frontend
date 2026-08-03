@@ -11,8 +11,8 @@ Klea is a B2B SaaS dev-tool: issue and validate software licenses/subscriptions 
 
 - Nuxt 4 (already scaffolded), Vue 3, vue-router
 - Tailwind CSS (to be added — not yet installed)
+- shadcn-vue (Radix-Vue primitives + Tailwind, components copied into repo) for base primitives: Button, Input, Dialog/Modal, Dropdown, Tabs, Select, Badge, Switch, Table — themed to match the sage-green/dark palette below
 - Lucide icons (SVG, no emoji icons)
-- No component library (shadcn-vue/Nuxt UI) — custom components styled with Tailwind
 - Fonts: Space Grotesk (headings), DM Sans or Inter (body) — loaded via Google Fonts
 
 ## Visual system
