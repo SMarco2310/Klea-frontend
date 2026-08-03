@@ -22,8 +22,8 @@ const navItems = [
   { label: 'Settings', to: '/settings', icon: SettingsIcon },
 ]
 
-function handleLogout() {
-  logout()
+async function handleLogout() {
+  await logout()
   navigateTo('/login')
 }
 </script>
