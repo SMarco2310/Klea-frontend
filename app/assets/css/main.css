@@ -1,6 +1,3 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
-
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -100,10 +97,6 @@
   --sidebar-accent-foreground: #06170d;
   --sidebar-border: #27313f;
   --sidebar-ring: oklch(0.556 0 0);
-}
-
-@theme inline {
-  --font-heading: var(--font-sans);
 }
 
 @layer base {
