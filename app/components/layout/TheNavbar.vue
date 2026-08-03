@@ -1,7 +1,6 @@
 <!-- app/components/layout/TheNavbar.vue -->
 <script setup lang="ts">
 import { Button } from '~/components/ui/button'
-import { Switch } from '~/components/ui/switch'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +10,6 @@ import {
 import { SearchIcon, BookOpenIcon, GiftIcon, BellIcon, ChevronDownIcon } from '@lucide/vue'
 import AppSwitcherModal from '~/components/layout/AppSwitcherModal.vue'
 
-const { workspace } = useWorkspace()
 const { apps, currentApp } = useApps()
 const { mode, toggle } = useEnvMode()
 const { user, logout } = useAuth()
@@ -51,7 +49,7 @@ function handleLogout() {
         :key="item.to"
         :to="item.to"
         class="px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors duration-200"
-        active-class="bg-white/10 text-white"
+        active-class="bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
         :class="!$route.path.startsWith(item.to) && 'text-slate-400 hover:text-white hover:bg-white/5'"
       >
         {{ item.label }}
@@ -65,7 +63,7 @@ function handleLogout() {
 
       <button
         class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium cursor-pointer transition-colors duration-200"
-        :class="mode === 'test' ? 'bg-white/10 text-slate-300' : 'text-slate-500'"
+        :class="mode === 'test' ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)]' : 'text-slate-500'"
         @click="mode === 'live' && toggle()"
       >
         Test
