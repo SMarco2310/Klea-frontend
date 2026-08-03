@@ -53,6 +53,10 @@ Seed data: no pre-existing keys on the demo app (empty list), so the empty state
 
 Applies to `app/pages/login.vue` and `app/pages/signup.vue` only (not app-wide — scoped per this task's decision).
 
+### Password visibility toggle
+
+Both password fields (login's single field, signup's single field) get a show/hide eye toggle, reusing the exact pattern already implemented in `app/pages/settings.vue`'s Semoa API key field: a `ref<boolean>` state, `:type="show ? 'text' : 'password'"` binding, and an absolutely-positioned icon-button inside the input's wrapper div (`EyeIcon`/`EyeOffIcon` from `@lucide/vue`, `aria-label` toggling between "Show password"/"Hide password").
+
 - **Email**: format-validated with a simple regex before calling `useAuth().login`/`register` (the native `type="email"` input already present provides browser-level validation; this adds an explicit check with an inline error message using the same error-banner pattern already used for Laravel API errors, so validation errors and server errors look identical to the user).
 - **Password**: minimum 8 characters before submit.
 - **Name** (signup only): trimmed, rejects empty/whitespace-only, max 100 characters.
