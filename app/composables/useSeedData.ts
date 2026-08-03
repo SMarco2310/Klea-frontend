@@ -46,6 +46,14 @@ export interface WebhookDelivery {
   status: 'success' | 'failed'
   createdAt: string
 }
+export interface ApiKey {
+  id: string
+  appId: string
+  name: string
+  env: 'test' | 'live'
+  maskedKey: string
+  createdAt: string
+}
 
 const apps = ref<App[]>([])
 const plans = ref<Plan[]>([])
@@ -53,6 +61,7 @@ const features = ref<Feature[]>([])
 const subscribers = ref<Subscriber[]>([])
 const subscriptions = ref<Subscription[]>([])
 const webhookDeliveries = ref<WebhookDelivery[]>([])
+const apiKeys = ref<ApiKey[]>([])
 let seeded = false
 
 export function useSeedData() {
@@ -83,7 +92,8 @@ export function useSeedData() {
       { id: 'txn-3', appId, subscriberId: 'sub-3', planId: basicPlanId, status: 'active', env: 'test', createdAt: '2026-08-01', amount: 9 },
     ]
     webhookDeliveries.value = []
+    apiKeys.value = []
   }
 
-  return { apps, plans, features, subscribers, subscriptions, webhookDeliveries }
+  return { apps, plans, features, subscribers, subscriptions, webhookDeliveries, apiKeys }
 }
