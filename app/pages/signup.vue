@@ -10,7 +10,7 @@ const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
 const isSubmitting = ref(false)
-const { register } = useAuth()
+const { register } = useKleaAuth()
 const { signIn, isLoaded } = useSignIn()
 
 async function handleSubmit() {
@@ -43,50 +43,65 @@ async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
 </script>
 
 <template>
-  <div class="bg-[var(--color-surface)] border border-[var(--color-border-dark)] rounded-xl p-8">
-    <h1 class="font-heading text-2xl font-semibold mb-1">Create your account</h1>
-    <p class="text-slate-400 text-sm mb-6">Start issuing licenses in minutes</p>
+  <div class="w-full max-w-sm mx-auto flex flex-col h-full justify-center pb-12">
+    <!-- Logo Placeholder -->
+    <div class="mb-16">
+      <NuxtLink to="/" class="flex items-center gap-2">
+        <span class="text-3xl font-heading font-bold text-white tracking-tight">Klea<span class="text-[var(--color-accent)]">.</span></span>
+      </NuxtLink>
+    </div>
+
+    <h1 class="font-heading text-2xl font-semibold mb-2 text-white">Sign up</h1>
+    <p class="text-slate-400 text-sm mb-10">Start issuing licenses in minutes</p>
 
     <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2 mb-4">
       {{ errorMessage }}
     </p>
 
     <form class="space-y-4" @submit.prevent="handleSubmit">
-      <div class="space-y-2">
-        <Label for="name">Full name</Label>
-        <Input id="name" v-model="name" placeholder="Ada Lovelace" required />
+      <div>
+        <Input id="name" v-model="name" placeholder="Enter Full Name" required 
+               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
       </div>
-      <div class="space-y-2">
-        <Label for="email">Email</Label>
-        <Input id="email" v-model="email" type="email" placeholder="you@example.com" required />
+      <div>
+        <Input id="email" v-model="email" type="email" placeholder="Enter Email" required 
+               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
       </div>
-      <div class="space-y-2">
-        <Label for="password">Password</Label>
-        <Input id="password" v-model="password" type="password" placeholder="••••••••" required />
+      <div>
+        <Input id="password" v-model="password" type="password" placeholder="Create Password" required 
+               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
       </div>
-      <Button type="submit" class="w-full cursor-pointer" :disabled="isSubmitting">
-        {{ isSubmitting ? 'Creating account...' : 'Create account' }}
+
+      <div class="flex items-center gap-2 py-1">
+        <input type="checkbox" id="terms" class="w-4 h-4 rounded border-[#27313f] bg-[#1a1f26] checked:bg-[var(--color-accent)] focus:ring-[var(--color-accent)]" required />
+        <label for="terms" class="text-xs text-slate-400 select-none cursor-pointer">I Agree To The Terms & Privacy Policy</label>
+      </div>
+
+      <Button type="submit" class="w-full cursor-pointer h-11 rounded-lg bg-white text-black hover:bg-slate-200 font-medium mt-2" :disabled="isSubmitting">
+        {{ isSubmitting ? 'Creating account...' : 'Create Account' }}
       </Button>
     </form>
 
-    <div class="flex items-center gap-3 my-6">
-      <div class="h-px bg-[var(--color-border-dark)] flex-1" />
-      <span class="text-xs text-slate-500">or continue with</span>
-      <div class="h-px bg-[var(--color-border-dark)] flex-1" />
+    <div class="flex items-center gap-3 my-8">
+      <div class="h-px bg-white/10 flex-1" />
+      <span class="text-xs text-slate-500">or sign up via</span>
+      <div class="h-px bg-white/10 flex-1" />
     </div>
 
-    <div class="space-y-2">
-      <Button variant="secondary" class="w-full cursor-pointer" @click="handleOAuth('oauth_google')">
-        Continue with Google
+    <div class="flex items-center gap-4">
+      <Button variant="secondary" class="flex-1 cursor-pointer h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg gap-2" @click="handleOAuth('oauth_google')">
+        <img src="/images/google.png" alt="Google" class="w-5 h-5 opacity-90" />
+        Google
       </Button>
-      <Button variant="secondary" class="w-full cursor-pointer" @click="handleOAuth('oauth_github')">
-        Continue with GitHub
+      <Button variant="secondary" class="flex-1 cursor-pointer h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg gap-2" @click="handleOAuth('oauth_github')">
+        <img src="/images/github.png" alt="GitHub" class="w-5 h-5 opacity-90" />
+        GitHub
       </Button>
     </div>
 
-    <p class="text-sm text-slate-400 mt-6 text-center">
-      Already have an account?
-      <NuxtLink to="/login" class="text-[var(--color-accent)] cursor-pointer">Log in</NuxtLink>
+    <p class="text-sm text-slate-400 mt-10 text-center">
+      Already Have An Account?
+      <NuxtLink to="/login" class="text-[var(--color-accent)] hover:underline cursor-pointer">Login</NuxtLink>
     </p>
   </div>
 </template>

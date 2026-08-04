@@ -11,7 +11,7 @@ export function useFeatures(appId: string) {
   }
   function updateFeature(id: string, patch: Partial<import('./useSeedData').Feature>) {
     const idx = features.value.findIndex((f) => f.id === id)
-    if (idx !== -1) features.value[idx] = { ...features.value[idx], ...patch }
+    if (idx !== -1) features.value[idx] = { ...features.value[idx], ...patch } as import('./useSeedData').Feature
   }
   function deleteFeature(id: string) {
     features.value = features.value.filter((f) => f.id !== id)

@@ -1,4 +1,4 @@
-// app/composables/useAuth.ts
+// app/composables/useKleaAuth.ts
 interface LaravelUser {
   id: number
   name: string
@@ -17,7 +17,7 @@ interface AuthResponse {
 
 const user = ref<LaravelUser | null>(null)
 
-export function useAuth() {
+export function useKleaAuth() {
   const token = useCookie<string | null>('auth_token', { default: () => null })
   const config = useRuntimeConfig()
 

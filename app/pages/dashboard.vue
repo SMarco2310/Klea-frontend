@@ -8,10 +8,14 @@ import StatCard from '~/components/dashboard/StatCard.vue'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
 import CreateAppModal from '~/components/layout/CreateAppModal.vue'
 
-const { user } = useAuth()
+const { user } = useKleaAuth()
 const { workspace } = useWorkspace()
 const { apps } = useApps()
 const { mode } = useEnvMode()
+const { apiKeys: allApiKeysRaw } = useSeedData()
+const totalApiKeys = computed(
+  () => allApiKeysRaw.value.filter((k) => k.env === mode.value).length
+)
 
 const createOpen = ref(false)
 </script>
@@ -34,7 +38,7 @@ const createOpen = ref(false)
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
       <StatCard label="Applications" :value="apps.length" :icon="LayersIcon" sublabel="Total registered apps" />
       <StatCard label="Subscribers" :value="0" :icon="UsersIcon" sublabel="In live environment" />
-      <StatCard label="API Keys" :value="0" :icon="KeyIcon" sublabel="Issued keys" />
+      <StatCard label="API Keys" :value="totalApiKeys" :icon="KeyIcon" sublabel="Issued keys" />
     </div>
 
     <div class="flex items-center justify-between mb-4">

@@ -5,7 +5,7 @@ import { Button } from '~/components/ui/button'
 
 <template>
   <nav class="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-    <span class="font-heading font-semibold text-lg">Klea</span>
+    <span class="font-heading font-semibold text-lg tracking-tight">Klea</span>
     <div class="hidden md:flex items-center gap-6 text-sm text-slate-400">
       <a href="#features" class="hover:text-white cursor-pointer transition-colors duration-200">Features</a>
       <NuxtLink to="/docs" class="hover:text-white cursor-pointer transition-colors duration-200">Docs</NuxtLink>

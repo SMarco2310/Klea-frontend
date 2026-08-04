@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async () => {
-  const { isSignedIn, fetchCurrentUser, user } = useAuth()
+  const { isSignedIn, fetchCurrentUser, user } = useKleaAuth()
   if (!isSignedIn.value) {
     return navigateTo('/login')
   }

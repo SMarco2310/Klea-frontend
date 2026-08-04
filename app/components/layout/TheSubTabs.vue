@@ -11,6 +11,7 @@ const tabs = [
   { label: 'Subscriptions', to: `/apps/${slug}/subscriptions` },
   { label: 'Analytics', to: `/apps/${slug}/analytics` },
   { label: 'Webhooks', to: `/apps/${slug}/webhooks` },
+  { label: 'API Keys', to: `/apps/${slug}/api-keys` },
 ]
 </script>
 

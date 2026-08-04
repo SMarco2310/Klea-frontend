@@ -12,7 +12,7 @@ import AppSwitcherModal from '~/components/layout/AppSwitcherModal.vue'
 
 const { apps, currentApp } = useApps()
 const { mode, toggle } = useEnvMode()
-const { user, logout } = useAuth()
+const { user, logout } = useKleaAuth()
 const switcherOpen = ref(false)
 
 const navItems = [

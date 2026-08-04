@@ -6,12 +6,14 @@
 @theme {
   --font-heading: "Space Grotesk", sans-serif;
   --font-body: "DM Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
   --color-bg: #0b0f14;
   --color-surface: #1e293b;
   --color-surface-muted: #0f172a;
   --color-accent: #7fb894;
   --color-accent-foreground: #06170d;
+  --color-key: #d4a574;
   --color-border-dark: #27313f;
 
   --color-bg-light: #f8fafc;
@@ -143,5 +145,11 @@
   }
   body {
     @apply bg-[color:var(--background)] text-[color:var(--foreground)];
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-black/40 border border-white/10 backdrop-blur-2xl shadow-xl;
   }
 }

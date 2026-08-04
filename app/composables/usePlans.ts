@@ -11,7 +11,7 @@ export function usePlans(appId: string) {
   }
   function updatePlan(id: string, patch: Partial<import('./useSeedData').Plan>) {
     const idx = plans.value.findIndex((p) => p.id === id)
-    if (idx !== -1) plans.value[idx] = { ...plans.value[idx], ...patch }
+    if (idx !== -1) plans.value[idx] = { ...plans.value[idx], ...patch } as import('./useSeedData').Plan
   }
   function deletePlan(id: string) {
     plans.value = plans.value.filter((p) => p.id !== id)

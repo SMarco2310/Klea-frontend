@@ -2,7 +2,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'dashboard', middleware: 'auth' })
 
-const { user } = useAuth()
+const { user } = useKleaAuth()
 </script>
 
 <template>
@@ -11,7 +11,7 @@ const { user } = useAuth()
     <div class="rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] divide-y divide-[var(--color-border-dark)]">
       <div class="flex items-center gap-3 px-5 py-4">
         <span class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-semibold">
-          {{ (user?.name ?? 'A')[0].toUpperCase() }}
+          {{ (user?.name || 'A').charAt(0).toUpperCase() }}
         </span>
         <div>
           <div class="font-medium">{{ user?.name ?? 'You' }}</div>

@@ -4,7 +4,7 @@ export function useSubscriptions(appId: string) {
   const { mode } = useEnvMode()
 
   const scoped = computed(() =>
-    subscriptions.value.filter((s) => s.appId === appId && s.env === mode.value)
+    subscriptions.value.filter((s: any) => s.appId === appId && s.env === mode.value)
   )
 
   return { subscriptions: scoped }
