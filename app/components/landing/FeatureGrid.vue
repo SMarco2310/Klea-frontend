@@ -18,7 +18,7 @@ const items = [
     <ScrollReveal direction="up" :duration="700">
       <div class="text-center mb-14">
         <span class="text-xs font-mono text-[var(--color-accent)] uppercase tracking-widest">The API surface</span>
-        <h2 class="font-heading text-3xl md:text-4xl font-semibold mt-3 tracking-tight">Everything you need to license software</h2>
+        <h2 class="font-heading text-3xl md:text-4xl font-semibold mt-3 tracking-[-0.015em] leading-[1.15]">Everything you need to license software</h2>
       </div>
     </ScrollReveal>
 
