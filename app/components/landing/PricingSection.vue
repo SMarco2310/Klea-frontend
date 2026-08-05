@@ -101,7 +101,8 @@ const tiers = [
           type="button"
           role="switch"
           :aria-checked="isYearly"
-          class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none"
+          aria-label="Toggle yearly billing"
+          class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
           style="transition-duration: var(--dur-base)"
           :class="isYearly ? 'bg-emerald-500' : 'bg-slate-700'"
         >

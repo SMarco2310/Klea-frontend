@@ -1,7 +1,7 @@
 <!-- app/components/landing/ScrollReveal.vue -->
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useIntersectionObserver, useMediaQuery } from '@vueuse/core'
+import { useIntersectionObserver } from '@vueuse/core'
 
 const props = withDefaults(
   defineProps<{
@@ -18,8 +18,6 @@ const props = withDefaults(
 
 const target = ref<HTMLElement | null>(null)
 const isVisible = ref(false)
-
-const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
 
 const clampedDuration = computed(() => Math.min(props.duration, 500))
 
@@ -45,11 +43,11 @@ useIntersectionObserver(
     }"
     :class="[
       isVisible ? 'opacity-100 translate-x-0 translate-y-0 scale-100' : 'opacity-0 pointer-events-none',
-      !prefersReducedMotion && !isVisible && direction === 'up' && 'translate-y-12',
-      !prefersReducedMotion && !isVisible && direction === 'down' && '-translate-y-12',
-      !prefersReducedMotion && !isVisible && direction === 'left' && 'translate-x-12',
-      !prefersReducedMotion && !isVisible && direction === 'right' && '-translate-x-12',
-      !prefersReducedMotion && !isVisible && direction === 'fade' && 'scale-95',
+      !isVisible && direction === 'up' && 'motion-safe:translate-y-12',
+      !isVisible && direction === 'down' && 'motion-safe:-translate-y-12',
+      !isVisible && direction === 'left' && 'motion-safe:translate-x-12',
+      !isVisible && direction === 'right' && 'motion-safe:-translate-x-12',
+      !isVisible && direction === 'fade' && 'motion-safe:scale-95',
     ]"
   >
     <slot />
