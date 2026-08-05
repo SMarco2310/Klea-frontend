@@ -1,6 +1,7 @@
 <!-- app/components/landing/LandingFooter.vue -->
 <template>
-  <footer class="border-t border-[var(--color-border-dark)] px-6 py-8">
+  <footer class="relative px-6 py-8">
+    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" aria-hidden="true" />
     <div class="max-w-6xl mx-auto flex items-center justify-between text-sm text-slate-400">
       <span class="font-mono text-xs">© 2026 Klea<span class="text-[var(--color-accent)]">.</span></span>
       <div class="flex gap-4">
