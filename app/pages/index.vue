@@ -9,17 +9,35 @@ import CodePreview from '~/components/landing/CodePreview.vue'
 import PricingSection from '~/components/landing/PricingSection.vue'
 import CtaBanner from '~/components/landing/CtaBanner.vue'
 import LandingFooter from '~/components/landing/LandingFooter.vue'
+import ScrollReveal from '~/components/landing/ScrollReveal.vue'
 </script>
 
 <template>
-  <div>
+  <div class="overflow-x-hidden">
     <LandingNavbar />
+    
     <HeroSection />
-    <FeatureGrid />
-    <HowItWorks />
-    <CodePreview />
-    <PricingSection />
-    <CtaBanner />
+    
+    <ScrollReveal direction="up" :duration="800">
+      <FeatureGrid />
+    </ScrollReveal>
+    
+    <ScrollReveal direction="up" :duration="800">
+      <HowItWorks />
+    </ScrollReveal>
+    
+    <ScrollReveal direction="fade" :duration="800">
+      <CodePreview />
+    </ScrollReveal>
+    
+    <ScrollReveal direction="up" :duration="800">
+      <PricingSection />
+    </ScrollReveal>
+    
+    <ScrollReveal direction="up" :duration="800">
+      <CtaBanner />
+    </ScrollReveal>
+    
     <LandingFooter />
   </div>
 </template>
