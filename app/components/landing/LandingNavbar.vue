@@ -18,9 +18,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <header class="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-5xl transition-all duration-300">
+  <header
+    class="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-5xl"
+    style="transition-property: all; transition-duration: var(--dur-base); transition-timing-function: var(--ease-spring-out)"
+  >
     <nav
-      class="flex items-center justify-between px-6 py-3.5 rounded-lg border transition-all duration-300 relative overflow-hidden shadow-xl"
+      class="flex items-center justify-between px-6 py-3.5 rounded-lg border relative overflow-hidden shadow-xl"
+      style="transition-property: all; transition-duration: var(--dur-base); transition-timing-function: var(--ease-spring-out)"
       :class="
         isScrolled
           ? 'border-white/15 bg-zinc-900/70 backdrop-blur-xl shadow-black/60'
@@ -56,7 +60,7 @@ onUnmounted(() => {
         </NuxtLink>
         <NuxtLink
           to="/signup"
-          class="px-4 py-2 rounded-full text-xs font-semibold bg-[var(--color-accent)] text-slate-950 hover:bg-[var(--color-accent)]/90 cursor-pointer transition-all duration-200 shadow-md shadow-emerald-950/40"
+          class="px-4 py-2 rounded-full text-xs font-semibold bg-[var(--color-accent)] text-slate-950 hover:bg-[var(--color-accent)]/90 cursor-pointer transition-all duration-200 active:scale-[0.97] active:duration-75 shadow-md shadow-emerald-950/40"
         >
           Get started
         </NuxtLink>
