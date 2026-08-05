@@ -15,7 +15,7 @@ const steps = [
     <ScrollReveal direction="up" :duration="700">
       <div class="text-center mb-14">
         <span class="text-xs font-mono text-[var(--color-accent)] uppercase tracking-widest">Four steps</span>
-        <h2 class="font-heading text-3xl md:text-4xl font-semibold mt-3 tracking-tight">From zero to licensed</h2>
+        <h2 class="font-heading text-3xl md:text-4xl font-semibold mt-3 tracking-[-0.015em] leading-[1.15]">From zero to licensed</h2>
       </div>
     </ScrollReveal>
 
