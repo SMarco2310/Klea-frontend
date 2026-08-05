@@ -1,7 +1,7 @@
 <!-- app/components/landing/ScrollReveal.vue -->
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useIntersectionObserver } from '@vueuse/core'
+import { useIntersectionObserver, useMediaQuery } from '@vueuse/core'
 
 const props = withDefaults(
   defineProps<{
@@ -19,10 +19,7 @@ const props = withDefaults(
 const target = ref<HTMLElement | null>(null)
 const isVisible = ref(false)
 
-const prefersReducedMotion = ref(false)
-if (typeof window !== 'undefined' && window.matchMedia) {
-  prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-}
+const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
 
 const clampedDuration = computed(() => Math.min(props.duration, 500))
 
