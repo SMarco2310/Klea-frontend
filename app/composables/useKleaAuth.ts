@@ -4,6 +4,7 @@ interface LaravelUser {
   name: string
   email: string
   current_tenant_id: number | null
+  email_verified_at: string | null
 }
 
 interface AuthResponse {
@@ -11,6 +12,17 @@ interface AuthResponse {
     user: LaravelUser
     token: string
   }
+  success: boolean
+  message: string
+}
+
+interface UserResponse {
+  data: LaravelUser
+  success: boolean
+  message: string
+}
+
+interface ApiMessageResponse {
   success: boolean
   message: string
 }
@@ -56,9 +68,10 @@ export function useKleaAuth() {
 
   async function fetchCurrentUser() {
     if (!token.value) return
-    user.value = await $fetch<LaravelUser>(`${config.public.apiBaseUrl}/api/me`, {
+    const res = await $fetch<UserResponse>(`${config.public.apiBaseUrl}/api/me`, {
       headers: authHeaders(),
     })
+    user.value = res.data
   }
 
   async function logout() {
@@ -72,7 +85,44 @@ export function useKleaAuth() {
     user.value = null
   }
 
-  return { user, isSignedIn, login, register, loginWithClerkToken, fetchCurrentUser, logout }
+  async function forgotPassword(email: string) {
+    await $fetch<ApiMessageResponse>(`${config.public.apiBaseUrl}/api/forgot-password`, {
+      method: 'POST',
+      body: { email },
+    })
+  }
+
+  async function resetPassword(token_: string, email: string, password: string, passwordConfirmation: string) {
+    await $fetch<ApiMessageResponse>(`${config.public.apiBaseUrl}/api/reset-password`, {
+      method: 'POST',
+      body: {
+        token: token_,
+        email,
+        password,
+        password_confirmation: passwordConfirmation,
+      },
+    })
+  }
+
+  async function resendVerificationEmail() {
+    await $fetch<ApiMessageResponse>(`${config.public.apiBaseUrl}/api/email/verification-notification`, {
+      method: 'POST',
+      headers: authHeaders(),
+    })
+  }
+
+  return {
+    user,
+    isSignedIn,
+    login,
+    register,
+    loginWithClerkToken,
+    fetchCurrentUser,
+    logout,
+    forgotPassword,
+    resetPassword,
+    resendVerificationEmail,
+  }
 }
 
 export function extractAuthErrorMessage(err: unknown): string {

@@ -5,10 +5,12 @@ import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 
+const route = useRoute()
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
 const isSubmitting = ref(false)
+const showResetSuccess = ref(route.query.reset === 'success')
 const { login } = useKleaAuth()
 const { signIn, isLoaded } = useSignIn()
 
@@ -53,20 +55,27 @@ async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
     <h1 class="font-heading text-2xl font-semibold mb-2 text-white">Log in</h1>
     <p class="text-slate-400 text-sm mb-10">Log in to your Klea workspace</p>
 
+    <p v-if="showResetSuccess" class="text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-md px-3 py-2 mb-4">
+      Password updated — log in with your new password.
+    </p>
+
     <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2 mb-4">
       {{ errorMessage }}
     </p>
 
     <form class="space-y-4" @submit.prevent="handleSubmit">
       <div>
-        <Input id="email" v-model="email" type="email" placeholder="Enter Email" required 
+        <Input id="email" v-model="email" type="email" placeholder="Enter Email" required
                class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
       </div>
       <div>
-        <Input id="password" v-model="password" type="password" placeholder="Enter Password" required 
+        <Input id="password" v-model="password" type="password" placeholder="Enter Password" required
                class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
       </div>
-      
+      <div class="text-right -mt-2">
+        <NuxtLink to="/forgot-password" class="text-xs text-slate-400 hover:text-[var(--color-accent)] hover:underline cursor-pointer">Forgot password?</NuxtLink>
+      </div>
+
       <div class="py-1"></div>
 
       <Button type="submit" class="w-full cursor-pointer h-11 rounded-lg bg-white text-black hover:bg-slate-200 font-medium" :disabled="isSubmitting">

@@ -7,6 +7,7 @@ import { Badge } from '~/components/ui/badge'
 import StatCard from '~/components/dashboard/StatCard.vue'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
 import CreateAppModal from '~/components/layout/CreateAppModal.vue'
+import VerifyEmailBanner from '~/components/dashboard/VerifyEmailBanner.vue'
 
 const { user } = useKleaAuth()
 const { workspace } = useWorkspace()
@@ -22,6 +23,7 @@ const createOpen = ref(false)
 
 <template>
   <div>
+    <VerifyEmailBanner />
     <div class="flex items-center gap-4 mb-8">
       <div class="w-12 h-12 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center">
         <LayersIcon class="w-6 h-6 text-[var(--color-accent)]" />
