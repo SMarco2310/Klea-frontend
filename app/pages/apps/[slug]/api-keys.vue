@@ -12,7 +12,7 @@ import EmptyState from '~/components/dashboard/EmptyState.vue'
 
 const { currentApp } = useApps()
 const { mode } = useEnvMode()
-const appId = computed(() => currentApp.value?.id ?? '')
+const appId = computed(() => currentApp.value?.id ? String(currentApp.value.id) : '')
 const { apiKeys, createApiKey, revokeApiKey } = useApiKeys(appId.value)
 
 const createOpen = ref(false)

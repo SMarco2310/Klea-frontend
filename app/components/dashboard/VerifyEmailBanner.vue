@@ -3,7 +3,7 @@
 import { MailWarningIcon, XIcon, CheckIcon } from '@lucide/vue'
 import { Button } from '~/components/ui/button'
 
-const { user, resendVerificationEmail } = useKleaAuth()
+const { user, resendVerificationEmail } = useAppAuth()
 
 const dismissed = ref(false)
 const isSending = ref(false)

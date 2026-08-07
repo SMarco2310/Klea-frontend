@@ -2,7 +2,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
 
-const { loginWithClerkToken } = useKleaAuth()
+const { loginWithClerkToken } = useAppAuth()
 const clerk = useClerk()
 const errorMessage = ref('')
 

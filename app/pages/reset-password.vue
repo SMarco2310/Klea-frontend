@@ -1,6 +1,7 @@
 <!-- app/pages/reset-password.vue -->
 <script setup lang="ts">
 definePageMeta({ layout: 'auth' })
+import { EyeIcon, EyeOffIcon } from '@lucide/vue'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 
@@ -10,9 +11,10 @@ const email = computed(() => String(route.query.email ?? ''))
 
 const password = ref('')
 const passwordConfirmation = ref('')
+const showPassword = ref(false)
 const errorMessage = ref('')
 const isSubmitting = ref(false)
-const { resetPassword } = useKleaAuth()
+const { resetPassword } = useAppAuth()
 
 async function handleSubmit() {
   if (!password.value || !passwordConfirmation.value) return
@@ -46,13 +48,29 @@ async function handleSubmit() {
     </p>
 
     <form class="space-y-4" @submit.prevent="handleSubmit">
-      <div>
-        <Input id="password" v-model="password" type="password" placeholder="New password" required
-               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
+      <div class="relative">
+        <Input id="password" v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="New password" required
+               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)] pr-11" />
+        <button
+          type="button"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer"
+          :aria-label="showPassword ? 'Hide password' : 'Show password'"
+          @click="showPassword = !showPassword"
+        >
+          <component :is="showPassword ? EyeOffIcon : EyeIcon" class="w-4 h-4" />
+        </button>
       </div>
-      <div>
-        <Input id="password_confirmation" v-model="passwordConfirmation" type="password" placeholder="Confirm new password" required
-               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
+      <div class="relative">
+        <Input id="password_confirmation" v-model="passwordConfirmation" :type="showPassword ? 'text' : 'password'" placeholder="Confirm new password" required
+               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)] pr-11" />
+        <button
+          type="button"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer"
+          :aria-label="showPassword ? 'Hide password' : 'Show password'"
+          @click="showPassword = !showPassword"
+        >
+          <component :is="showPassword ? EyeOffIcon : EyeIcon" class="w-4 h-4" />
+        </button>
       </div>
 
       <div class="py-1"></div>

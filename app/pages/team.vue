@@ -2,7 +2,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'dashboard', middleware: 'auth' })
 
-const { user } = useKleaAuth()
+const { user } = useAppAuth()
 </script>
 
 <template>

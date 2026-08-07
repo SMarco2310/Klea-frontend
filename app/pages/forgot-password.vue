@@ -8,7 +8,7 @@ const email = ref('')
 const errorMessage = ref('')
 const isSubmitting = ref(false)
 const isSent = ref(false)
-const { forgotPassword } = useKleaAuth()
+const { forgotPassword } = useAppAuth()
 
 async function handleSubmit() {
   if (!email.value) return

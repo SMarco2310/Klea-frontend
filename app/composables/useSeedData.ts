@@ -11,12 +11,15 @@ export interface Plan {
   appId: string
   name: string
   price: number
+  currency?: string
   interval: 'month' | 'year'
+  yearlyDiscount?: number
   features: string[]
 }
 export interface Feature {
   id: string
   appId: string
+  name: string
   key: string
   description: string
 }
@@ -74,12 +77,12 @@ export function useSeedData() {
     const proPlanId = 'plan-pro'
     const basicPlanId = 'plan-basic'
     plans.value = [
-      { id: basicPlanId, appId, name: 'Basic', price: 9, interval: 'month', features: ['feat-auth'] },
-      { id: proPlanId, appId, name: 'Pro', price: 29, interval: 'month', features: ['feat-auth', 'feat-api'] },
+      { id: basicPlanId, appId, name: 'Basic', price: 9000, currency: 'NGN', interval: 'month', yearlyDiscount: 20, features: ['feat-auth'] },
+      { id: proPlanId, appId, name: 'Pro', price: 29000, currency: 'NGN', interval: 'month', yearlyDiscount: 20, features: ['feat-auth', 'feat-api'] },
     ]
     features.value = [
-      { id: 'feat-auth', appId, key: 'auth_multiple', description: 'User can sign in on multiple devices' },
-      { id: 'feat-api', appId, key: 'api_access', description: 'Access to the REST API' },
+      { id: 'feat-auth', appId, name: 'Multiple Device Login', key: 'auth_multiple', description: 'User can sign in on multiple devices' },
+      { id: 'feat-api', appId, name: 'REST API Access', key: 'api_access', description: 'Access to the REST API' },
     ]
     subscribers.value = [
       { id: 'sub-1', appId, email: 'ada@example.com', planId: proPlanId, status: 'active', joinedAt: '2026-06-01', env: 'live' },
@@ -87,9 +90,9 @@ export function useSeedData() {
       { id: 'sub-3', appId, email: 'test@example.com', planId: basicPlanId, status: 'active', joinedAt: '2026-08-01', env: 'test' },
     ]
     subscriptions.value = [
-      { id: 'txn-1', appId, subscriberId: 'sub-1', planId: proPlanId, status: 'active', env: 'live', createdAt: '2026-06-01', amount: 29 },
-      { id: 'txn-2', appId, subscriberId: 'sub-2', planId: basicPlanId, status: 'active', env: 'live', createdAt: '2026-07-10', amount: 9 },
-      { id: 'txn-3', appId, subscriberId: 'sub-3', planId: basicPlanId, status: 'active', env: 'test', createdAt: '2026-08-01', amount: 9 },
+      { id: 'txn-1', appId, subscriberId: 'sub-1', planId: proPlanId, status: 'active', env: 'live', createdAt: '2026-06-01', amount: 29000 },
+      { id: 'txn-2', appId, subscriberId: 'sub-2', planId: basicPlanId, status: 'active', env: 'live', createdAt: '2026-07-10', amount: 9000 },
+      { id: 'txn-3', appId, subscriberId: 'sub-3', planId: basicPlanId, status: 'active', env: 'test', createdAt: '2026-08-01', amount: 9000 },
     ]
     webhookDeliveries.value = []
     apiKeys.value = []

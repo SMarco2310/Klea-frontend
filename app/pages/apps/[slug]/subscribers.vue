@@ -8,7 +8,7 @@ import EmptyState from '~/components/dashboard/EmptyState.vue'
 import DataTable from '~/components/dashboard/DataTable.vue'
 
 const { currentApp } = useApps()
-const appId = computed(() => currentApp.value?.id ?? '')
+const appId = computed(() => currentApp.value?.id ? String(currentApp.value.id) : '')
 const { subscribers } = useSubscribers(appId.value)
 
 const columns = [

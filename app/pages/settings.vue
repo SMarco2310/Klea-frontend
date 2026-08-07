@@ -5,12 +5,14 @@ import { Building2Icon, CreditCardIcon, SaveIcon, EyeIcon, EyeOffIcon } from '@l
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { Button } from '~/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 
 const { workspace, updateSettings } = useWorkspace()
 const name = ref(workspace.value.name)
 const slug = ref(workspace.value.slug)
 const apiKey = ref(workspace.value.semoaApiKey)
 const merchantId = ref(workspace.value.semoaMerchantId)
+const currency = ref(workspace.value.currency || 'XAF')
 const showApiKey = ref(false)
 
 function handleSave() {
@@ -19,6 +21,7 @@ function handleSave() {
     slug: slug.value,
     semoaApiKey: apiKey.value,
     semoaMerchantId: merchantId.value,
+    currency: currency.value,
   })
 }
 </script>
@@ -41,6 +44,21 @@ function handleSave() {
         <div class="space-y-2">
           <Label for="ws-slug">Slug</Label>
           <Input id="ws-slug" v-model="slug" />
+        </div>
+        <div class="space-y-2">
+          <Label for="ws-currency">Default Currency</Label>
+          <Select v-model="currency">
+            <SelectTrigger id="ws-currency">
+              <SelectValue placeholder="Select a currency" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="XAF">FCFA (XAF)</SelectItem>
+              <SelectItem value="USD">US Dollar (USD)</SelectItem>
+              <SelectItem value="EUR">Euro (EUR)</SelectItem>
+              <SelectItem value="NGN">Naira (NGN)</SelectItem>
+              <SelectItem value="GBP">British Pound (GBP)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </section>

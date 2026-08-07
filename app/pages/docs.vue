@@ -1,7 +1,11 @@
 <!-- app/pages/docs.vue -->
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
-import { RocketIcon, KeyRoundIcon, FlaskConicalIcon, TerminalIcon, WebhookIcon, ListChecksIcon } from '@lucide/vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { RocketIcon, KeyRoundIcon, FlaskConicalIcon, TerminalIcon, WebhookIcon, ListChecksIcon, SearchIcon } from '@lucide/vue'
+
+const searchQuery = ref('')
+const searchInputRef = ref<HTMLInputElement | null>(null)
 
 const sections = [
   { id: 'quickstart', icon: RocketIcon, label: 'Quickstart' },
@@ -11,20 +15,68 @@ const sections = [
   { id: 'webhooks', icon: WebhookIcon, label: 'Webhooks' },
   { id: 'status-reference', icon: ListChecksIcon, label: 'Status reference' },
 ]
+
+const filteredSections = computed(() => {
+  if (!searchQuery.value.trim()) return sections
+  const q = searchQuery.value.toLowerCase()
+  return sections.filter((s) => s.label.toLowerCase().includes(q) || s.id.toLowerCase().includes(q))
+})
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+    e.preventDefault()
+    searchInputRef.value?.focus()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-[200px_1fr] gap-10">
-    <nav class="space-y-1">
-      <p class="text-xs uppercase tracking-wide text-slate-500 mb-2">Contents</p>
-      <a
-        v-for="s in sections"
-        :key="s.id"
-        :href="`#${s.id}`"
-        class="flex items-center gap-2 text-sm text-slate-400 hover:text-white cursor-pointer py-1"
-      >
-        <component :is="s.icon" class="w-4 h-4" /> {{ s.label }}
-      </a>
+  <div class="max-w-5xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-10">
+    <nav class="space-y-4">
+      <!-- Brand Logo -->
+      <div class="mb-8">
+        <NuxtLink to="/" class="font-heading font-bold text-xl tracking-tight text-white flex items-center cursor-pointer select-none">
+          <span>Klea</span>
+          <span class="text-[var(--color-accent)] font-extrabold text-2xl leading-none">.</span>
+        </NuxtLink>
+      </div>
+
+      <!-- Search Input inside Docs Sidebar -->
+      <div class="relative">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-slate-400 focus-within:border-teal-500/60 focus-within:ring-1 focus-within:ring-teal-500/30 transition-all">
+          <SearchIcon class="w-4 h-4 text-slate-400 shrink-0" />
+          <input
+            ref="searchInputRef"
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search docs..."
+            class="bg-transparent border-none outline-none text-slate-200 text-sm w-full placeholder:text-slate-500"
+          />
+          <kbd class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400 font-mono shrink-0">/</kbd>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <p class="text-xs uppercase tracking-wide text-slate-500 mb-2 font-medium">Contents</p>
+        <a
+          v-for="s in filteredSections"
+          :key="s.id"
+          :href="`#${s.id}`"
+          class="flex items-center gap-2 text-sm text-slate-400 hover:text-white cursor-pointer py-1.5 px-2 rounded-md hover:bg-white/5 transition-colors"
+        >
+          <component :is="s.icon" class="w-4 h-4 text-teal-400 shrink-0" />
+          <span>{{ s.label }}</span>
+        </a>
+        <p v-if="filteredSections.length === 0" class="text-xs text-slate-500 italic px-2 py-1">No matching topics</p>
+      </div>
     </nav>
 
     <div class="space-y-16">

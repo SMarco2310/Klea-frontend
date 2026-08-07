@@ -4,6 +4,7 @@ const workspace = ref({
   slug: 'kleaaaa',
   semoaApiKey: '',
   semoaMerchantId: '',
+  currency: 'XAF',
 })
 
 export function useWorkspace() {

@@ -6,7 +6,7 @@ import TheSubTabs from '~/components/layout/TheSubTabs.vue'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
 
 const { currentApp } = useApps()
-const appId = computed(() => currentApp.value?.id ?? '')
+const appId = computed(() => currentApp.value?.id ? String(currentApp.value.id) : '')
 const { deliveries, endpointUrl } = useWebhooks(appId.value)
 </script>
 

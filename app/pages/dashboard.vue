@@ -9,7 +9,7 @@ import EmptyState from '~/components/dashboard/EmptyState.vue'
 import CreateAppModal from '~/components/layout/CreateAppModal.vue'
 import VerifyEmailBanner from '~/components/dashboard/VerifyEmailBanner.vue'
 
-const { user } = useKleaAuth()
+const { user } = useAppAuth()
 const { workspace } = useWorkspace()
 const { apps } = useApps()
 const { mode } = useEnvMode()

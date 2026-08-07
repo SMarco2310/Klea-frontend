@@ -8,10 +8,24 @@ import EmptyState from '~/components/dashboard/EmptyState.vue'
 import DataTable from '~/components/dashboard/DataTable.vue'
 
 const { currentApp } = useApps()
-const appId = computed(() => currentApp.value?.id ?? '')
+const appId = computed(() => currentApp.value?.id ? String(currentApp.value.id) : '')
 const { subscriptions } = useSubscriptions(appId.value)
+const { subscribers } = useSubscribers(appId.value)
+const { plans } = usePlans(appId.value)
+
+function getSubscriberEmail(subscriberId: string) {
+  const sub = subscribers.value.find((s) => s.id === subscriberId)
+  return sub?.email || subscriberId || '—'
+}
+
+function getPlanName(planId: string) {
+  const plan = plans.value.find((p) => p.id === planId)
+  return plan?.name || '—'
+}
 
 const columns = [
+  { key: 'email', label: 'Subscriber Email' },
+  { key: 'plan', label: 'Plan' },
   { key: 'status', label: 'Status' },
   { key: 'amount', label: 'Amount' },
   { key: 'createdAt', label: 'Created' },
@@ -32,6 +46,26 @@ const columns = [
     />
     <div v-else class="overflow-x-auto">
       <DataTable :columns="columns" :rows="subscriptions">
+        <template #cell-email="{ row }">
+          <span class="font-medium text-slate-100">{{ getSubscriberEmail(row.subscriberId as string) }}</span>
+        </template>
+        <template #cell-plan="{ row }">
+          <span class="text-slate-300 font-mono text-xs px-2 py-0.5 rounded bg-slate-800 border border-slate-700/60">
+            {{ getPlanName(row.planId as string) }}
+          </span>
+        </template>
+        <template #cell-status="{ row }">
+          <span
+            class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium capitalize"
+            :class="
+              row.status === 'active'
+                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                : 'bg-slate-800 text-slate-400 border border-slate-700'
+            "
+          >
+            {{ row.status }}
+          </span>
+        </template>
         <template #cell-amount="{ row }">{{ formatCurrency(row.amount as number) }}</template>
         <template #cell-createdAt="{ row }">{{ formatDate(row.createdAt as string) }}</template>
       </DataTable>

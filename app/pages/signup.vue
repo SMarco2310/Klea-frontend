@@ -1,6 +1,7 @@
 <!-- app/pages/signup.vue -->
 <script setup lang="ts">
 definePageMeta({ layout: 'auth' })
+import { EyeIcon, EyeOffIcon } from '@lucide/vue'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
@@ -8,9 +9,10 @@ import { Label } from '~/components/ui/label'
 const name = ref('')
 const email = ref('')
 const password = ref('')
+const showPassword = ref(false)
 const errorMessage = ref('')
 const isSubmitting = ref(false)
-const { register } = useKleaAuth()
+const { register } = useAppAuth()
 const { signIn, isLoaded } = useSignIn()
 
 async function handleSubmit() {
@@ -67,9 +69,17 @@ async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
         <Input id="email" v-model="email" type="email" placeholder="Enter Email" required 
                class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
       </div>
-      <div>
-        <Input id="password" v-model="password" type="password" placeholder="Create Password" required 
-               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
+      <div class="relative">
+        <Input id="password" v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="Create Password" required
+               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)] pr-11" />
+        <button
+          type="button"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer"
+          :aria-label="showPassword ? 'Hide password' : 'Show password'"
+          @click="showPassword = !showPassword"
+        >
+          <component :is="showPassword ? EyeOffIcon : EyeIcon" class="w-4 h-4" />
+        </button>
       </div>
 
       <div class="flex items-center gap-2 py-1">

@@ -2,6 +2,11 @@
 <script setup lang="ts">
 import TheNavbar from '~/components/layout/TheNavbar.vue'
 import TheEnvBanner from '~/components/layout/TheEnvBanner.vue'
+
+const { apps, fetchApps } = useApps()
+if (apps.value.length === 0) {
+  fetchApps()
+}
 </script>
 
 <template>

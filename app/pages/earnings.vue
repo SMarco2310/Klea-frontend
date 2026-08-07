@@ -1,7 +1,7 @@
 <!-- app/pages/earnings.vue -->
 <script setup lang="ts">
 definePageMeta({ layout: 'dashboard', middleware: 'auth' })
-import { WalletIcon, CreditCardIcon, DollarSignIcon, Layers2Icon } from '@lucide/vue'
+import { WalletIcon, CreditCardIcon, BanknoteIcon, Layers2Icon } from '@lucide/vue'
 import { formatCurrency } from '~/utils/format'
 import StatCard from '~/components/dashboard/StatCard.vue'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
@@ -42,7 +42,7 @@ const { mode } = useEnvMode()
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
       <StatCard label="Transactions" :value="transactionCount" :icon="CreditCardIcon" />
-      <StatCard label="Successful" :value="successfulCount" :icon="DollarSignIcon" />
+      <StatCard label="Successful" :value="successfulCount" :icon="BanknoteIcon" />
       <StatCard label="Apps" :value="appCount" :icon="Layers2Icon" />
     </div>
 
