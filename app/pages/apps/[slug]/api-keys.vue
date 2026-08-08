@@ -7,25 +7,41 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { formatDate } from '~/utils/format'
-import TheSubTabs from '~/components/layout/TheSubTabs.vue'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
+import AppHeader from '~/components/dashboard/AppHeader.vue'
 
 const { currentApp } = useApps()
 const { mode } = useEnvMode()
-const appId = computed(() => currentApp.value?.id ? String(currentApp.value.id) : '')
-const { apiKeys, createApiKey, revokeApiKey } = useApiKeys(appId.value)
+const appId = computed(() => currentApp.value?.id ?? 0)
+const { apiKeys, pending, fetchApiKeys, createApiKey, revokeApiKey } = useApiKeys(appId.value)
+
+watchEffect(() => {
+  if (appId.value) fetchApiKeys()
+})
 
 const createOpen = ref(false)
 const name = ref('')
 const revealedKey = ref<string | null>(null)
 const copied = ref(false)
-const pendingRevokeId = ref<string | null>(null)
+const isCreating = ref(false)
+const errorMessage = ref('')
 
-function handleCreate() {
+const pendingRevokeId = ref<number | null>(null)
+const isRevoking = ref(false)
+
+async function handleCreate() {
   if (!name.value.trim()) return
-  const { fullKey } = createApiKey(name.value.trim())
-  revealedKey.value = fullKey
-  name.value = ''
+  isCreating.value = true
+  errorMessage.value = ''
+  try {
+    const { fullKey } = await createApiKey(name.value.trim())
+    revealedKey.value = fullKey
+    name.value = ''
+  } catch (e) {
+    errorMessage.value = extractApiErrorMessage(e)
+  } finally {
+    isCreating.value = false
+  }
 }
 
 async function copyKey() {
@@ -39,32 +55,40 @@ function closeDialog() {
   createOpen.value = false
   revealedKey.value = null
   copied.value = false
+  errorMessage.value = ''
 }
 
-function confirmRevoke(id: string) {
-  revokeApiKey(id)
-  pendingRevokeId.value = null
+async function confirmRevoke(id: number) {
+  isRevoking.value = true
+  try {
+    await revokeApiKey(id)
+    pendingRevokeId.value = null
+  } catch (e) {
+    errorMessage.value = extractApiErrorMessage(e)
+  } finally {
+    isRevoking.value = false
+  }
+}
+
+function lastUsedLabel(key: { last_used_at: string | null }) {
+  return key.last_used_at ? `Last used ${formatDate(key.last_used_at)}` : 'Never used'
 }
 </script>
 
 <template>
   <div>
-    <TheSubTabs />
-    <div class="flex items-start justify-between mb-6">
-      <div>
-        <h1 class="font-heading text-xl font-semibold">API keys</h1>
-        <p class="text-sm text-slate-400 mt-0.5">
-          {{ apiKeys.length }} key{{ apiKeys.length === 1 ? '' : 's' }} · authenticating in
-          <span :class="mode === 'live' ? 'text-[var(--color-accent)]' : 'text-amber-400'">{{ mode }}</span> mode
-        </p>
-      </div>
-      <Button class="cursor-pointer gap-1" @click="createOpen = true">
-        <PlusIcon class="w-4 h-4" /> New key
-      </Button>
-    </div>
+    <AppHeader title="API keys" :subtitle="`${apiKeys.length} key${apiKeys.length === 1 ? '' : 's'} · authenticating in ${mode} mode`">
+      <template #actions>
+        <Button class="cursor-pointer gap-1" @click="createOpen = true">
+          <PlusIcon class="w-4 h-4" /> New key
+        </Button>
+      </template>
+    </AppHeader>
+
+    <p v-if="pending" class="text-sm text-slate-400 mb-4">Loading API keys...</p>
 
     <EmptyState
-      v-if="apiKeys.length === 0"
+      v-else-if="apiKeys.length === 0"
       :icon="KeyIcon"
       title="No API keys yet"
       description="Generate a key to start authenticating requests."
@@ -79,22 +103,22 @@ function confirmRevoke(id: string) {
         class="flex items-center justify-between gap-4 px-4 py-3.5 bg-[var(--color-surface)] hover:bg-white/[0.02] transition-colors duration-150"
       >
         <div class="flex items-center gap-3 min-w-0">
-          <span class="w-8 h-8 rounded-md bg-[var(--color-accent)]/10 flex items-center justify-center shrink-0">
-            <KeyIcon class="w-4 h-4 text-[var(--color-accent)]" />
+          <span class="w-8 h-8 rounded-md bg-[var(--color-key)]/10 flex items-center justify-center shrink-0">
+            <KeyIcon class="w-4 h-4 text-[var(--color-key)]" />
           </span>
           <div class="min-w-0">
             <div class="flex items-center gap-2">
               <span class="font-medium truncate">{{ key.name }}</span>
               <span
                 class="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0"
-                :class="key.env === 'live' ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)]' : 'bg-amber-400/15 text-amber-400'"
-              >{{ key.env }}</span>
+                :class="key.environment === 'live' ? 'bg-[var(--color-key)]/15 text-[var(--color-key)]' : 'bg-amber-400/15 text-amber-400'"
+              >{{ key.environment }}</span>
             </div>
-            <div class="text-sm text-slate-400 font-mono tracking-tight">{{ key.maskedKey }}</div>
+            <div class="text-sm text-slate-400 font-mono tracking-tight">{{ key.public_id }}</div>
           </div>
         </div>
         <div class="flex items-center gap-4 shrink-0">
-          <span class="text-xs text-slate-500 hidden sm:block">Created {{ formatDate(key.createdAt) }}</span>
+          <span class="text-xs text-slate-500 hidden sm:block">{{ lastUsedLabel(key) }}</span>
           <button
             class="text-slate-500 hover:text-red-400 cursor-pointer transition-colors duration-150"
             :aria-label="`Revoke ${key.name}`"
@@ -114,13 +138,17 @@ function confirmRevoke(id: string) {
             Any request using this key will stop working immediately. This can't be undone.
           </DialogDescription>
         </DialogHeader>
+        <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2">
+          {{ errorMessage }}
+        </p>
         <div class="flex justify-end gap-2">
-          <Button variant="ghost" class="cursor-pointer" @click="pendingRevokeId = null">Cancel</Button>
+          <Button variant="ghost" class="cursor-pointer" :disabled="isRevoking" @click="pendingRevokeId = null">Cancel</Button>
           <Button
             variant="destructive"
             class="cursor-pointer"
+            :disabled="isRevoking"
             @click="pendingRevokeId && confirmRevoke(pendingRevokeId)"
-          >Revoke key</Button>
+          >{{ isRevoking ? 'Revoking...' : 'Revoke key' }}</Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -137,10 +165,15 @@ function confirmRevoke(id: string) {
               <Label for="key-name">Key name</Label>
               <Input id="key-name" v-model="name" placeholder="Production server" />
             </div>
+            <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2">
+              {{ errorMessage }}
+            </p>
           </div>
           <div class="flex justify-end gap-2">
-            <Button variant="ghost" class="cursor-pointer" @click="closeDialog">Cancel</Button>
-            <Button class="cursor-pointer" :disabled="!name.trim()" @click="handleCreate">Create key</Button>
+            <Button variant="ghost" class="cursor-pointer" :disabled="isCreating" @click="closeDialog">Cancel</Button>
+            <Button class="cursor-pointer" :disabled="!name.trim() || isCreating" @click="handleCreate">
+              {{ isCreating ? 'Creating...' : 'Create key' }}
+            </Button>
           </div>
         </template>
         <template v-else>

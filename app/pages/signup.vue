@@ -9,6 +9,7 @@ import { Label } from '~/components/ui/label'
 const name = ref('')
 const email = ref('')
 const password = ref('')
+const passwordConfirmation = ref('')
 const showPassword = ref(false)
 const errorMessage = ref('')
 const isSubmitting = ref(false)
@@ -16,11 +17,11 @@ const { register } = useAppAuth()
 const { signIn, isLoaded } = useSignIn()
 
 async function handleSubmit() {
-  if (!name.value || !email.value || !password.value) return
+  if (!name.value || !email.value || !password.value || !passwordConfirmation.value) return
   errorMessage.value = ''
   isSubmitting.value = true
   try {
-    await register(name.value, email.value, password.value)
+    await register(name.value, email.value, password.value, passwordConfirmation.value)
     await navigateTo('/dashboard')
   } catch (e) {
     errorMessage.value = extractAuthErrorMessage(e)
@@ -80,6 +81,10 @@ async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
         >
           <component :is="showPassword ? EyeOffIcon : EyeIcon" class="w-4 h-4" />
         </button>
+      </div>
+      <div class="relative">
+        <Input id="password_confirmation" v-model="passwordConfirmation" :type="showPassword ? 'text' : 'password'" placeholder="Confirm Password" required
+               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)] pr-11" />
       </div>
 
       <div class="flex items-center gap-2 py-1">

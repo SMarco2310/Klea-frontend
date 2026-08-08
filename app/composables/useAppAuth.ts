@@ -3,6 +3,7 @@ interface LaravelTenant {
   id: number
   name: string
   slug: string
+  pivot?: { role: string }
 }
 
 interface LaravelUser {
@@ -70,10 +71,10 @@ export function useAppAuth() {
     user.value = res.data.user
   }
 
-  async function register(name: string, email: string, password: string) {
+  async function register(name: string, email: string, password: string, passwordConfirmation: string) {
     const res = await $fetch<AuthResponse>(`${config.public.apiBaseUrl}/api/register`, {
       method: 'POST',
-      body: { name, email, password },
+      body: { name, email, password, password_confirmation: passwordConfirmation },
     })
     token.value = res.data.token
     user.value = res.data.user
@@ -140,6 +141,15 @@ export function useAppAuth() {
     })
   }
 
+  async function updateProfile(patch: { name?: string; email?: string; password?: string; password_confirmation?: string }) {
+    const res = await $fetch<UserResponse>(`${config.public.apiBaseUrl}/api/me`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: patch,
+    })
+    user.value = res.data
+  }
+
   return {
     user,
     isSignedIn,
@@ -151,6 +161,7 @@ export function useAppAuth() {
     forgotPassword,
     resetPassword,
     resendVerificationEmail,
+    updateProfile,
   }
 }
 

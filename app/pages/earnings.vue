@@ -53,5 +53,10 @@ const { mode } = useEnvMode()
       title="No transactions yet"
       description="When end users pay through your apps, earnings will appear here."
     />
+    <div v-else class="overflow-x-auto rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] p-4">
+      <div class="flex items-center justify-center py-12 text-slate-400 text-sm border-2 border-dashed border-[var(--color-border-dark)] rounded-lg">
+        Transaction list placeholder — This will display the details of the {{ transactionCount }} recent transactions.
+      </div>
+    </div>
   </div>
 </template>

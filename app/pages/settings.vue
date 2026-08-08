@@ -6,98 +6,146 @@ import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { Button } from '~/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
+import SettingsSection from '~/components/dashboard/SettingsSection.vue'
+import SettingsIdentityCard from '~/components/dashboard/SettingsIdentityCard.vue'
 
-const { workspace, updateSettings } = useWorkspace()
-const name = ref(workspace.value.name)
-const slug = ref(workspace.value.slug)
-const apiKey = ref(workspace.value.semoaApiKey)
-const merchantId = ref(workspace.value.semoaMerchantId)
-const currency = ref(workspace.value.currency || 'XAF')
+const { workspace, pending, updateSettings } = useWorkspace()
+const { apps } = useApps()
+
+const name = ref('')
+const slug = ref('')
+const currency = ref('XOF')
+const semoaApiKey = ref('')
+const semoaMerchantId = ref('')
 const showApiKey = ref(false)
+const isSaving = ref(false)
+const saved = ref(false)
+const errorMessage = ref('')
 
-function handleSave() {
-  updateSettings({
-    name: name.value,
-    slug: slug.value,
-    semoaApiKey: apiKey.value,
-    semoaMerchantId: merchantId.value,
-    currency: currency.value,
-  })
+watch(workspace, (w) => {
+  name.value = w.name
+  slug.value = w.slug
+  currency.value = w.currency
+  semoaApiKey.value = w.semoaApiKey
+  semoaMerchantId.value = w.semoaMerchantId
+}, { immediate: true })
+
+async function handleSave() {
+  isSaving.value = true
+  errorMessage.value = ''
+  try {
+    await updateSettings({
+      name: name.value,
+      slug: slug.value,
+      currency: currency.value,
+      semoaApiKey: semoaApiKey.value,
+      semoaMerchantId: semoaMerchantId.value,
+    })
+    saved.value = true
+    setTimeout(() => { saved.value = false }, 2000)
+  } catch (e) {
+    errorMessage.value = extractApiErrorMessage(e)
+  } finally {
+    isSaving.value = false
+  }
+}
+
+const STATUS_STYLES: Record<string, string> = {
+  active: 'bg-[var(--color-accent)]/15 text-[var(--color-accent)]',
+  inactive: 'bg-slate-700/40 text-slate-400',
+  suspended: 'bg-red-500/15 text-red-400',
 }
 </script>
 
 <template>
-  <div class="max-w-xl">
+  <div>
     <h1 class="font-heading text-2xl font-semibold mb-8">Settings</h1>
 
-    <section class="mb-8">
-      <div class="flex items-center gap-2 mb-1">
-        <Building2Icon class="w-4 h-4 text-slate-400" />
-        <h2 class="font-heading font-semibold">Workspace</h2>
-      </div>
-      <p class="text-sm text-slate-400 mb-4">Public name and URL of your workspace.</p>
-      <div class="space-y-4">
-        <div class="space-y-2">
-          <Label for="ws-name">Workspace name</Label>
-          <Input id="ws-name" v-model="name" />
-        </div>
-        <div class="space-y-2">
-          <Label for="ws-slug">Slug</Label>
-          <Input id="ws-slug" v-model="slug" />
-        </div>
-        <div class="space-y-2">
-          <Label for="ws-currency">Default Currency</Label>
-          <Select v-model="currency">
-            <SelectTrigger id="ws-currency">
-              <SelectValue placeholder="Select a currency" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="XAF">FCFA (XAF)</SelectItem>
-              <SelectItem value="USD">US Dollar (USD)</SelectItem>
-              <SelectItem value="EUR">Euro (EUR)</SelectItem>
-              <SelectItem value="NGN">Naira (NGN)</SelectItem>
-              <SelectItem value="GBP">British Pound (GBP)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </section>
+    <p v-if="pending" class="text-sm text-slate-400 mb-4">Loading workspace...</p>
 
-    <section class="mb-8">
-      <div class="flex items-center gap-2 mb-1">
-        <CreditCardIcon class="w-4 h-4 text-slate-400" />
-        <h2 class="font-heading font-semibold">Payment gateway</h2>
-      </div>
-      <p class="text-sm text-slate-400 mb-4">Semoa credentials used to process payments for your subscribers.</p>
-      <div class="space-y-4">
-        <div class="space-y-2">
-          <Label for="semoa-key">Semoa API key</Label>
-          <div class="relative">
-            <Input
-              id="semoa-key"
-              v-model="apiKey"
-              :type="showApiKey ? 'text' : 'password'"
-              placeholder="semoa_live_..."
-            />
-            <button
-              type="button"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer"
-              :aria-label="showApiKey ? 'Hide API key' : 'Show API key'"
-              @click="showApiKey = !showApiKey"
-            >
-              <component :is="showApiKey ? EyeOffIcon : EyeIcon" class="w-4 h-4" />
-            </button>
+    <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 items-start">
+      <SettingsIdentityCard
+        :initial="workspace.name?.[0]?.toUpperCase() || '?'"
+        :title="workspace.name || 'Workspace'"
+        :subtitle="workspace.slug ? `/${workspace.slug}` : undefined"
+      >
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-slate-400">Status</span>
+          <span class="text-xs font-medium px-2 py-0.5 rounded-full capitalize" :class="STATUS_STYLES[workspace.status]">
+            {{ workspace.status }}
+          </span>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-slate-400">Apps</span>
+          <span class="font-medium">{{ apps.length }}</span>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-slate-400">Currency</span>
+          <span class="font-medium">{{ workspace.currency }}</span>
+        </div>
+      </SettingsIdentityCard>
+
+      <div class="space-y-5">
+        <SettingsSection :icon="Building2Icon" title="Workspace" description="Public name and URL of your workspace.">
+          <div class="space-y-2">
+            <Label for="ws-name">Workspace name</Label>
+            <Input id="ws-name" v-model="name" />
           </div>
-        </div>
-        <div class="space-y-2">
-          <Label for="semoa-merchant">Semoa merchant ID</Label>
-          <Input id="semoa-merchant" v-model="merchantId" placeholder="M-XXXXXX" />
-        </div>
-      </div>
-    </section>
+          <div class="space-y-2">
+            <Label for="ws-slug">Slug</Label>
+            <Input id="ws-slug" v-model="slug" />
+          </div>
+          <div class="space-y-2">
+            <Label for="ws-currency">Default Currency</Label>
+            <Select v-model="currency">
+              <SelectTrigger id="ws-currency">
+                <SelectValue placeholder="Select a currency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="XOF">FCFA (XOF)</SelectItem>
+                <SelectItem value="USD">US Dollar (USD)</SelectItem>
+                <SelectItem value="EUR">Euro (EUR)</SelectItem>
+                <SelectItem value="NGN">Naira (NGN)</SelectItem>
+                <SelectItem value="GBP">British Pound (GBP)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </SettingsSection>
 
-    <Button class="cursor-pointer gap-2" @click="handleSave">
-      <SaveIcon class="w-4 h-4" /> Save changes
-    </Button>
+        <SettingsSection :icon="CreditCardIcon" title="Payment gateway" description="Semoa credentials used to process payments for your subscribers.">
+          <div class="space-y-2">
+            <Label for="semoa-key">Semoa API key</Label>
+            <div class="relative">
+              <Input
+                id="semoa-key"
+                v-model="semoaApiKey"
+                :type="showApiKey ? 'text' : 'password'"
+                placeholder="semoa_live_..."
+              />
+              <button
+                type="button"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer"
+                :aria-label="showApiKey ? 'Hide API key' : 'Show API key'"
+                @click="showApiKey = !showApiKey"
+              >
+                <component :is="showApiKey ? EyeOffIcon : EyeIcon" class="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <Label for="semoa-merchant">Semoa merchant ID</Label>
+            <Input id="semoa-merchant" v-model="semoaMerchantId" placeholder="M-XXXXXX" />
+          </div>
+        </SettingsSection>
+
+        <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2">
+          {{ errorMessage }}
+        </p>
+
+        <Button class="cursor-pointer gap-2" :disabled="isSaving" @click="handleSave">
+          <SaveIcon class="w-4 h-4" /> {{ isSaving ? 'Saving...' : saved ? 'Saved' : 'Save changes' }}
+        </Button>
+      </div>
+    </div>
   </div>
 </template>

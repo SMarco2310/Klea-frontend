@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
+import { toast } from 'vue-sonner'
 
 const open = defineModel<boolean>('open', { required: true })
 const { createApp, selectApp } = useApps()
@@ -24,6 +25,7 @@ async function handleCreate() {
     name.value = ''
     open.value = false
     selectApp(app.slug)
+    toast.success('Application created successfully')
   } catch (e) {
     errorMessage.value = extractApiErrorMessage(e)
   } finally {

@@ -3,17 +3,15 @@ import { useWorkspace } from '~/composables/useWorkspace'
 
 export function formatCurrency(amount: number, currency?: string): string {
   const { workspace } = useWorkspace()
-  const finalCurrency = currency || workspace.value.currency || 'XAF'
+  const finalCurrency = (currency || workspace.value.currency || 'XOF').toUpperCase()
   try {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: finalCurrency.toUpperCase(),
-      currencyDisplay: 'narrowSymbol',
+    const formattedNum = new Intl.NumberFormat('en-US', {
       maximumFractionDigits: 2,
       minimumFractionDigits: 0,
     }).format(amount)
+    return `${formattedNum} ${finalCurrency}`
   } catch {
-    return `${finalCurrency.toUpperCase()} ${amount}`
+    return `${amount} ${finalCurrency}`
   }
 }
 

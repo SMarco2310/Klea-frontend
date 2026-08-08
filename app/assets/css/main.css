@@ -1,3 +1,6 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -7,20 +10,6 @@
   --font-heading: "Space Grotesk", sans-serif;
   --font-body: "DM Sans", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
-
-  --color-bg: #0b0f14;
-  --color-surface: #1e293b;
-  --color-surface-muted: #0f172a;
-  --color-accent: #7fb894;
-  --color-accent-foreground: #06170d;
-  --color-key: #d4a574;
-  --color-border-dark: #27313f;
-
-  --color-bg-light: #f8fafc;
-  --color-surface-light: #ffffff;
-  --color-border-light: #e2e8f0;
-  --color-text-light: #0f172a;
-  --color-text-muted-light: #475569;
 
   --ease-spring-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -74,6 +63,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --font-heading: var(--font-sans);
 }
 
 :root {
@@ -83,8 +73,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #3f8a5c;
+  --primary-foreground: #f4fbf7;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -109,6 +99,16 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Klea brand tokens — light. --color-accent-foreground isn't set here;
+     it's already mapped in @theme inline from --accent-foreground above. */
+  --color-bg: #f4f6f5;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8faf9;
+  --color-border-dark: #e1e6e3;
+  --color-accent: #3f8a5c;
+  --color-key: #9c6b2e;
+  --color-hover: rgba(15, 23, 20, 0.045);
 }
 
 .dark {
@@ -143,6 +143,15 @@
   --sidebar-accent-foreground: #06170d;
   --sidebar-border: #27313f;
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Klea brand tokens — dark */
+  --color-bg: #0b0f14;
+  --color-surface: #1e293b;
+  --color-surface-muted: #0f172a;
+  --color-border-dark: #27313f;
+  --color-accent: #7fb894;
+  --color-key: #d4a574;
+  --color-hover: rgba(255, 255, 255, 0.06);
 }
 
 @layer base {
@@ -171,5 +180,14 @@
   .glass-panel, header nav {
     backdrop-filter: none !important;
     background: var(--color-surface) !important;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }

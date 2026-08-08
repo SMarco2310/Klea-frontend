@@ -6,8 +6,9 @@ import { Button } from '~/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/components/ui/dialog'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
-import TheSubTabs from '~/components/layout/TheSubTabs.vue'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
+import AppHeader from '~/components/dashboard/AppHeader.vue'
+import { toast } from 'vue-sonner'
 
 const { currentApp } = useApps()
 const appId = computed(() => currentApp.value?.id ?? 0)
@@ -61,12 +62,14 @@ async function handleSave() {
         code: cleanKey,
         description: description.value.trim(),
       })
+      toast.success('Feature updated successfully')
     } else {
       await createFeature({
         name: featureName,
         code: cleanKey,
         description: description.value.trim(),
       })
+      toast.success('Feature created successfully')
     }
     dialogOpen.value = false
   } catch (e) {
@@ -79,6 +82,7 @@ async function handleSave() {
 async function handleDelete(id: number) {
   try {
     await deleteFeature(id)
+    toast.success('Feature deleted successfully')
   } catch (e) {
     errorMessage.value = extractApiErrorMessage(e)
   }
@@ -87,13 +91,13 @@ async function handleDelete(id: number) {
 
 <template>
   <div>
-    <TheSubTabs />
-    <div class="flex items-center justify-between mb-4">
-      <span class="text-sm text-slate-400">{{ features.length }} feature{{ features.length === 1 ? '' : 's' }}</span>
-      <Button class="cursor-pointer gap-1" @click="openCreateModal">
-        <PlusIcon class="w-4 h-4" /> New feature
-      </Button>
-    </div>
+    <AppHeader title="Features" :subtitle="`${features.length} feature${features.length === 1 ? '' : 's'}`">
+      <template #actions>
+        <Button class="cursor-pointer gap-1" @click="openCreateModal">
+          <PlusIcon class="w-4 h-4" /> New feature
+        </Button>
+      </template>
+    </AppHeader>
 
     <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2 mb-4">
       {{ errorMessage }}

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Copy, Check, ChevronDown, ChevronUp } from 'lucide-vue-next'
+import { Copy, Check, ChevronDown, ChevronUp } from '@lucide/vue'
 import { useClipboard } from '@vueuse/core'
 
 const props = withDefaults(defineProps<{

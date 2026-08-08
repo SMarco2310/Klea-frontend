@@ -7,13 +7,13 @@ export default defineNuxtConfig({
   shiki: {
     defaultTheme: 'github-dark',
   },
-  clerk: {
-    // Clerk is only used client-side to broker Google/GitHub OAuth identity,
-    // then exchanged for a real session via the Laravel API. There is no
-    // server-side use of Clerk here, so its server middleware (which
-    // otherwise requires a secret key) is disabled.
-    skipServerMiddleware: true,
-  },
+  // Clerk is used client-side to broker Google/GitHub OAuth identity, then
+  // exchanged for a real session via the Laravel API — we don't use Clerk's
+  // server-side auth/session helpers ourselves. Its server middleware still
+  // needs to run, though: on a *.clerk.accounts.dev dev instance it's what
+  // completes the "dev browser" cookie handshake that authenticateWithRedirect
+  // requires. Skipping it makes every OAuth sign-in 400 with
+  // dev_browser_unauthenticated before it can even redirect to the provider.
   css: ['~/assets/css/main.css'],
   vite: {
     plugins: [tailwindcss()],
@@ -26,13 +26,20 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      htmlAttrs: { class: 'dark' },
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap',
+        },
+      ],
+      // Sets the .dark class before Vue hydrates so there's no flash of the
+      // wrong theme — useDark() (useTheme.ts) picks up the same storage key
+      // once the client takes over.
+      script: [
+        {
+          innerHTML: `(function(){try{var m=localStorage.getItem('klea-color-mode');var d=m?m==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark')}catch(e){}})()`,
         },
       ],
     },

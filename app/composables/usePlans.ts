@@ -42,6 +42,7 @@ export function usePlans(appId: number | string) {
     currency: string
     duration_days: number
     yearly_discount_percent: number
+    is_active?: boolean
   }) {
     const plan = await api.post<Plan>('/plans', { ...input, application_id: Number(appId) })
     plans.value.push(plan)

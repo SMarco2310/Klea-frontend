@@ -1,47 +1,58 @@
 // app/composables/useApiKeys.ts
-type ApiKeyRecord = import('./useSeedData').ApiKey
-
-function generateFullKey(env: 'test' | 'live'): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let random = ''
-  for (let i = 0; i < 32; i++) {
-    random += chars[Math.floor(Math.random() * chars.length)]
-  }
-  return `lk_${env}_${random}`
+export interface ApiKey {
+  id: number
+  application_id: number
+  name: string
+  environment: 'test' | 'live'
+  public_id: string
+  last_used_at: string | null
+  revoked_at: string | null
+  created_at: string
 }
 
-function maskKey(fullKey: string, env: 'test' | 'live'): string {
-  const prefix = `lk_${env}_`
-  const tail = fullKey.slice(-4)
-  return `${prefix}....${tail}`
-}
-
-export function useApiKeys(appId: string) {
-  const { apiKeys } = useSeedData()
+export function useApiKeys(appId: number | string) {
+  const api = useApi()
   const { mode } = useEnvMode()
+  const all = ref<ApiKey[]>([])
+  const pending = ref(false)
+  const error = ref<string | null>(null)
 
-  const scopedApiKeys = computed(() =>
-    apiKeys.value.filter((k) => k.appId === appId && k.env === mode.value)
+  async function fetchApiKeys() {
+    pending.value = true
+    error.value = null
+    try {
+      const page = await api.get<Paginated<ApiKey>>('/api-keys')
+      all.value = page.data
+    } catch (e) {
+      error.value = extractApiErrorMessage(e)
+    } finally {
+      pending.value = false
+    }
+  }
+
+  const apiKeys = computed(() =>
+    all.value.filter(
+      (k) => k.application_id === Number(appId) && k.environment === mode.value && !k.revoked_at
+    )
   )
 
-  function createApiKey(name: string) {
-    const env = mode.value
-    const fullKey = generateFullKey(env)
-    const record: ApiKeyRecord = {
-      id: `key-${Date.now()}`,
-      appId,
+  async function createApiKey(name: string) {
+    const created = await api.post<ApiKey & { secret: string }>('/api-keys', {
+      application_id: Number(appId),
       name,
-      env,
-      maskedKey: maskKey(fullKey, env),
-      createdAt: new Date().toISOString(),
-    }
-    apiKeys.value.push(record)
-    return { record, fullKey }
+      environment: mode.value,
+    })
+    all.value.push(created)
+    // public_id and secret are only ever concatenated here, at creation —
+    // the secret can't be recovered from the API again after this.
+    return { record: created, fullKey: `${created.public_id}.${created.secret}` }
   }
 
-  function revokeApiKey(id: string) {
-    apiKeys.value = apiKeys.value.filter((k) => k.id !== id)
+  async function revokeApiKey(id: number) {
+    await api.delete(`/api-keys/${id}`)
+    const key = all.value.find((k) => k.id === id)
+    if (key) key.revoked_at = new Date().toISOString()
   }
 
-  return { apiKeys: scopedApiKeys, createApiKey, revokeApiKey }
+  return { apiKeys, pending, error, fetchApiKeys, createApiKey, revokeApiKey }
 }

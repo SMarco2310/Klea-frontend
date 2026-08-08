@@ -8,11 +8,12 @@ import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { formatCurrency } from '~/utils/format'
-import TheSubTabs from '~/components/layout/TheSubTabs.vue'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
+import AppHeader from '~/components/dashboard/AppHeader.vue'
 import PlanPreviewGrid from '~/components/plans/PlanPreviewGrid.vue'
 import type { Plan } from '~/composables/usePlans'
 import type { Feature } from '~/composables/useFeatures'
+import { toast } from 'vue-sonner'
 
 const { currentApp } = useApps()
 const appId = computed(() => currentApp.value?.id ?? 0)
@@ -131,7 +132,7 @@ function isFeatureSelected(featureId: number) {
   return selectedFeatureIds.value.includes(featureId)
 }
 
-async function handleSave() {
+async function handleSave(publish: boolean) {
   if (!name.value.trim()) return
 
   isSaving.value = true
@@ -146,7 +147,9 @@ async function handleSave() {
         currency: currencyVal.value,
         duration_days: durationDays,
         yearly_discount_percent: yearlyDiscountVal.value,
+        is_active: publish,
       })
+      toast.success(publish ? 'Plan published successfully' : 'Plan saved as draft')
     } else {
       plan = await createPlan({
         name: name.value.trim(),
@@ -154,7 +157,9 @@ async function handleSave() {
         currency: currencyVal.value,
         duration_days: durationDays,
         yearly_discount_percent: yearlyDiscountVal.value,
+        is_active: publish,
       })
+      toast.success(publish ? 'Plan published successfully' : 'Plan saved as draft')
     }
 
     // Sync feature attachments: attach newly selected, detach unselected.
@@ -175,6 +180,7 @@ async function handleSave() {
 async function handleDelete(id: number) {
   try {
     await deletePlan(id)
+    toast.success('Plan deleted successfully')
   } catch (e) {
     errorMessage.value = extractApiErrorMessage(e)
   }
@@ -183,42 +189,45 @@ async function handleDelete(id: number) {
 
 <template>
   <div>
-    <TheSubTabs />
-    <div class="mb-5 mt-1 p-3.5 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-start gap-3">
+    <AppHeader title="Plans">
+      <template #subtitle>
+        <div class="flex items-center gap-3">
+          <span class="text-sm text-slate-400">{{ plans.length }} plan{{ plans.length === 1 ? '' : 's' }}</span>
+
+          <!-- View mode switcher -->
+          <div class="inline-flex p-1 rounded-lg bg-slate-900 border border-slate-800 text-xs">
+            <button
+              class="flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-colors cursor-pointer"
+              :class="viewMode === 'list' ? 'bg-slate-800 text-slate-100 shadow-sm' : 'text-slate-400 hover:text-slate-200'"
+              @click="viewMode = 'list'"
+            >
+              <LayoutListIcon class="w-3.5 h-3.5" />
+              <span>List</span>
+            </button>
+            <button
+              class="flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-colors cursor-pointer"
+              :class="viewMode === 'preview' ? 'bg-slate-800 text-slate-100 shadow-sm' : 'text-slate-400 hover:text-slate-200'"
+              @click="viewMode = 'preview'"
+            >
+              <EyeIcon class="w-3.5 h-3.5" />
+              <span>Preview</span>
+            </button>
+          </div>
+        </div>
+      </template>
+      <template #actions>
+        <Button class="cursor-pointer gap-1" @click="openCreateModal">
+          <PlusIcon class="w-4 h-4" /> New plan
+        </Button>
+      </template>
+    </AppHeader>
+
+    <div class="mb-5 p-3.5 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-start gap-3">
       <InfoIcon class="w-5 h-5 mt-0.5 text-sky-400 shrink-0" />
       <div>
         <h4 class="text-sm font-medium text-sky-300 mb-0.5">Currency Configuration</h4>
         <p class="text-xs text-sky-400/80 leading-relaxed">Ensure all active plans use the same currency. Mixing different currencies for a single application can cause checkout issues.</p>
       </div>
-    </div>
-    <div class="flex items-center justify-between mb-4">
-      <div class="flex items-center gap-3">
-        <span class="text-sm text-slate-400">{{ plans.length }} plan{{ plans.length === 1 ? '' : 's' }}</span>
-
-        <!-- View mode switcher -->
-        <div class="inline-flex p-1 rounded-lg bg-slate-900 border border-slate-800 text-xs">
-          <button
-            class="flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-colors cursor-pointer"
-            :class="viewMode === 'list' ? 'bg-slate-800 text-slate-100 shadow-sm' : 'text-slate-400 hover:text-slate-200'"
-            @click="viewMode = 'list'"
-          >
-            <LayoutListIcon class="w-3.5 h-3.5" />
-            <span>List</span>
-          </button>
-          <button
-            class="flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-colors cursor-pointer"
-            :class="viewMode === 'preview' ? 'bg-slate-800 text-slate-100 shadow-sm' : 'text-slate-400 hover:text-slate-200'"
-            @click="viewMode = 'preview'"
-          >
-            <EyeIcon class="w-3.5 h-3.5" />
-            <span>Preview</span>
-          </button>
-        </div>
-      </div>
-
-      <Button class="cursor-pointer gap-1" @click="openCreateModal">
-        <PlusIcon class="w-4 h-4" /> New plan
-      </Button>
     </div>
 
     <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2 mb-4">
@@ -267,7 +276,13 @@ async function handleDelete(id: number) {
               <div>
                 <div class="flex items-center gap-2">
                   <span class="font-medium text-lg text-slate-100">{{ plan.name }}</span>
-                  <span v-if="(plan.yearly_discount_percent ?? 0) > 0" class="px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  <span v-if="!plan.is_active" class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-500/10 text-slate-400 border border-slate-500/30">
+                    Draft
+                  </span>
+                  <span v-else class="px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    Published
+                  </span>
+                  <span v-if="(plan.yearly_discount_percent ?? 0) > 0" class="px-2 py-0.5 rounded text-[11px] font-medium bg-teal-500/10 text-teal-400 border border-teal-500/30">
                     {{ plan.yearly_discount_percent }}% annual discount
                   </span>
                 </div>
@@ -427,8 +442,11 @@ async function handleDelete(id: number) {
 
         <div class="flex justify-end gap-2 pt-4 border-t border-[var(--color-border-dark)] mt-2">
           <Button variant="ghost" class="cursor-pointer" @click="modalOpen = false">Cancel</Button>
-          <Button class="cursor-pointer" :disabled="!name.trim() || isSaving" @click="handleSave">
-            {{ isSaving ? 'Saving...' : editingPlanId ? 'Save changes' : 'Create plan' }}
+          <Button variant="outline" class="cursor-pointer" :disabled="!name.trim() || isSaving" @click="handleSave(false)">
+            {{ isSaving ? 'Saving...' : 'Save as Draft' }}
+          </Button>
+          <Button class="cursor-pointer" :disabled="!name.trim() || isSaving" @click="handleSave(true)">
+            {{ isSaving ? 'Publishing...' : editingPlanId ? 'Publish Changes' : 'Publish Plan' }}
           </Button>
         </div>
       </DialogContent>

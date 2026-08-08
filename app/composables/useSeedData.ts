@@ -1,38 +1,16 @@
 // app/composables/useSeedData.ts
-export interface App {
+// Backs useEarnings.ts only — every other entity (plans, features, subscribers,
+// subscriptions, webhooks, api keys) has since moved to the real API. Kept
+// separate from useApps/useSubscriptions' real types (hence the "Seed" prefix)
+// so this mock data doesn't collide with them.
+export interface SeedApp {
   id: string
   name: string
   slug: string
   status: 'active' | 'inactive'
   webhookUrl: string | null
 }
-export interface Plan {
-  id: string
-  appId: string
-  name: string
-  price: number
-  currency?: string
-  interval: 'month' | 'year'
-  yearlyDiscount?: number
-  features: string[]
-}
-export interface Feature {
-  id: string
-  appId: string
-  name: string
-  key: string
-  description: string
-}
-export interface Subscriber {
-  id: string
-  appId: string
-  email: string
-  planId: string
-  status: 'active' | 'canceled'
-  joinedAt: string
-  env: 'test' | 'live'
-}
-export interface Subscription {
+export interface SeedSubscription {
   id: string
   appId: string
   subscriberId: string
@@ -42,29 +20,9 @@ export interface Subscription {
   createdAt: string
   amount: number
 }
-export interface WebhookDelivery {
-  id: string
-  appId: string
-  event: string
-  status: 'success' | 'failed'
-  createdAt: string
-}
-export interface ApiKey {
-  id: string
-  appId: string
-  name: string
-  env: 'test' | 'live'
-  maskedKey: string
-  createdAt: string
-}
 
-const apps = ref<App[]>([])
-const plans = ref<Plan[]>([])
-const features = ref<Feature[]>([])
-const subscribers = ref<Subscriber[]>([])
-const subscriptions = ref<Subscription[]>([])
-const webhookDeliveries = ref<WebhookDelivery[]>([])
-const apiKeys = ref<ApiKey[]>([])
+const apps = ref<SeedApp[]>([])
+const subscriptions = ref<SeedSubscription[]>([])
 let seeded = false
 
 export function useSeedData() {
@@ -74,29 +32,12 @@ export function useSeedData() {
     apps.value = [
       { id: appId, name: 'Demo App', slug: 'demo-app', status: 'active', webhookUrl: null },
     ]
-    const proPlanId = 'plan-pro'
-    const basicPlanId = 'plan-basic'
-    plans.value = [
-      { id: basicPlanId, appId, name: 'Basic', price: 9000, currency: 'NGN', interval: 'month', yearlyDiscount: 20, features: ['feat-auth'] },
-      { id: proPlanId, appId, name: 'Pro', price: 29000, currency: 'NGN', interval: 'month', yearlyDiscount: 20, features: ['feat-auth', 'feat-api'] },
-    ]
-    features.value = [
-      { id: 'feat-auth', appId, name: 'Multiple Device Login', key: 'auth_multiple', description: 'User can sign in on multiple devices' },
-      { id: 'feat-api', appId, name: 'REST API Access', key: 'api_access', description: 'Access to the REST API' },
-    ]
-    subscribers.value = [
-      { id: 'sub-1', appId, email: 'ada@example.com', planId: proPlanId, status: 'active', joinedAt: '2026-06-01', env: 'live' },
-      { id: 'sub-2', appId, email: 'grace@example.com', planId: basicPlanId, status: 'active', joinedAt: '2026-07-10', env: 'live' },
-      { id: 'sub-3', appId, email: 'test@example.com', planId: basicPlanId, status: 'active', joinedAt: '2026-08-01', env: 'test' },
-    ]
     subscriptions.value = [
-      { id: 'txn-1', appId, subscriberId: 'sub-1', planId: proPlanId, status: 'active', env: 'live', createdAt: '2026-06-01', amount: 29000 },
-      { id: 'txn-2', appId, subscriberId: 'sub-2', planId: basicPlanId, status: 'active', env: 'live', createdAt: '2026-07-10', amount: 9000 },
-      { id: 'txn-3', appId, subscriberId: 'sub-3', planId: basicPlanId, status: 'active', env: 'test', createdAt: '2026-08-01', amount: 9000 },
+      { id: 'txn-1', appId, subscriberId: 'sub-1', planId: 'plan-pro', status: 'active', env: 'live', createdAt: '2026-06-01', amount: 29000 },
+      { id: 'txn-2', appId, subscriberId: 'sub-2', planId: 'plan-basic', status: 'active', env: 'live', createdAt: '2026-07-10', amount: 9000 },
+      { id: 'txn-3', appId, subscriberId: 'sub-3', planId: 'plan-basic', status: 'active', env: 'test', createdAt: '2026-08-01', amount: 9000 },
     ]
-    webhookDeliveries.value = []
-    apiKeys.value = []
   }
 
-  return { apps, plans, features, subscribers, subscriptions, webhookDeliveries, apiKeys }
+  return { apps, subscriptions }
 }

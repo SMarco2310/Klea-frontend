@@ -1,4 +1,4 @@
-<!-- app/pages/apps/[slug]/overview.vue -->
+<!-- app/pages/apps/[slug]/settings.vue -->
 <script setup lang="ts">
 definePageMeta({ layout: 'dashboard', middleware: 'auth' })
 import { WebhookIcon, TrashIcon } from '@lucide/vue'
@@ -6,10 +6,11 @@ import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { Button } from '~/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '~/components/ui/dialog'
-import TheSubTabs from '~/components/layout/TheSubTabs.vue'
+import AppHeader from '~/components/dashboard/AppHeader.vue'
 
 const { currentApp, updateApp, deleteApp } = useApps()
 
+const appName = ref(currentApp.value?.name ?? '')
 const webhookUrl = ref(currentApp.value?.webhook_url ?? '')
 const isSaving = ref(false)
 const errorMessage = ref('')
@@ -18,12 +19,23 @@ const deleteOpen = ref(false)
 const isDeleting = ref(false)
 const deleteError = ref('')
 
-async function saveWebhook() {
+// Update refs if currentApp changes
+watch(currentApp, (newApp) => {
+  if (newApp) {
+    appName.value = newApp.name
+    webhookUrl.value = newApp.webhook_url ?? ''
+  }
+})
+
+async function saveSettings() {
   if (!currentApp.value) return
   isSaving.value = true
   errorMessage.value = ''
   try {
-    await updateApp(currentApp.value.id, { webhook_url: webhookUrl.value || null })
+    await updateApp(currentApp.value.id, { 
+      name: appName.value,
+      webhook_url: webhookUrl.value || null 
+    })
   } catch (e) {
     errorMessage.value = extractApiErrorMessage(e)
   } finally {
@@ -47,25 +59,34 @@ async function confirmDelete() {
 
 <template>
   <div v-if="currentApp">
-    <TheSubTabs />
+    <AppHeader title="App settings" subtitle="General configuration and danger zone" />
     <div class="max-w-xl">
-      <h2 class="font-heading font-semibold mb-1">App details</h2>
-      <p class="text-sm text-slate-400 mb-6">{{ currentApp.name }} · {{ currentApp.slug }}</p>
 
-      <div class="flex items-center gap-2 mb-1">
-        <WebhookIcon class="w-4 h-4 text-slate-400" />
-        <h3 class="font-medium">Webhook endpoint</h3>
-      </div>
-      <p class="text-sm text-slate-400 mb-4">We'll POST subscription events to this URL.</p>
-      <div class="space-y-2 mb-4">
-        <Label for="webhook-url">Endpoint URL</Label>
-        <Input id="webhook-url" v-model="webhookUrl" placeholder="https://yourapp.com/webhooks/klea" />
+      <div class="space-y-6 mb-4">
+        <!-- General Settings -->
+        <div class="space-y-2">
+          <Label for="app-name">App Name</Label>
+          <Input id="app-name" v-model="appName" placeholder="Your amazing app" />
+        </div>
+
+        <!-- Webhook Settings -->
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <WebhookIcon class="w-4 h-4 text-slate-400" />
+            <h3 class="font-medium">Webhook endpoint</h3>
+          </div>
+          <p class="text-sm text-slate-400 mb-4">We'll POST subscription events to this URL.</p>
+          <div class="space-y-2">
+            <Label for="webhook-url">Endpoint URL</Label>
+            <Input id="webhook-url" v-model="webhookUrl" placeholder="https://yourapp.com/webhooks/klea" />
+          </div>
+        </div>
       </div>
       <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2 mb-4">
         {{ errorMessage }}
       </p>
-      <Button class="cursor-pointer" :disabled="isSaving" @click="saveWebhook">
-        {{ isSaving ? 'Saving...' : 'Save' }}
+      <Button class="cursor-pointer" :disabled="isSaving" @click="saveSettings">
+        {{ isSaving ? 'Saving...' : 'Save changes' }}
       </Button>
 
       <div class="mt-10 pt-6 border-t border-[var(--color-border-dark)]">

@@ -8,15 +8,38 @@ import StatCard from '~/components/dashboard/StatCard.vue'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
 import CreateAppModal from '~/components/layout/CreateAppModal.vue'
 import VerifyEmailBanner from '~/components/dashboard/VerifyEmailBanner.vue'
+import type { ApiKey } from '~/composables/useApiKeys'
+import type { Subscription } from '~/composables/useSubscriptions'
 
 const { user } = useAppAuth()
 const { workspace } = useWorkspace()
 const { apps } = useApps()
 const { mode } = useEnvMode()
-const { apiKeys: allApiKeysRaw } = useSeedData()
-const totalApiKeys = computed(
-  () => allApiKeysRaw.value.filter((k) => k.env === mode.value).length
-)
+const api = useApi()
+
+const totalApiKeys = ref(0)
+const totalSubscribers = ref(0)
+
+// Both endpoints are tenant-wide (not scoped to a single app), which matches
+// what these two stats mean at the workspace level.
+async function loadWorkspaceStats(currentMode: 'test' | 'live') {
+  try {
+    const [keysPage, subsPage] = await Promise.all([
+      api.get<Paginated<ApiKey>>('/api-keys'),
+      api.get<Paginated<Subscription>>('/subscriptions'),
+    ])
+    totalApiKeys.value = keysPage.data.filter((k) => k.environment === currentMode && !k.revoked_at).length
+    totalSubscribers.value = new Set(
+      subsPage.data.filter((s) => s.environment === currentMode).map((s) => s.subscriber_id)
+    ).size
+  } catch {
+    // Leave stats at 0 — the app grid below still works even if this rollup fails.
+  }
+}
+
+watchEffect(() => {
+  loadWorkspaceStats(mode.value)
+})
 
 const createOpen = ref(false)
 </script>
@@ -39,7 +62,7 @@ const createOpen = ref(false)
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
       <StatCard label="Applications" :value="apps.length" :icon="LayersIcon" sublabel="Total registered apps" />
-      <StatCard label="Subscribers" :value="0" :icon="UsersIcon" sublabel="In live environment" />
+      <StatCard label="Subscribers" :value="totalSubscribers" :icon="UsersIcon" :sublabel="`In ${mode} environment`" />
       <StatCard label="API Keys" :value="totalApiKeys" :icon="KeyIcon" sublabel="Issued keys" />
     </div>
 
@@ -63,7 +86,7 @@ const createOpen = ref(false)
       <NuxtLink
         v-for="app in apps"
         :key="app.id"
-        :to="`/apps/${app.slug}/overview`"
+        :to="`/apps/${app.slug}/analytics`"
         class="p-5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] hover:border-[var(--color-accent)]/50 cursor-pointer transition-colors duration-200"
       >
         <div class="flex items-center justify-between mb-4">
@@ -75,7 +98,7 @@ const createOpen = ref(false)
         <h3 class="font-heading font-semibold">{{ app.name }}</h3>
         <p class="text-sm text-slate-400">{{ app.slug }}</p>
         <div class="border-t border-[var(--color-border-dark)] mt-4 pt-3 text-xs text-slate-500">
-          {{ app.webhookUrl ? 'Webhook configured' : 'No webhook' }}
+          {{ app.webhook_url ? 'Webhook configured' : 'No webhook' }}
         </div>
       </NuxtLink>
     </div>

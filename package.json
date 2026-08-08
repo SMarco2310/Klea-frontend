@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@clerk/nuxt": "^3.0.1",
-    "@lucide/vue": "^1.28.0",
+    "@lucide/vue": "^1.30.0",
     "@tanstack/vue-table": "^8.21.3",
     "@vueuse/core": "^14.4.0",
     "class-variance-authority": "^0.7.1",
@@ -21,7 +21,8 @@
     "reka-ui": "^2.10.1",
     "shadcn-vue": "^2.8.1",
     "vue": "^3.5.40",
-    "vue-router": "^5.2.0"
+    "vue-router": "^5.2.0",
+    "vue-sonner": "^2.0.9"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
