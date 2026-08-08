@@ -42,11 +42,11 @@ const activeAppTabs = computed(() => {
           <li v-for="item in defaultNavItems" :key="item.to">
             <NuxtLink
               :to="item.to"
-              class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors duration-200"
+              class="flex items-center gap-3 px-3.5 py-3 rounded-md text-sm cursor-pointer transition-colors duration-200"
               active-class="bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
               :class="!$route.path.startsWith(item.to) && 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
             >
-              <component :is="item.icon" class="w-4 h-4" />
+              <component :is="item.icon" class="w-[18px] h-[18px]" />
               {{ item.label }}
             </NuxtLink>
           </li>
@@ -60,12 +60,13 @@ const activeAppTabs = computed(() => {
         <ul class="space-y-1">
           <li v-for="item in activeAppTabs" :key="item.to">
             <NuxtLink
+              :id="`tour-sidebar-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`"
               :to="item.to"
-              class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors duration-200"
+              class="flex items-center gap-3 px-3.5 py-3 rounded-md text-sm cursor-pointer transition-colors duration-200"
               active-class="bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
               :class="!$route.path.startsWith(item.to) && 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
             >
-              <component :is="item.icon" class="w-4 h-4" />
+              <component :is="item.icon" class="w-[18px] h-[18px]" />
               {{ item.label }}
             </NuxtLink>
           </li>

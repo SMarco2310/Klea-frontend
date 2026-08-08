@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
-import { BookOpenIcon, GiftIcon, BellIcon, ChevronDownIcon, MenuIcon, SunIcon, MoonIcon } from '@lucide/vue'
+import { BookOpenIcon, GiftIcon, BellIcon, ChevronDownIcon, MenuIcon, SunIcon, MoonIcon, LanguagesIcon } from '@lucide/vue'
 import AppSwitcherModal from '~/components/layout/AppSwitcherModal.vue'
 import { toast } from 'vue-sonner'
 
@@ -49,7 +49,7 @@ function handleWorkspaceSwitch() {
 
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
-          <button class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md hover:bg-[var(--color-hover)] cursor-pointer transition-colors duration-200">
+          <button id="tour-workspace" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md hover:bg-[var(--color-hover)] cursor-pointer transition-colors duration-200">
             <span class="hidden sm:inline">{{ currentTenant?.name ?? 'Workspace' }}</span>
             <ChevronDownIcon class="w-3.5 h-3.5 text-[var(--muted-foreground)]" />
           </button>
@@ -64,6 +64,7 @@ function handleWorkspaceSwitch() {
       <span class="text-[var(--muted-foreground)]">/</span>
 
       <button
+        id="tour-app-switcher"
         class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] hover:bg-[var(--color-hover)] cursor-pointer transition-colors duration-200"
         @click="switcherOpen = true"
       >
@@ -81,20 +82,22 @@ function handleWorkspaceSwitch() {
     </div>
 
     <div class="md:ml-auto flex items-center gap-2 md:gap-3 shrink-0">
-      <button
-        class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium cursor-pointer transition-colors duration-200"
-        :class="mode === 'test' ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)]' : 'text-[var(--muted-foreground)]'"
-        @click="mode === 'live' && toggle()"
-      >
-        Test
-      </button>
-      <button
-        class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium cursor-pointer transition-colors duration-200"
-        :class="mode === 'live' ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)]' : 'text-[var(--muted-foreground)]'"
-        @click="mode === 'test' && toggle()"
-      >
-        Live
-      </button>
+      <div id="tour-env-toggle" class="flex bg-[var(--color-surface)] border border-[var(--color-border-dark)] rounded-lg p-1 shrink-0">
+        <button
+          class="px-3 py-1 rounded-md text-xs font-medium cursor-pointer transition-all duration-200"
+          :class="mode === 'test' ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)] shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
+          @click="mode === 'live' && toggle()"
+        >
+          Test
+        </button>
+        <button
+          class="px-3 py-1 rounded-md text-xs font-medium cursor-pointer transition-all duration-200"
+          :class="mode === 'live' ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)] shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
+          @click="mode === 'test' && toggle()"
+        >
+          Live
+        </button>
+      </div>
 
       <NuxtLink to="/docs" class="hidden lg:flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer">
         <BookOpenIcon class="w-4 h-4" /> Docs
@@ -112,9 +115,10 @@ function handleWorkspaceSwitch() {
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <button
-            class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer transition-colors flex items-center justify-center h-8 px-2 rounded-md hover:bg-[var(--color-surface-muted)] text-xs font-medium"
+            class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer transition-colors flex items-center gap-1.5 justify-center h-8 px-2.5 rounded-md hover:bg-[var(--color-surface-muted)] text-xs font-medium"
             aria-label="Change language"
           >
+            <LanguagesIcon class="w-4 h-4" />
             EN
           </button>
         </DropdownMenuTrigger>

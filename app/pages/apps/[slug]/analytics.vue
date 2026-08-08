@@ -9,6 +9,7 @@ import EmptyState from '~/components/dashboard/EmptyState.vue'
 
 const { currentApp } = useApps()
 const appId = computed(() => currentApp.value?.id ?? 0)
+const timeRange = ref(30)
 const {
   activeSubs,
   revenue,
@@ -22,7 +23,7 @@ const {
   recentSubscriptions,
   pending,
   fetchAnalytics,
-} = useAnalytics(appId.value)
+} = useAnalytics(appId.value, timeRange)
 
 watchEffect(() => {
   if (appId.value) fetchAnalytics()
@@ -39,13 +40,39 @@ const planCategories = computed(() => {
   return cats
 })
 const planCounts = computed(() => planDistribution.value.map((p) => p.count))
+
+const transactionStatusCounts = computed(() => {
+  const active = activeSubs.value
+  const pendingCount = transactions.value - active
+  if (active === 0 && pendingCount === 0) return []
+  return [active, pendingCount]
+})
+
+const transactionCategories = {
+  Succeeded: { name: 'Succeeded', color: '#10b981' },
+  Pending: { name: 'Pending', color: '#334155' }
+}
 </script>
 
 <template>
   <div class="flex flex-col min-h-[calc(100vh-14rem)]">
-    <AppHeader title="Analytics" subtitle="Overview of your app's performance" />
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <AppHeader title="Analytics" subtitle="Overview of your app's performance" />
+      <div class="flex bg-[var(--color-surface)] border border-[var(--color-border-dark)] rounded-lg p-1 shrink-0">
+        <button
+          v-for="range in [7, 30, 90]"
+          :key="range"
+          class="px-4 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-all duration-200"
+          :class="timeRange === range ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)] shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
+          @click="timeRange = range"
+        >
+          Last {{ range }} days
+        </button>
+      </div>
+    </div>
 
-    <p v-if="pending" class="text-sm text-slate-400 mb-4">Loading analytics...</p>
+    <p v-if="pending" class="text-sm text-slate-400 mb-4 mt-4">Loading analytics...</p>
+    <div v-else class="mb-4 mt-4" />
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 shrink-0">
       <StatCard label="Active subs" :value="activeSubs" :icon="UsersIcon" :trend="subscriptionTrend" :delta="subscriptionsDelta" />
@@ -58,7 +85,7 @@ const planCounts = computed(() => planDistribution.value.map((p) => p.count))
       />
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
       <div class="p-6 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] h-full min-h-[320px] flex flex-col">
         <h3 class="text-sm font-medium text-slate-300 mb-4">Revenue over time</h3>
         <div v-if="revenueTrend.length === 0" class="flex-grow flex items-center justify-center">
@@ -97,6 +124,15 @@ const planCounts = computed(() => planDistribution.value.map((p) => p.count))
         </div>
         <div v-else class="flex-grow flex items-center justify-center min-h-[200px]">
           <DonutChart :data="planCounts" :radius="65" :arc-width="20" :categories="planCategories" />
+        </div>
+      </div>
+      <div class="p-6 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] h-full min-h-[320px] flex flex-col">
+        <h3 class="text-sm font-medium text-slate-300 mb-4">Transaction status</h3>
+        <div v-if="transactionStatusCounts.length === 0" class="flex-grow flex items-center justify-center min-h-[200px]">
+          <p class="text-sm text-slate-500">No transactions yet</p>
+        </div>
+        <div v-else class="flex-grow flex items-center justify-center min-h-[200px]">
+          <DonutChart :data="transactionStatusCounts" :radius="65" :arc-width="20" :categories="transactionCategories" />
         </div>
       </div>
     </div>

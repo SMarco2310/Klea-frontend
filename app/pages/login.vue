@@ -68,11 +68,11 @@ async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
     <form class="space-y-4" @submit.prevent="handleSubmit">
       <div>
         <Input id="email" v-model="email" type="email" placeholder="Enter Email" required
-               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
+               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white [--autofill-bg:#1a1f26] [--autofill-fg:white] placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
       </div>
       <div class="relative">
         <Input id="password" v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="Enter Password" required
-               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)] pr-11" />
+               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white [--autofill-bg:#1a1f26] [--autofill-fg:white] placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)] pr-11" />
         <button
           type="button"
           class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer"

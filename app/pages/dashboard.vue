@@ -42,6 +42,7 @@ watchEffect(() => {
 })
 
 const createOpen = ref(false)
+const { startTour } = useTour()
 </script>
 
 <template>
@@ -52,11 +53,14 @@ const createOpen = ref(false)
         <LayersIcon class="w-6 h-6 text-[var(--color-accent)]" />
       </div>
       <div>
-        <h1 class="font-heading text-2xl font-semibold">Welcome back, {{ user?.name ?? 'there' }}</h1>
-        <p class="text-slate-400 text-sm">
+        <h1 class="font-heading text-3xl font-bold tracking-tight">Welcome back, {{ user?.name ?? 'there' }}</h1>
+        <p class="text-slate-400 mt-1">
           You're working in <span class="font-medium text-slate-200">{{ workspace.name }}</span>
           · {{ mode === 'live' ? 'Live' : 'Test' }} mode
         </p>
+      </div>
+      <div class="ml-auto">
+        <Button variant="outline" class="cursor-pointer font-medium" @click="startTour">Take a tour</Button>
       </div>
     </div>
 
