@@ -6,6 +6,11 @@ export default defineNuxtConfig({
   modules: ['@clerk/nuxt', 'nuxt-shiki', 'nuxt-charts'],
   shiki: {
     defaultTheme: 'github-dark',
+    // nuxt-shiki only bundles languages listed here — nothing lazy-loads on
+    // demand, so every lang= used anywhere in the app (CodeBlock/LanguageTabs
+    // usages, docs.vue's multi-language samples) must be listed explicitly
+    // or highlighting 500s at render time.
+    bundledLangs: ['typescript', 'tsx', 'javascript', 'bash', 'php', 'python', 'java', 'json'],
   },
   // Clerk is used client-side to broker Google/GitHub OAuth identity, then
   // exchanged for a real session via the Laravel API — we don't use Clerk's
