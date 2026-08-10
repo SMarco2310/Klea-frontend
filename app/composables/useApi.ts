@@ -44,6 +44,14 @@ export function useApi() {
 }
 
 export function extractApiErrorMessage(err: unknown): string {
-  const fetchError = err as { data?: { message?: string } }
-  return fetchError?.data?.message || 'Something went wrong. Please try again.'
+  const fetchError = err as { data?: { message?: string; errors?: Record<string, string[]> }, message?: string }
+  
+  if (fetchError?.data?.errors) {
+    const firstErrorKey = Object.keys(fetchError.data.errors)[0]
+    if (firstErrorKey && fetchError.data.errors[firstErrorKey]?.[0]) {
+      return fetchError.data.errors[firstErrorKey][0]
+    }
+  }
+
+  return fetchError?.data?.message || fetchError?.message || 'Something went wrong. Please try again.'
 }

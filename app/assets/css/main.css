@@ -109,6 +109,15 @@
   --color-accent: #3f8a5c;
   --color-key: #9c6b2e;
   --color-hover: rgba(15, 23, 20, 0.045);
+
+  /* Featured pricing-card treatment — light */
+  --plan-card-featured-bg:
+    radial-gradient(130% 100% at 12% -10%, rgba(63, 138, 92, 0.16), transparent 55%),
+    linear-gradient(165deg, #eef6f0 0%, #dfede3 45%, #cde3d4 100%);
+  --plan-card-featured-border: rgba(63, 138, 92, 0.35);
+  --plan-card-cta-bg: #3f8a5c;
+  --plan-card-cta-fg: #f4fbf7;
+  --plan-card-cta-hover: #356f4b;
 }
 
 .dark {
@@ -152,6 +161,15 @@
   --color-accent: #7fb894;
   --color-key: #d4a574;
   --color-hover: rgba(255, 255, 255, 0.06);
+
+  /* Featured pricing-card treatment — dark */
+  --plan-card-featured-bg:
+    radial-gradient(130% 100% at 12% -10%, rgba(127, 184, 148, 0.22), transparent 55%),
+    linear-gradient(165deg, #16291f 0%, #0f2018 50%, #081711 100%);
+  --plan-card-featured-border: rgba(127, 184, 148, 0.35);
+  --plan-card-cta-bg: #ffffff;
+  --plan-card-cta-fg: #0b0f14;
+  --plan-card-cta-hover: #e5e7eb;
 }
 
 @layer base {

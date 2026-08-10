@@ -2,7 +2,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
 
-const { loginWithClerkToken } = useAppAuth()
+const { loginWithClerkToken, user } = useAppAuth()
 const clerk = useClerk()
 const errorMessage = ref('')
 const started = ref(false)
@@ -35,7 +35,11 @@ async function exchangeToken() {
   }
   try {
     await loginWithClerkToken(clerkToken)
-    await navigateTo('/dashboard')
+    if (user.value?.current_tenant_id) {
+      await navigateTo('/dashboard')
+    } else {
+      await navigateTo('/onboarding')
+    }
   } catch (e) {
     errorMessage.value = 'Could not complete sign-in with our server. Please try again.'
   }

@@ -23,7 +23,7 @@ const defaultTab = tabs[0]
             v-for="tab in tabs"
             :key="tab"
             :value="tab"
-            class="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-white text-zinc-400 hover:text-zinc-300 rounded-none pb-2.5 px-0 font-medium text-sm transition-none border-b-2 border-transparent"
+            class="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-white text-zinc-400 hover:text-zinc-300 rounded-none pb-2.5 px-0 font-medium text-sm transition-none border-b-2 border-transparent focus-visible:ring-0 focus-visible:outline-none focus:outline-none"
           >
             {{ tab }}
           </TabsTrigger>

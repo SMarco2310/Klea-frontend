@@ -32,7 +32,7 @@ const activeAppTabs = computed(() => {
 </script>
 
 <template>
-  <aside class="w-64 shrink-0 bg-[var(--color-surface)] overflow-y-auto">
+  <aside class="w-75 shrink-0 bg-[var(--color-surface)] overflow-y-auto">
     <nav class="p-4">
       <div class="mb-6">
         <h3 class="px-3 text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-2">

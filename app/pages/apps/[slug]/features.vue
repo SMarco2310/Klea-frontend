@@ -121,24 +121,24 @@ async function handleDelete(id: number) {
         class="flex items-start justify-between p-4 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border-dark)]"
       >
         <div class="space-y-1">
-          <div class="font-medium text-slate-100">{{ feature.name }}</div>
+          <div class="font-medium text-[var(--foreground)]">{{ feature.name }}</div>
           <div class="flex items-center gap-2">
             <span class="inline-block px-2 py-0.5 rounded text-xs font-mono bg-slate-800 text-teal-400 border border-slate-700/60">
               {{ feature.code }}
             </span>
           </div>
-          <p class="text-sm text-slate-400">{{ feature.description }}</p>
+          <p class="text-sm text-[var(--muted-foreground)]">{{ feature.description }}</p>
         </div>
         <div class="flex items-center gap-3 pt-1">
           <button
-            class="text-slate-400 hover:text-slate-200 cursor-pointer transition-colors"
+            class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer transition-colors"
             :aria-label="`Edit ${feature.name || feature.code}`"
             @click="openEditModal(feature)"
           >
             <PencilIcon class="w-4 h-4" />
           </button>
           <button
-            class="text-slate-400 hover:text-red-400 cursor-pointer transition-colors"
+            class="text-[var(--muted-foreground)] hover:text-red-500 cursor-pointer transition-colors"
             :aria-label="`Delete ${feature.name || feature.code}`"
             @click="handleDelete(feature.id)"
           >

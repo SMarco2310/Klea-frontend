@@ -59,7 +59,7 @@ const toggleExpand = () => {
       </button>
 
       <div class="p-4 text-[13px] font-mono overflow-x-auto custom-scrollbar leading-relaxed">
-        <Shiki :code="code" :lang="lang" />
+        <Shiki :code="code" :lang="lang as any" />
       </div>
 
       <!-- Expand Fade Overlay -->

@@ -54,8 +54,8 @@ const { startTour } = useTour()
       </div>
       <div>
         <h1 class="font-heading text-3xl font-bold tracking-tight">Welcome back, {{ user?.name ?? 'there' }}</h1>
-        <p class="text-slate-400 mt-1">
-          You're working in <span class="font-medium text-slate-200">{{ workspace.name }}</span>
+        <p class="text-[var(--muted-foreground)] mt-1">
+          You're working in <span class="font-medium text-[var(--foreground)]">{{ workspace.name }}</span>
           · {{ mode === 'live' ? 'Live' : 'Test' }} mode
         </p>
       </div>
@@ -94,7 +94,7 @@ const { startTour } = useTour()
         class="p-5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] hover:border-[var(--color-accent)]/50 cursor-pointer transition-colors duration-200"
       >
         <div class="flex items-center justify-between mb-4">
-          <span class="w-8 h-8 rounded bg-white/10 flex items-center justify-center text-xs font-semibold">
+          <span class="w-8 h-8 rounded bg-[#e8e7e7] dark:bg-[#4c4a4a] flex items-center justify-center text-xs font-semibold">
             {{ app.name[0] }}
           </span>
           <Badge v-if="app.status === 'active'" class="bg-[var(--color-accent)]/20 text-[var(--color-accent)]">Active</Badge>

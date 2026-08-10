@@ -1,4 +1,4 @@
-export default defineNuxtRouteMiddleware(async () => {
+export default defineNuxtRouteMiddleware(async (to) => {
   const { isSignedIn, fetchCurrentUser, user } = useAppAuth()
   if (!isSignedIn.value) {
     return navigateTo('/login')
@@ -12,5 +12,9 @@ export default defineNuxtRouteMiddleware(async () => {
       // on a page that has no valid session behind it.
       return navigateTo('/login')
     }
+  }
+
+  if (user.value && !user.value.current_tenant_id && to.path !== '/onboarding') {
+    return navigateTo('/onboarding')
   }
 })

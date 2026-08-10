@@ -7,7 +7,9 @@ export interface Feature {
   description: string
 }
 
-export function useFeatures(appId: number | string) {
+import { toValue, type MaybeRefOrGetter } from 'vue'
+
+export function useFeatures(appId: MaybeRefOrGetter<number | string>) {
   const api = useApi()
   const features = ref<Feature[]>([])
   const pending = ref(false)
@@ -18,7 +20,7 @@ export function useFeatures(appId: number | string) {
     error.value = null
     try {
       const page = await api.get<Paginated<Feature>>('/features')
-      features.value = page.data.filter((f) => f.application_id === Number(appId))
+      features.value = page.data.filter((f) => f.application_id === Number(toValue(appId)))
     } catch (e) {
       error.value = extractApiErrorMessage(e)
     } finally {
@@ -27,7 +29,7 @@ export function useFeatures(appId: number | string) {
   }
 
   async function createFeature(input: { name: string; code: string; description: string }) {
-    const feature = await api.post<Feature>('/features', { ...input, application_id: Number(appId) })
+    const feature = await api.post<Feature>('/features', { ...input, application_id: Number(toValue(appId)) })
     features.value.push(feature)
     return feature
   }

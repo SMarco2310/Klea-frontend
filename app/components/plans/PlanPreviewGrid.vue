@@ -62,9 +62,9 @@ const activeDiscountBadge = computed(() => {
     <!-- Empty state for preview -->
     <div
       v-if="plans.length === 0"
-      class="p-12 text-center rounded-[2rem] bg-white/5 border border-white/10 w-full max-w-xl my-8"
+      class="p-12 text-center rounded-[2.5rem] bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] w-full max-w-xl my-8"
     >
-      <p class="text-slate-400 text-sm">No plans available to preview. Switch to List view to create your first plan.</p>
+      <p class="text-[var(--muted-foreground)] text-sm">No plans available to preview. Switch to List view to create your first plan.</p>
     </div>
 
     <template v-else>
@@ -80,33 +80,33 @@ const activeDiscountBadge = computed(() => {
         <div
           v-for="plan in displayPlans"
           :key="plan.id"
-          class="p-8 rounded-[2rem] flex flex-col relative transition-all duration-300 hover:scale-[1.02] border"
+          class="p-8 rounded-[2.5rem] flex flex-col relative transition-all duration-500 border group"
           :class="
             plan.highlighted
-              ? 'border-emerald-500/40 bg-emerald-950/20 shadow-2xl shadow-emerald-950/50 ring-1 ring-emerald-500/30'
-              : 'bg-slate-900/60 border-slate-800'
+              ? 'border-[var(--plan-card-featured-border)] bg-[image:var(--plan-card-featured-bg)] shadow-2xl shadow-[var(--plan-card-featured-border)]/20 hover:-translate-y-2'
+              : 'bg-[var(--color-surface)] dark:bg-gradient-to-b dark:from-slate-800/90 dark:to-slate-900/90 border-[var(--color-border-dark)] dark:border-slate-700/60 shadow-lg shadow-black/5 dark:shadow-black/20 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/40 hover:-translate-y-1 backdrop-blur-xl dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]'
           "
         >
           <!-- Plan Header -->
           <div class="mb-8">
-            <p class="text-sm font-medium text-zinc-400 mb-2">
+            <p class="text-sm font-medium text-[var(--muted-foreground)] mb-2 uppercase tracking-wider text-xs">
               {{ plan.name.toLowerCase().endsWith('plan') ? plan.name : `${plan.name} Plan` }}
             </p>
             <div class="flex flex-col gap-1 mt-1">
-              <h3 class="font-heading text-4xl font-bold text-white tracking-tight">
+              <h3 class="font-heading text-4xl font-extrabold text-[var(--foreground)] tracking-tight drop-shadow-sm">
                 {{ plan.displayPrice }}
               </h3>
-              <span v-if="isYearly && plan.price > 0" class="text-xs text-emerald-400 font-medium">
+              <span v-if="isYearly && plan.price > 0" class="text-xs text-[var(--color-accent)] font-semibold mt-1">
                 (billed yearly<template v-if="plan.discountPercent > 0"> - {{ plan.discountPercent }}% off</template>)
               </span>
             </div>
           </div>
 
           <!-- Feature List -->
-          <div class="mb-10 flex-grow">
+          <div class="mb-10 flex-grow relative">
             <div
               v-if="plan.resolvedFeatures.length === 0"
-              class="text-sm text-zinc-500 italic py-2"
+              class="text-sm text-[var(--muted-foreground)] italic py-2"
             >
               No features assigned to this plan
             </div>
@@ -114,16 +114,16 @@ const activeDiscountBadge = computed(() => {
               <li
                 v-for="feature in plan.resolvedFeatures"
                 :key="feature.id"
-                class="flex items-start gap-3 text-sm text-zinc-300"
+                class="flex items-start gap-3 text-sm group/feature"
               >
                 <div
-                  class="mt-0.5 bg-white/10 p-0.5 rounded-full shrink-0 flex items-center justify-center h-4 w-4"
+                  class="mt-0.5 bg-[var(--color-accent)]/15 dark:bg-[var(--color-accent)]/20 p-0.5 rounded-full shrink-0 flex items-center justify-center h-5 w-5 transition-transform duration-300 group-hover/feature:scale-110"
                 >
-                  <CheckIcon class="w-3 h-3 text-white" />
+                  <CheckIcon class="w-3.5 h-3.5 text-[var(--color-accent)] drop-shadow-md" stroke-width="3" />
                 </div>
                 <div>
-                  <span class="font-medium text-slate-200">{{ feature.name }}</span>
-                  <span v-if="feature.description" class="block text-xs text-slate-400 mt-0.5">
+                  <span class="font-semibold text-[var(--foreground)] dark:text-slate-200 transition-colors group-hover/feature:text-white">{{ feature.name }}</span>
+                  <span v-if="feature.description" class="block text-[13px] text-[var(--muted-foreground)] dark:text-slate-400 mt-1 leading-relaxed">
                     {{ feature.description }}
                   </span>
                 </div>
@@ -133,11 +133,11 @@ const activeDiscountBadge = computed(() => {
 
           <!-- Action Button -->
           <Button
-            class="w-full rounded-full py-6 text-sm font-semibold transition-colors cursor-pointer"
+            class="w-full rounded-full py-6 text-sm font-bold transition-all duration-300 cursor-pointer shadow-sm relative overflow-hidden"
             :class="
               plan.highlighted
-                ? 'bg-white text-black hover:bg-zinc-200 border-none'
-                : 'bg-transparent text-white hover:bg-white/10 border border-white/20'
+                ? 'bg-[var(--plan-card-cta-bg)] text-[var(--plan-card-cta-fg)] hover:bg-[var(--plan-card-cta-hover)] border-none hover:shadow-lg hover:shadow-[var(--plan-card-featured-border)]/30 hover:scale-[1.02]'
+                : 'bg-slate-100 dark:bg-white/5 text-[var(--foreground)] dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 hover:shadow-md hover:scale-[1.02]'
             "
           >
             Get Started

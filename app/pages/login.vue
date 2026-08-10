@@ -13,7 +13,7 @@ const showPassword = ref(false)
 const errorMessage = ref('')
 const isSubmitting = ref(false)
 const showResetSuccess = ref(route.query.reset === 'success')
-const { login } = useAppAuth()
+const { login, user } = useAppAuth()
 const { signIn, isLoaded } = useSignIn()
 
 async function handleSubmit() {
@@ -22,7 +22,11 @@ async function handleSubmit() {
   isSubmitting.value = true
   try {
     await login(email.value, password.value)
-    await navigateTo('/dashboard')
+    if (user.value?.current_tenant_id) {
+      await navigateTo('/dashboard')
+    } else {
+      await navigateTo('/onboarding')
+    }
   } catch (e) {
     errorMessage.value = extractAuthErrorMessage(e)
   } finally {

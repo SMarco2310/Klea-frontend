@@ -6,7 +6,11 @@ import EmptyState from '~/components/dashboard/EmptyState.vue'
 import AppHeader from '~/components/dashboard/AppHeader.vue'
 
 const { currentApp } = useApps()
-const { deliveries, endpointUrl, webhookSecret } = useWebhooks()
+const { deliveries, endpointUrl, webhookSecret, fetchDeliveries } = useWebhooks()
+
+watchEffect(() => {
+  fetchDeliveries()
+})
 
 const copiedUrl = ref(false)
 const copiedSecret = ref(false)
@@ -91,14 +95,45 @@ const maskedSecret = computed(() =>
       </div>
     </div>
 
-    <div class="rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] p-5">
-      <h3 class="text-sm font-medium text-slate-300 mb-4">Recent deliveries</h3>
-      <EmptyState
-        v-if="deliveries.length === 0"
-        :icon="WebhookIcon"
-        title="No deliveries yet"
-        description="Delivery logs will appear here once we send your endpoint its first subscription event."
-      />
+    <div class="rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] p-0">
+      <h3 class="text-sm font-medium text-slate-300 mb-4 p-5 pb-0">Recent deliveries</h3>
+      <div v-if="deliveries.length === 0" class="p-5">
+        <EmptyState
+          :icon="WebhookIcon"
+          title="No deliveries yet"
+          description="Delivery logs will appear here once we send your endpoint its first subscription event."
+        />
+      </div>
+      <table v-else class="w-full text-left text-sm whitespace-nowrap mt-4">
+        <thead class="border-y border-[var(--color-border-dark)] bg-[var(--color-surface-muted)]">
+          <tr>
+            <th class="px-5 py-3 font-medium text-slate-300">Date</th>
+            <th class="px-5 py-3 font-medium text-slate-300">Status</th>
+            <th class="px-5 py-3 font-medium text-slate-300">Event</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--color-border-dark)]">
+          <tr v-for="delivery in deliveries" :key="delivery.id" class="hover:bg-white/5 transition-colors">
+            <td class="px-5 py-3 text-slate-400">
+              {{ new Date(delivery.created_at).toLocaleString() }}
+            </td>
+            <td class="px-5 py-3">
+              <span 
+                class="px-2 py-0.5 rounded-full text-xs font-medium"
+                :class="{
+                  'bg-green-500/10 text-green-400 border border-green-500/20': delivery.status_code && delivery.status_code.startsWith('2'),
+                  'bg-red-500/10 text-red-400 border border-red-500/20': !delivery.status_code || !delivery.status_code.startsWith('2')
+                }"
+              >
+                {{ delivery.status_code || 'Failed' }}
+              </span>
+            </td>
+            <td class="px-5 py-3 font-mono text-xs text-slate-300">
+              {{ delivery.payload ? 'subscription.updated' : 'unknown' }} <!-- We could parse JSON here if needed -->
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>

@@ -15,6 +15,7 @@ const { mode, toggle } = useEnvMode()
 const { user, logout } = useAppAuth()
 const { toggleSidebar } = useSidebar()
 const { isDark, toggleDark } = useTheme()
+const { recentTransactions } = useNotifications()
 const switcherOpen = ref(false)
 
 // Tenant switching isn't wired to the backend yet (GET /tenants /
@@ -129,7 +130,54 @@ function handleWorkspaceSwitch() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <BellIcon class="w-4 h-4 text-[var(--muted-foreground)] cursor-pointer" aria-label="Notifications" />
+      <DropdownMenu>
+        <DropdownMenuTrigger as-child>
+          <button class="relative w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--color-surface-muted)] cursor-pointer transition-colors" aria-label="Notifications">
+            <BellIcon class="w-4 h-4 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors" />
+            <span v-if="recentTransactions.length > 0" class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 border-2 border-[var(--color-surface)]"></span>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" class="w-80 p-0 border border-[var(--color-border-dark)] overflow-hidden">
+          <div class="px-4 py-3 bg-[var(--color-surface-muted)] border-b border-[var(--color-border-dark)] flex items-center justify-between">
+            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Recent Payments</h3>
+          </div>
+          <div class="max-h-80 overflow-y-auto">
+            <div v-if="recentTransactions.length === 0" class="px-4 py-8 text-center text-sm text-[var(--muted-foreground)]">
+              No recent payments.
+            </div>
+            <div v-else class="divide-y divide-[var(--color-border-dark)]">
+              <div v-for="tx in recentTransactions" :key="tx.id" class="px-4 py-3 hover:bg-[var(--color-surface-muted)] transition-colors cursor-default">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="space-y-1">
+                    <p class="text-sm font-medium text-[var(--foreground)]">New Payment</p>
+                    <p class="text-xs text-[var(--muted-foreground)]">
+                      {{ tx.currency }} {{ tx.amount.toLocaleString() }} via {{ tx.payment_method }}
+                    </p>
+                  </div>
+                  <span 
+                    class="px-2 py-0.5 rounded-full text-[10px] font-medium"
+                    :class="{
+                      'bg-green-500/10 text-green-400': tx.status === 'successful',
+                      'bg-yellow-500/10 text-yellow-400': tx.status === 'pending',
+                      'bg-red-500/10 text-red-400': tx.status === 'failed'
+                    }"
+                  >
+                    {{ tx.status }}
+                  </span>
+                </div>
+                <div class="mt-2 text-[10px] text-[var(--muted-foreground)]">
+                  {{ new Date(tx.created_at).toLocaleString() }}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="p-2 border-t border-[var(--color-border-dark)] bg-[var(--color-surface)]">
+            <NuxtLink to="/earnings" class="block w-full text-center text-xs font-medium text-[var(--color-accent)] hover:underline py-1.5 rounded-md hover:bg-[var(--color-surface-muted)] transition-colors">
+              View all transactions
+            </NuxtLink>
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <DropdownMenu>
         <DropdownMenuTrigger as-child>

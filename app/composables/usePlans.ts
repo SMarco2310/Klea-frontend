@@ -1,4 +1,5 @@
 // app/composables/usePlans.ts
+import { toValue, type MaybeRefOrGetter } from 'vue'
 import type { Feature } from './useFeatures'
 
 export interface Plan {
@@ -15,7 +16,7 @@ export interface Plan {
   features?: Feature[]
 }
 
-export function usePlans(appId: number | string) {
+export function usePlans(appId: MaybeRefOrGetter<number | string>) {
   const api = useApi()
   const plans = ref<Plan[]>([])
   const pending = ref(false)
@@ -27,7 +28,7 @@ export function usePlans(appId: number | string) {
     try {
       const page = await api.get<Paginated<Plan>>('/plans')
       plans.value = page.data
-        .filter((p) => p.application_id === Number(appId))
+        .filter((p) => p.application_id === Number(toValue(appId)))
         .sort((a, b) => a.position - b.position)
     } catch (e) {
       error.value = extractApiErrorMessage(e)
@@ -44,7 +45,7 @@ export function usePlans(appId: number | string) {
     yearly_discount_percent: number
     is_active?: boolean
   }) {
-    const plan = await api.post<Plan>('/plans', { ...input, application_id: Number(appId) })
+    const plan = await api.post<Plan>('/plans', { ...input, application_id: Number(toValue(appId)) })
     plans.value.push(plan)
     return plan
   }

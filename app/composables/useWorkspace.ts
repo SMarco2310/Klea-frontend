@@ -53,6 +53,25 @@ export function useWorkspace() {
     }
   }
 
+  async function createWorkspace(name: string, slug: string) {
+    pending.value = true
+    error.value = null
+    try {
+      const tenantRecord = await api.post<TenantRecord>('/tenants', { name, slug })
+      tenant.value = tenantRecord
+      if (user.value) {
+        user.value.current_tenant_id = tenantRecord.id
+      }
+      fetchedForTenantId = tenantRecord.id
+      return tenantRecord
+    } catch (e) {
+      error.value = extractApiErrorMessage(e)
+      throw e
+    } finally {
+      pending.value = false
+    }
+  }
+
   async function updateSettings(patch: {
     name?: string
     slug?: string
@@ -73,5 +92,31 @@ export function useWorkspace() {
     tenant.value = await api.patch<TenantRecord>(`/tenants/${tenant.value.id}`, body)
   }
 
-  return { workspace, pending, error, fetchWorkspace, updateSettings }
+  const isOwner = computed(() => {
+    if (!user.value?.tenants || !tenant.value) return false
+    const t = user.value.tenants.find((t) => t.id === tenant.value!.id)
+    return t?.pivot?.role === 'owner'
+  })
+
+  async function deleteWorkspace() {
+    if (!tenant.value) return
+    pending.value = true
+    error.value = null
+    try {
+      await api.delete(`/tenants/${tenant.value.id}`)
+      tenant.value = null
+      fetchedForTenantId = null
+      if (user.value) {
+        user.value.current_tenant_id = null
+        // refresh the user object to get the updated tenants list if needed, or just let the caller handle redirection
+      }
+    } catch (e) {
+      error.value = extractApiErrorMessage(e)
+      throw e
+    } finally {
+      pending.value = false
+    }
+  }
+
+  return { workspace, isOwner, pending, error, fetchWorkspace, createWorkspace, updateSettings, deleteWorkspace }
 }

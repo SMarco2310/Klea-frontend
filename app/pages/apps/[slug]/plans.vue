@@ -17,8 +17,8 @@ import { toast } from 'vue-sonner'
 
 const { currentApp } = useApps()
 const appId = computed(() => currentApp.value?.id ?? 0)
-const { plans, pending, fetchPlans, createPlan, updatePlan, deletePlan, reorderPlans, attachFeature, detachFeature } = usePlans(appId.value)
-const { features, fetchFeatures } = useFeatures(appId.value)
+const { plans, pending, fetchPlans, createPlan, updatePlan, deletePlan, reorderPlans, attachFeature, detachFeature } = usePlans(appId)
+const { features, fetchFeatures } = useFeatures(appId)
 
 watchEffect(() => {
   if (appId.value) {
@@ -185,6 +185,16 @@ async function handleDelete(id: number) {
     errorMessage.value = extractApiErrorMessage(e)
   }
 }
+
+async function togglePublish(plan: Plan) {
+  const newStatus = !plan.is_active
+  try {
+    await updatePlan(plan.id, { is_active: newStatus })
+    toast.success(newStatus ? 'Plan published successfully' : 'Plan moved to draft')
+  } catch (e) {
+    errorMessage.value = extractApiErrorMessage(e)
+  }
+}
 </script>
 
 <template>
@@ -195,10 +205,10 @@ async function handleDelete(id: number) {
           <span class="text-sm text-slate-400">{{ plans.length }} plan{{ plans.length === 1 ? '' : 's' }}</span>
 
           <!-- View mode switcher -->
-          <div class="inline-flex p-1 rounded-lg bg-slate-900 border border-slate-800 text-xs">
+          <div class="inline-flex p-1 rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] text-xs">
             <button
               class="flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-colors cursor-pointer"
-              :class="viewMode === 'list' ? 'bg-slate-800 text-slate-100 shadow-sm' : 'text-slate-400 hover:text-slate-200'"
+              :class="viewMode === 'list' ? 'bg-[var(--color-surface)] text-[var(--foreground)] shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
               @click="viewMode = 'list'"
             >
               <LayoutListIcon class="w-3.5 h-3.5" />
@@ -206,7 +216,7 @@ async function handleDelete(id: number) {
             </button>
             <button
               class="flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-colors cursor-pointer"
-              :class="viewMode === 'preview' ? 'bg-slate-800 text-slate-100 shadow-sm' : 'text-slate-400 hover:text-slate-200'"
+              :class="viewMode === 'preview' ? 'bg-[var(--color-surface)] text-[var(--foreground)] shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
               @click="viewMode = 'preview'"
             >
               <EyeIcon class="w-3.5 h-3.5" />
@@ -275,7 +285,7 @@ async function handleDelete(id: number) {
               </div>
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="font-medium text-lg text-slate-100">{{ plan.name }}</span>
+                  <span class="font-medium text-lg text-[var(--foreground)]">{{ plan.name }}</span>
                   <span v-if="!plan.is_active" class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-500/10 text-slate-400 border border-slate-500/30">
                     Draft
                   </span>
@@ -292,17 +302,35 @@ async function handleDelete(id: number) {
               </div>
             </div>
             <div class="flex items-center gap-3">
+              <Button
+                v-if="!plan.is_active"
+                variant="outline"
+                size="sm"
+                class="h-7 text-xs font-medium"
+                @click.stop="togglePublish(plan)"
+              >
+                Publish
+              </Button>
+              <Button
+                v-else
+                variant="ghost"
+                size="sm"
+                class="h-7 text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                @click.stop="togglePublish(plan)"
+              >
+                Unpublish
+              </Button>
               <button
-                class="text-slate-400 hover:text-slate-200 cursor-pointer transition-colors"
+                class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer transition-colors"
                 :aria-label="`Edit ${plan.name}`"
-                @click="openEditModal(plan)"
+                @click.stop="openEditModal(plan)"
               >
                 <PencilIcon class="w-4 h-4" />
               </button>
               <button
                 class="text-slate-400 hover:text-red-400 cursor-pointer transition-colors"
                 :aria-label="`Delete ${plan.name}`"
-                @click="handleDelete(plan.id)"
+                @click.stop="handleDelete(plan.id)"
               >
                 <Trash2Icon class="w-4 h-4" />
               </button>
@@ -388,11 +416,11 @@ async function handleDelete(id: number) {
           <!-- Feature Selection Section -->
           <div class="space-y-2 pt-2">
             <Label class="text-sm font-medium">Select Features</Label>
-            <p class="text-xs text-slate-400">Choose which features are included in this plan</p>
+            <p class="text-xs text-[var(--muted-foreground)]">Choose which features are included in this plan</p>
 
-            <div v-if="features.length === 0" class="p-4 rounded-lg bg-slate-900/50 border border-slate-800 text-center">
-              <p class="text-xs text-slate-400">No features created yet.</p>
-              <NuxtLink :to="`/apps/${currentApp?.slug}/features`" class="text-xs text-teal-400 hover:underline mt-1 inline-block">
+            <div v-if="features.length === 0" class="p-4 rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] text-center">
+              <p class="text-xs text-[var(--muted-foreground)]">No features created yet.</p>
+              <NuxtLink :to="`/apps/${currentApp?.slug}/features`" class="text-xs text-teal-500 dark:text-teal-400 hover:underline mt-1 inline-block">
                 Create features first
               </NuxtLink>
             </div>
@@ -404,8 +432,8 @@ async function handleDelete(id: number) {
                 class="flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-150"
                 :class="[
                   isFeatureSelected(feature.id)
-                    ? 'bg-teal-500/10 border-teal-500/50 text-slate-100'
-                    : 'bg-[var(--color-surface)] border-[var(--color-border-dark)] text-slate-300 hover:border-slate-600'
+                    ? 'bg-teal-500/10 border-teal-500/50 text-[var(--foreground)]'
+                    : 'bg-[var(--color-surface)] border-[var(--color-border-dark)] text-[var(--foreground)] hover:border-slate-400 dark:hover:border-slate-600'
                 ]"
                 @click="toggleFeature(feature.id)"
               >
@@ -413,15 +441,15 @@ async function handleDelete(id: number) {
                   class="w-5 h-5 rounded border flex items-center justify-center mt-0.5 shrink-0 transition-colors"
                   :class="[
                     isFeatureSelected(feature.id)
-                      ? 'bg-teal-500 border-teal-500 text-slate-950'
-                      : 'border-slate-600 bg-slate-900/50'
+                      ? 'bg-teal-500 border-teal-500 text-white'
+                      : 'border-[var(--color-border-dark)] bg-[var(--color-surface-muted)]'
                   ]"
                 >
                   <CheckIcon v-if="isFeatureSelected(feature.id)" class="w-3.5 h-3.5 stroke-[3]" />
                 </div>
                 <div class="space-y-1 min-w-0 flex-1">
                   <!-- Name on top -->
-                  <div class="font-medium text-sm text-slate-100 leading-tight">{{ feature.name }}</div>
+                  <div class="font-medium text-sm text-[var(--foreground)] leading-tight">{{ feature.name }}</div>
                   <!-- Code / Key -->
                   <div class="flex items-center gap-1.5">
                     <span class="inline-block px-1.5 py-0.5 rounded text-[11px] font-mono bg-slate-800 text-teal-400 border border-slate-700/60">
@@ -429,7 +457,7 @@ async function handleDelete(id: number) {
                     </span>
                   </div>
                   <!-- Description -->
-                  <p class="text-xs text-slate-400 line-clamp-2">{{ feature.description }}</p>
+                  <p class="text-xs text-[var(--muted-foreground)] line-clamp-2">{{ feature.description }}</p>
                 </div>
               </div>
             </div>

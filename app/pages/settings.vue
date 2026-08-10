@@ -9,8 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~
 import SettingsSection from '~/components/dashboard/SettingsSection.vue'
 import SettingsIdentityCard from '~/components/dashboard/SettingsIdentityCard.vue'
 
-const { workspace, pending, updateSettings } = useWorkspace()
+const { workspace, isOwner, pending, updateSettings, deleteWorkspace } = useWorkspace()
 const { apps } = useApps()
+const { fetchCurrentUser } = useAppAuth()
 
 const name = ref('')
 const slug = ref('')
@@ -21,6 +22,24 @@ const showApiKey = ref(false)
 const isSaving = ref(false)
 const saved = ref(false)
 const errorMessage = ref('')
+
+const showDeleteConfirm = ref(false)
+const deleteConfirmText = ref('')
+const isDeleting = ref(false)
+
+async function handleDelete() {
+  if (deleteConfirmText.value !== workspace.value.name) return
+  isDeleting.value = true
+  errorMessage.value = ''
+  try {
+    await deleteWorkspace()
+    await fetchCurrentUser() // Refresh user data to remove deleted tenant
+    navigateTo('/') // Redirect to root/dashboard to pick new tenant
+  } catch (e) {
+    errorMessage.value = extractApiErrorMessage(e)
+    isDeleting.value = false
+  }
+}
 
 watch(workspace, (w) => {
   name.value = w.name
@@ -145,6 +164,59 @@ const STATUS_STYLES: Record<string, string> = {
         <Button class="cursor-pointer gap-2" :disabled="isSaving" @click="handleSave">
           <SaveIcon class="w-4 h-4" /> {{ isSaving ? 'Saving...' : saved ? 'Saved' : 'Save changes' }}
         </Button>
+
+        <div v-if="isOwner" class="pt-10 mt-10 border-t border-[var(--color-border-dark)]">
+          <SettingsSection 
+            :icon="Building2Icon" 
+            title="Danger Zone" 
+            description="Irreversibly delete this workspace and all of its data. This action cannot be undone."
+          >
+            <div class="p-4 rounded-xl border border-red-500/30 bg-red-500/10 space-y-4">
+              <h3 class="text-sm font-medium text-red-400">Delete Workspace</h3>
+              <p class="text-xs text-slate-400">
+                Once you delete a workspace, there is no going back. Please be certain.
+              </p>
+              
+              <div v-if="showDeleteConfirm" class="space-y-3 pt-3 border-t border-red-500/20">
+                <Label for="delete-confirm" class="text-xs text-slate-300">
+                  Type <span class="font-bold text-red-400">{{ workspace.name }}</span> to confirm
+                </Label>
+                <Input 
+                  id="delete-confirm" 
+                  v-model="deleteConfirmText" 
+                  class="border-red-500/30 focus-visible:ring-red-500/50" 
+                  :placeholder="workspace.name"
+                />
+                <div class="flex items-center gap-3">
+                  <Button 
+                    variant="destructive" 
+                    class="cursor-pointer"
+                    :disabled="deleteConfirmText !== workspace.name || isDeleting"
+                    @click="handleDelete"
+                  >
+                    {{ isDeleting ? 'Deleting...' : 'Yes, delete this workspace' }}
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    class="cursor-pointer"
+                    @click="showDeleteConfirm = false; deleteConfirmText = ''"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+              
+              <Button 
+                v-else 
+                variant="destructive" 
+                class="cursor-pointer" 
+                @click="showDeleteConfirm = true"
+              >
+                Delete Workspace
+              </Button>
+            </div>
+          </SettingsSection>
+        </div>
       </div>
     </div>
   </div>

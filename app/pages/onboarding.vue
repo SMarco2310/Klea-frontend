@@ -25,18 +25,17 @@ function onSlugInput() {
   hasManuallyEditedSlug.value = true
 }
 
+const { createWorkspace } = useWorkspace()
+
 async function handleSubmit() {
   if (!tenantName.value || !slug.value) return
   errorMessage.value = ''
   isSubmitting.value = true
   try {
-    // Simulate API delay for creating a tenant
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    // TODO: Connect to backend when ready (e.g., await createTenant(tenantName.value, slug.value))
-    
+    await createWorkspace(tenantName.value, slug.value)
     await navigateTo('/dashboard')
-  } catch (e: any) {
-    errorMessage.value = e.message || 'Could not create workspace. Please try again.'
+  } catch (e) {
+    errorMessage.value = extractApiErrorMessage(e)
   } finally {
     isSubmitting.value = false
   }
