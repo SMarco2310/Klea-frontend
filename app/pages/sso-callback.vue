@@ -15,7 +15,7 @@ async function exchangeToken() {
     // Clerk's authenticateWithRedirect flow lands here mid-handshake — the
     // OAuth callback params are in the URL, but no session exists yet until
     // this actually runs. Without it, clerk.value.session stays null forever.
-    await clerk.value?.handleRedirectCallback({}, () => {
+    await clerk.value?.handleRedirectCallback({}, async (to: string) => {
       // Do nothing: we want to handle the navigation manually after backend auth
     })
   } catch (e) {

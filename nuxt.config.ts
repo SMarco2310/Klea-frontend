@@ -44,7 +44,7 @@ export default defineNuxtConfig({
       // once the client takes over.
       script: [
         {
-          innerHTML: `(function(){try{var m=localStorage.getItem('klea-color-mode');var d=m?m==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark')}catch(e){}})()`,
+          innerHTML: `(function(){try{var m=localStorage.getItem('klea-color-mode');var d=m?m==='dark':true;if(d)document.documentElement.classList.add('dark')}catch(e){}})()`,
         },
       ],
     },

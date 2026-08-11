@@ -94,7 +94,7 @@ const { startTour } = useTour()
         class="p-5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] hover:border-[var(--color-accent)]/50 cursor-pointer transition-colors duration-200"
       >
         <div class="flex items-center justify-between mb-4">
-          <span class="w-8 h-8 rounded bg-[#e8e7e7] dark:bg-[#4c4a4a] flex items-center justify-center text-xs font-semibold">
+          <span class="w-8 h-8 rounded bg-[#e8e7e7] dark:bg-[#a9a9a9] flex items-center justify-center text-xs font-semibold">
             {{ app.name[0] }}
           </span>
           <Badge v-if="app.status === 'active'" class="bg-[var(--color-accent)]/20 text-[var(--color-accent)]">Active</Badge>

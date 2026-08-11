@@ -29,8 +29,8 @@ async function handleResend() {
     v-if="shouldShow"
     class="flex items-center gap-3 rounded-lg border border-amber-400/30 bg-amber-400/10 px-4 py-3 mb-6"
   >
-    <MailWarningIcon class="w-4 h-4 text-amber-400 shrink-0" />
-    <p class="text-sm text-amber-200 flex-1">
+    <MailWarningIcon class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+    <p class="text-sm text-amber-800 dark:text-amber-200 flex-1">
       <template v-if="sent">Verification email sent — check your inbox.</template>
       <template v-else>Verify your email to unlock all features.</template>
     </p>
@@ -38,15 +38,15 @@ async function handleResend() {
       v-if="!sent"
       variant="ghost"
       size="sm"
-      class="cursor-pointer h-7 text-amber-200 hover:text-amber-100 hover:bg-amber-400/10"
+      class="cursor-pointer h-7 text-amber-700 dark:text-amber-200 hover:text-amber-900 dark:hover:text-amber-100 hover:bg-amber-400/10"
       :disabled="isSending"
       @click="handleResend"
     >
       {{ isSending ? 'Sending...' : 'Resend email' }}
     </Button>
-    <CheckIcon v-else class="w-4 h-4 text-amber-400 shrink-0" />
+    <CheckIcon v-else class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
     <button
-      class="text-amber-400/70 hover:text-amber-200 cursor-pointer shrink-0"
+      class="text-amber-600/70 dark:text-amber-400/70 hover:text-amber-800 dark:hover:text-amber-200 cursor-pointer shrink-0"
       aria-label="Dismiss"
       @click="dismissed = true"
     >

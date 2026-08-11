@@ -35,7 +35,10 @@ async function handleSubmit() {
 }
 
 async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
-  if (!isLoaded.value || !signIn.value) return
+  if (!isLoaded.value || !signIn.value) {
+    errorMessage.value = 'Still loading sign-in, please try again in a moment.'
+    return
+  }
   errorMessage.value = ''
   try {
     await signIn.value.authenticateWithRedirect({
@@ -104,11 +107,11 @@ async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
     </div>
 
     <div class="flex items-center gap-4">
-      <Button variant="secondary" class="flex-1 cursor-pointer h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg gap-2" @click="handleOAuth('oauth_google')">
+      <Button variant="secondary" class="flex-1 cursor-pointer h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg gap-2 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="!isLoaded" @click="handleOAuth('oauth_google')">
         <img src="/images/google.png" alt="Google" class="w-5 h-5 opacity-90" />
         Google
       </Button>
-      <Button variant="secondary" class="flex-1 cursor-pointer h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg gap-2" @click="handleOAuth('oauth_github')">
+      <Button variant="secondary" class="flex-1 cursor-pointer h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg gap-2 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="!isLoaded" @click="handleOAuth('oauth_github')">
         <img src="/images/github.png" alt="GitHub" class="w-5 h-5 opacity-90" />
         GitHub
       </Button>
