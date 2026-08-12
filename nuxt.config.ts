@@ -11,8 +11,6 @@ export default defineNuxtConfig({
       { code: 'es', language: 'es-ES', file: 'es.json' }
     ],
     defaultLocale: 'en',
-    lazy: true,
-    langDir: 'i18n/locales/',
   },
   shiki: {
     defaultTheme: 'github-dark',
@@ -50,11 +48,11 @@ export default defineNuxtConfig({
         },
       ],
       // Sets the .dark class before Vue hydrates so there's no flash of the
-      // wrong theme — useDark() (useTheme.ts) picks up the same storage key
+      // wrong theme — useTheme.ts picks up the same storage key
       // once the client takes over.
       script: [
         {
-          innerHTML: `(function(){try{var m=localStorage.getItem('klea-color-mode');var d=m?m==='dark':true;if(d)document.documentElement.classList.add('dark')}catch(e){}})()`,
+          innerHTML: `(function(){try{var m=localStorage.getItem('klea-color-mode')||'auto';var d=m==='dark'||(m==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark')}catch(e){}})()`,
         },
       ],
     },

@@ -2,7 +2,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { RocketIcon, KeyRoundIcon, FlaskConicalIcon, ListIcon, TerminalIcon, WebhookIcon, ListChecksIcon, SearchIcon, MoonIcon, SunIcon, ExternalLinkIcon } from '@lucide/vue'
+import { RocketIcon, KeyRoundIcon, FlaskConicalIcon, ListIcon, TerminalIcon, WebhookIcon, ListChecksIcon, SearchIcon, MoonIcon, SunIcon, ExternalLinkIcon, MonitorIcon } from '@lucide/vue'
 import DocsCodeBlock from '~/components/Docs/CodeBlock.vue'
 import DocsLanguageTabs from '~/components/Docs/LanguageTabs.vue'
 
@@ -11,7 +11,7 @@ const apiBase = config.public.apiBaseUrl
 
 const searchQuery = ref('')
 const searchInputRef = ref<HTMLInputElement | null>(null)
-const { isDark, toggleDark } = useTheme()
+const { isDark, toggleDark, colorMode } = useTheme()
 
 const sections = [
   { id: 'quickstart', icon: RocketIcon, label: 'Quickstart' },
@@ -313,7 +313,8 @@ const validationErrorSample = `{
             @click="toggleDark()"
             aria-label="Toggle theme"
           >
-            <MoonIcon v-if="!isDark" class="w-4 h-4" />
+            <MonitorIcon v-if="colorMode === 'auto'" class="w-4 h-4" />
+            <MoonIcon v-else-if="colorMode === 'light'" class="w-4 h-4" />
             <SunIcon v-else class="w-4 h-4" />
           </button>
         </div>
@@ -410,7 +411,7 @@ const validationErrorSample = `{
           <code class="bg-[var(--color-surface)] px-1 rounded">POST /api/public/subscribe</code> — creates the subscriber if new, a pending subscription, a pending transaction, and returns a payment link.
         </p>
 
-        <table class="w-full text-sm mt-4 mb-6 border border-[var(--color-border-dark)] rounded-lg overflow-hidden">
+        <table class="w-full text-sm mt-4 mb-6 border border-[var(--color-border-dark)] rounded-lg overflow-hidden bg-[var(--color-bg)]">
           <thead class="bg-[var(--color-surface)] text-[var(--muted-foreground)]">
             <tr>
               <th class="text-left font-medium px-4 py-2">Field</th>

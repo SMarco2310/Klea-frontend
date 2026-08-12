@@ -113,6 +113,13 @@ export function useAppAuth() {
       }).catch(() => {})
     }
     clearSession()
+
+    try {
+      const clerk = useClerk()
+      await clerk.value?.signOut()
+    } catch (e) {
+      // Ignore Clerk signout errors if it's not initialized
+    }
   }
 
   async function forgotPassword(email: string) {

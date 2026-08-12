@@ -14,7 +14,4 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
   }
 
-  if (user.value && !user.value.current_tenant_id && to.path !== '/onboarding') {
-    return navigateTo('/onboarding')
-  }
 })

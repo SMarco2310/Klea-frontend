@@ -27,35 +27,35 @@ onUnmounted(() => {
       style="transition-property: all; transition-duration: var(--dur-base); transition-timing-function: var(--ease-spring-out)"
       :class="
         isScrolled
-          ? 'border-white/15 bg-zinc-900/70 backdrop-blur-xl shadow-black/60'
-          : 'border-white/10 bg-white/[0.06] backdrop-blur-md shadow-black/40'
+          ? 'border-[color:var(--color-border-dark)] bg-[color:var(--color-surface)]/70 backdrop-blur-xl shadow-lg'
+          : 'border-transparent bg-[color:var(--color-surface)]/20 backdrop-blur-md shadow-md'
       "
     >
       <!-- Top subtle glass sheen line -->
-      <div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
+      <div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[color:var(--color-border-dark)] to-transparent pointer-events-none" />
 
       <!-- Brand Logo -->
-      <NuxtLink to="/" class="font-heading font-bold text-xl tracking-tight text-white flex items-center cursor-pointer select-none">
+      <NuxtLink to="/" class="font-heading font-bold text-xl tracking-tight text-foreground flex items-center cursor-pointer select-none">
         <span>Klea</span>
         <span class="text-[var(--color-accent)] font-extrabold text-2xl leading-none">.</span>
       </NuxtLink>
 
       <!-- Center Navigation Links -->
       <div class="hidden md:flex items-center gap-8 text-sm font-medium">
-        <a href="#features" class="text-slate-300 hover:text-white cursor-pointer transition-colors duration-200">
+        <a href="#features" class="text-muted-foreground hover:text-foreground cursor-pointer transition-colors duration-200">
           Features
         </a>
-        <NuxtLink to="/docs" class="text-slate-300 hover:text-white cursor-pointer transition-colors duration-200">
+        <NuxtLink to="/docs" class="text-muted-foreground hover:text-foreground cursor-pointer transition-colors duration-200">
           Docs
         </NuxtLink>
-        <a href="#pricing" class="text-slate-300 hover:text-white cursor-pointer transition-colors duration-200">
+        <a href="#pricing" class="text-muted-foreground hover:text-foreground cursor-pointer transition-colors duration-200">
           Pricing
         </a>
       </div>
 
       <!-- Right Action Buttons -->
       <div class="flex items-center gap-4">
-        <NuxtLink to="/login" class="text-sm font-medium text-slate-300 hover:text-white cursor-pointer transition-colors">
+        <NuxtLink to="/login" class="text-sm font-medium text-muted-foreground hover:text-foreground cursor-pointer transition-colors">
           Login
         </NuxtLink>
         <NuxtLink

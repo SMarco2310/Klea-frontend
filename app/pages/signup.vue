@@ -15,6 +15,7 @@ const errorMessage = ref('')
 const isSubmitting = ref(false)
 const { register, user } = useAppAuth()
 const { signIn, isLoaded } = useSignIn()
+const clerk = useClerk()
 
 async function handleSubmit() {
   if (!name.value || !email.value || !password.value || !passwordConfirmation.value) return
@@ -37,14 +38,24 @@ async function handleSubmit() {
 async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
   if (!isLoaded.value || !signIn.value) return
   errorMessage.value = ''
+  
+  try {
+    if (clerk.value?.session) {
+      await clerk.value.signOut()
+    }
+  } catch (e) {
+    // Ignore signout errors
+  }
+
   try {
     await signIn.value.authenticateWithRedirect({
       strategy,
       redirectUrl: '/sso-callback',
       redirectUrlComplete: '/sso-callback',
     })
-  } catch (e) {
-    errorMessage.value = 'Could not start sign-up. Please try again.'
+  } catch (e: any) {
+    console.error('OAuth error:', e)
+    errorMessage.value = e?.message || e?.errors?.[0]?.message || 'Could not start sign-up. Please try again.'
   }
 }
 </script>

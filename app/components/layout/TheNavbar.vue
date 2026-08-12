@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
-import { BookOpenIcon, GiftIcon, BellIcon, ChevronDownIcon, MenuIcon, SunIcon, MoonIcon, LanguagesIcon } from '@lucide/vue'
+import { BookOpenIcon, GiftIcon, BellIcon, ChevronDownIcon, MenuIcon, SunIcon, MoonIcon, LanguagesIcon, MonitorIcon } from '@lucide/vue'
 import AppSwitcherModal from '~/components/layout/AppSwitcherModal.vue'
 import { toast } from 'vue-sonner'
 
@@ -14,7 +14,7 @@ const { apps, currentApp } = useApps()
 const { mode, toggle } = useEnvMode()
 const { user, logout } = useAppAuth()
 const { toggleSidebar } = useSidebar()
-const { isDark, toggleDark } = useTheme()
+const { isDark, toggleDark, colorMode } = useTheme()
 const { recentTransactions } = useNotifications()
 const { workspace } = useWorkspace()
 const { t, locale, setLocale } = useI18n()
@@ -110,7 +110,8 @@ function changeLanguage(lang: string, label: string) {
         @click="toggleDark()"
         aria-label="Toggle theme"
       >
-        <MoonIcon v-if="!isDark" class="w-4 h-4" />
+        <MonitorIcon v-if="colorMode === 'auto'" class="w-4 h-4" />
+        <MoonIcon v-else-if="colorMode === 'light'" class="w-4 h-4" />
         <SunIcon v-else class="w-4 h-4" />
       </button>
 

@@ -15,6 +15,7 @@ const isSubmitting = ref(false)
 const showResetSuccess = ref(route.query.reset === 'success')
 const { login, user } = useAppAuth()
 const { signIn, isLoaded } = useSignIn()
+const clerk = useClerk()
 
 async function handleSubmit() {
   if (!email.value || !password.value) return
@@ -22,11 +23,7 @@ async function handleSubmit() {
   isSubmitting.value = true
   try {
     await login(email.value, password.value)
-    if (user.value?.current_tenant_id) {
-      await navigateTo('/dashboard')
-    } else {
-      await navigateTo('/onboarding')
-    }
+    await navigateTo('/dashboard')
   } catch (e) {
     errorMessage.value = extractAuthErrorMessage(e)
   } finally {
@@ -40,14 +37,24 @@ async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
     return
   }
   errorMessage.value = ''
+  
+  try {
+    if (clerk.value?.session) {
+      await clerk.value.signOut()
+    }
+  } catch (e) {
+    // Ignore signout errors
+  }
+
   try {
     await signIn.value.authenticateWithRedirect({
       strategy,
       redirectUrl: '/sso-callback',
       redirectUrlComplete: '/sso-callback',
     })
-  } catch (e) {
-    errorMessage.value = 'Could not start sign-in. Please try again.'
+  } catch (e: any) {
+    console.error('OAuth error:', e)
+    errorMessage.value = e?.message || e?.errors?.[0]?.message || 'Could not start sign-in. Please try again.'
   }
 }
 </script>

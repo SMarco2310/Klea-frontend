@@ -12,7 +12,7 @@ import { ArrowRightIcon } from '@lucide/vue'
         <h2 class="font-heading text-3xl md:text-4xl font-semibold tracking-tight mb-4">
           Start shipping licenses today
         </h2>
-        <p class="text-slate-400 mb-9 text-lg">No credit card required to get started in Test mode.</p>
+        <p class="text-muted-foreground mb-9 text-lg">No credit card required to get started in Test mode.</p>
         <Button
           size="lg"
           as-child

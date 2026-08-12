@@ -12,8 +12,8 @@ import TerminalWindow from '~/components/landing/TerminalWindow.vue'
     <div class="relative">
       <div class="absolute -inset-8 bg-[var(--color-accent)]/[0.06] blur-3xl rounded-full" aria-hidden="true" />
       <TerminalWindow title="auth.sh" class="relative shadow-2xl">
-        <code><span class="text-slate-500">curl</span> https://api.klea.dev/v1/plans \
-  -H <span class="text-slate-400">"Authorization: Bearer</span> <span class="text-[var(--color-key)]">lk_test_9f2a…c73e</span><span class="text-slate-400">"</span></code>
+        <code><span class="text-muted-foreground">curl</span> https://api.klea.dev/v1/plans \
+  -H <span class="text-muted-foreground/80">"Authorization: Bearer</span> <span class="text-[var(--color-key)]">lk_test_9f2a…c73e</span><span class="text-muted-foreground/80">"</span></code>
       </TerminalWindow>
     </div>
   </section>

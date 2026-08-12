@@ -9,7 +9,7 @@ defineProps<{ title: string }>()
       <span class="w-2.5 h-2.5 rounded-full bg-red-400/40" />
       <span class="w-2.5 h-2.5 rounded-full bg-amber-400/40" />
       <span class="w-2.5 h-2.5 rounded-full bg-[var(--color-accent)]/40" />
-      <span class="ml-2 text-xs text-slate-500 font-mono">{{ title }}</span>
+      <span class="ml-2 text-xs text-muted-foreground font-mono">{{ title }}</span>
     </div>
     <div class="p-5 font-mono text-sm leading-relaxed">
       <slot />

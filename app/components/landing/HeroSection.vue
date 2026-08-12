@@ -26,7 +26,7 @@ onMounted(() => {
             software licenses<br />
             <span class="text-[var(--color-accent)]">in one API call.</span>
           </h1>
-          <p class="text-slate-400 text-lg mt-6 max-w-lg leading-relaxed">
+          <p class="text-muted-foreground text-lg mt-6 max-w-lg leading-relaxed">
             Create an app, generate a key, define a plan — your subscribers get
             licensed automatically the moment they pay.
           </p>
@@ -44,7 +44,7 @@ onMounted(() => {
               <NuxtLink to="/docs">View docs</NuxtLink>
             </Button>
           </div>
-          <p class="text-xs text-slate-500 mt-4 font-mono">No credit card · Test mode included</p>
+          <p class="text-xs text-muted-foreground/80 mt-4 font-mono">No credit card · Test mode included</p>
         </div>
       </ScrollReveal>
 
@@ -52,20 +52,20 @@ onMounted(() => {
         <div class="relative">
           <div class="absolute -inset-8 bg-[var(--color-accent)]/[0.10] blur-3xl rounded-full" aria-hidden="true" />
           <TerminalWindow title="validate-license.sh" class="relative shadow-2xl">
-            <div class="text-slate-500">POST /v1/licenses/validate</div>
+            <div class="text-muted-foreground">POST /v1/licenses/validate</div>
             <div class="mt-3 flex flex-wrap gap-x-1">
-              <span class="text-slate-500">key:</span>
+              <span class="text-muted-foreground">key:</span>
               <span class="text-[var(--color-key)]">lk_live_9f2a…c73e</span>
             </div>
             <div class="mt-4 flex items-center gap-2 h-5">
               <template v-if="!validated">
-                <span class="w-1.5 h-1.5 rounded-full bg-slate-500 animate-pulse" />
-                <span class="text-slate-400">checking key…</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-pulse" />
+                <span class="text-muted-foreground/80">checking key…</span>
               </template>
               <template v-else>
                 <CheckIcon class="w-4 h-4 text-[var(--color-accent)]" />
                 <span class="text-[var(--color-accent)]">valid</span>
-                <span class="text-slate-500">· plan: pro · expires in 27d</span>
+                <span class="text-muted-foreground">· plan: pro · expires in 27d</span>
               </template>
             </div>
           </TerminalWindow>

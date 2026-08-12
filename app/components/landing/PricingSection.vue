@@ -112,7 +112,7 @@ const tiers = [
             :class="isYearly ? 'translate-x-5' : 'translate-x-0'"
           />
         </button>
-        <span class="text-sm font-medium text-slate-200">
+        <span class="text-sm font-medium text-muted-foreground">
           Billed Yearly
         </span>
         <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">

@@ -37,7 +37,7 @@ const steps = [
             {{ step.n }}
           </div>
           <h3 class="font-heading font-medium mb-1.5">{{ step.title }}</h3>
-          <p class="text-sm text-slate-400 leading-relaxed">{{ step.desc }}</p>
+          <p class="text-sm text-muted-foreground leading-relaxed">{{ step.desc }}</p>
         </div>
       </ScrollReveal>
     </div>

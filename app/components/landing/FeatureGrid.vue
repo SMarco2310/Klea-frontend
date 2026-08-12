@@ -35,10 +35,10 @@ const items = [
             <span class="flex items-center justify-center w-9 h-9 rounded-lg bg-[var(--color-accent)]/10 ring-1 ring-[var(--color-accent)]/25 shadow-[0_0_16px_-4px_var(--color-accent)]">
               <component :is="item.icon" class="w-4.5 h-4.5 text-[var(--color-accent)]" />
             </span>
-            <span class="text-[11px] font-mono text-slate-600">{{ item.path }}</span>
+            <span class="text-[11px] font-mono text-muted-foreground">{{ item.path }}</span>
           </div>
           <h3 class="font-heading font-semibold mb-1.5">{{ item.title }}</h3>
-          <p class="text-sm text-slate-400 leading-relaxed">{{ item.desc }}</p>
+          <p class="text-sm text-muted-foreground leading-relaxed">{{ item.desc }}</p>
         </div>
       </ScrollReveal>
     </div>
