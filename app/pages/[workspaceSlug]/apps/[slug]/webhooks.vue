@@ -61,7 +61,7 @@ const maskedSecret = computed(() =>
         </div>
         <p v-else class="text-xs text-slate-500">
           Not configured —
-          <NuxtLink :to="`/apps/${currentApp?.slug}/settings`" class="text-[var(--color-accent)] hover:underline">set it in Settings</NuxtLink>
+          <NuxtLink :to="`/${$route.params.workspaceSlug}/apps/${currentApp?.slug}/settings`" class="text-[var(--color-accent)] hover:underline">set it in Settings</NuxtLink>
         </p>
       </div>
 

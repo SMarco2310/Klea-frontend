@@ -20,7 +20,11 @@ const steps = [
     </ScrollReveal>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-      <div class="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] h-px bg-[var(--color-border-dark)]" aria-hidden="true" />
+      <div
+        class="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] h-px"
+        style="background-image: linear-gradient(90deg, transparent, var(--color-border-dark) 12%, var(--color-border-dark) 88%, transparent)"
+        aria-hidden="true"
+      />
       <ScrollReveal
         v-for="(step, idx) in steps"
         :key="step.n"
@@ -29,7 +33,7 @@ const steps = [
         :duration="600"
       >
         <div class="text-center relative">
-          <div class="w-10 h-10 rounded-full bg-[var(--color-bg)] border border-[var(--color-accent)]/40 text-[var(--color-accent)] font-mono text-sm font-medium flex items-center justify-center mx-auto mb-5">
+          <div class="w-10 h-10 rounded-full bg-[var(--color-bg)] border border-[var(--color-accent)]/40 text-[var(--color-accent)] font-mono text-sm font-medium flex items-center justify-center mx-auto mb-5 shadow-[0_0_20px_-6px_var(--color-accent)]">
             {{ step.n }}
           </div>
           <h3 class="font-heading font-medium mb-1.5">{{ step.title }}</h3>

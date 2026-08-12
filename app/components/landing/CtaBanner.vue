@@ -6,7 +6,7 @@ import { ArrowRightIcon } from '@lucide/vue'
 
 <template>
   <section class="max-w-4xl mx-auto px-6 py-24 text-center">
-    <div class="rounded-2xl border border-[var(--color-border-dark)] bg-[var(--color-surface)] px-8 py-16 relative overflow-hidden">
+    <div class="surface-card rounded-2xl px-8 py-16 relative overflow-hidden">
       <div class="absolute -inset-x-20 -top-32 h-64 bg-[var(--color-accent)]/[0.08] blur-3xl rounded-full" aria-hidden="true" />
       <div class="relative">
         <h2 class="font-heading text-3xl md:text-4xl font-semibold tracking-tight mb-4">

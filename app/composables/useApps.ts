@@ -53,7 +53,8 @@ export function useApps() {
   }
 
   function selectApp(slug: string) {
-    navigateTo(`/apps/${slug}/analytics`)
+    const { workspace } = useWorkspace()
+    navigateTo(`/${workspace.value.slug}/apps/${slug}/analytics`)
   }
 
   return { apps, currentApp, pending, error, fetchApps, createApp, updateApp, deleteApp, selectApp }

@@ -22,7 +22,7 @@ const items = [
       </div>
     </ScrollReveal>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-[var(--color-border-dark)] rounded-xl overflow-hidden border border-[var(--color-border-dark)]">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
       <ScrollReveal
         v-for="(item, idx) in items"
         :key="item.title"
@@ -30,9 +30,11 @@ const items = [
         :delay="idx * 80"
         :duration="600"
       >
-        <div class="p-6 bg-[var(--color-surface)] hover:bg-[var(--color-surface)]/60 transition-colors duration-200 h-full">
+        <div class="surface-card surface-card--interactive rounded-xl p-6 h-full">
           <div class="flex items-center justify-between mb-5">
-            <component :is="item.icon" class="w-5 h-5 text-[var(--color-accent)]" />
+            <span class="flex items-center justify-center w-9 h-9 rounded-lg bg-[var(--color-accent)]/10 ring-1 ring-[var(--color-accent)]/25 shadow-[0_0_16px_-4px_var(--color-accent)]">
+              <component :is="item.icon" class="w-4.5 h-4.5 text-[var(--color-accent)]" />
+            </span>
             <span class="text-[11px] font-mono text-slate-600">{{ item.path }}</span>
           </div>
           <h3 class="font-heading font-semibold mb-1.5">{{ item.title }}</h3>

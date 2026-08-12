@@ -2,6 +2,6 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'dashboard', middleware: 'auth' })
 const route = useRoute()
-await navigateTo(`/apps/${route.params.slug}/analytics`, { redirectCode: 302 })
+await navigateTo(`/${route.params.workspaceSlug}/apps/${route.params.slug}/analytics`, { redirectCode: 302 })
 </script>
 <template><div /></template>

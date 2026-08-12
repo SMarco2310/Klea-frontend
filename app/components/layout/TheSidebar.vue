@@ -7,26 +7,27 @@ import {
 
 const route = useRoute()
 const { currentApp } = useApps()
+const { workspace } = useWorkspace()
 const slug = computed(() => route.params.slug as string || currentApp.value?.slug)
 
-const defaultNavItems = [
-  { label: 'Apps', to: '/dashboard', icon: LayersIcon },
-  { label: 'Earnings', to: '/earnings', icon: WalletIcon },
-  { label: 'Team', to: '/team', icon: UsersIcon },
-  { label: 'Settings', to: '/settings', icon: SettingsIcon },
-]
+const defaultNavItems = computed(() => [
+  { label: 'Apps', to: `/${workspace.value.slug}/dashboard`, icon: LayersIcon },
+  { label: 'Earnings', to: `/${workspace.value.slug}/earnings`, icon: WalletIcon },
+  { label: 'Team', to: `/${workspace.value.slug}/team`, icon: UsersIcon },
+  { label: 'Settings', to: `/${workspace.value.slug}/settings`, icon: SettingsIcon },
+])
 
 const activeAppTabs = computed(() => {
   if (!slug.value) return []
   return [
-    { label: 'Analytics', to: `/apps/${slug.value}/analytics`, icon: BarChartIcon },
-    { label: 'Subscribers', to: `/apps/${slug.value}/subscribers`, icon: UsersIcon },
-    { label: 'Subscriptions', to: `/apps/${slug.value}/subscriptions`, icon: CreditCardIcon },
-    { label: 'Plans & access', to: `/apps/${slug.value}/plans`, icon: SlidersIcon },
-    { label: 'Features', to: `/apps/${slug.value}/features`, icon: SparklesIcon },
-    { label: 'API Keys', to: `/apps/${slug.value}/api-keys`, icon: KeyIcon },
-    { label: 'Webhooks', to: `/apps/${slug.value}/webhooks`, icon: PlugIcon },
-    { label: 'Settings', to: `/apps/${slug.value}/settings`, icon: SettingsIcon },
+    { label: 'Analytics', to: `/${workspace.value.slug}/apps/${slug.value}/analytics`, icon: BarChartIcon },
+    { label: 'Subscribers', to: `/${workspace.value.slug}/apps/${slug.value}/subscribers`, icon: UsersIcon },
+    { label: 'Subscriptions', to: `/${workspace.value.slug}/apps/${slug.value}/subscriptions`, icon: CreditCardIcon },
+    { label: 'Plans & access', to: `/${workspace.value.slug}/apps/${slug.value}/plans`, icon: SlidersIcon },
+    { label: 'Features', to: `/${workspace.value.slug}/apps/${slug.value}/features`, icon: SparklesIcon },
+    { label: 'API Keys', to: `/${workspace.value.slug}/apps/${slug.value}/api-keys`, icon: KeyIcon },
+    { label: 'Webhooks', to: `/${workspace.value.slug}/apps/${slug.value}/webhooks`, icon: PlugIcon },
+    { label: 'Settings', to: `/${workspace.value.slug}/apps/${slug.value}/settings`, icon: SettingsIcon },
   ]
 })
 </script>

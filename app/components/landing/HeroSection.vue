@@ -3,6 +3,7 @@
 import { Button } from '~/components/ui/button'
 import { ArrowRightIcon, CheckIcon } from '@lucide/vue'
 import ScrollReveal from '~/components/landing/ScrollReveal.vue'
+import TerminalWindow from '~/components/landing/TerminalWindow.vue'
 
 const validated = ref(false)
 
@@ -49,33 +50,25 @@ onMounted(() => {
 
       <ScrollReveal direction="left" :delay="300" :duration="900">
         <div class="relative">
-          <div class="absolute -inset-6 bg-[var(--color-accent)]/[0.06] blur-3xl rounded-full" aria-hidden="true" />
-          <div class="relative rounded-xl border border-[var(--color-border-dark)] bg-[var(--color-surface-muted)] overflow-hidden shadow-2xl">
-            <div class="flex items-center gap-1.5 px-4 py-3 border-b border-[var(--color-border-dark)] bg-[var(--color-surface)]/50">
-              <span class="w-2.5 h-2.5 rounded-full bg-red-400/40" />
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-400/40" />
-              <span class="w-2.5 h-2.5 rounded-full bg-[var(--color-accent)]/40" />
-              <span class="ml-2 text-xs text-slate-500 font-mono">validate-license.sh</span>
+          <div class="absolute -inset-8 bg-[var(--color-accent)]/[0.10] blur-3xl rounded-full" aria-hidden="true" />
+          <TerminalWindow title="validate-license.sh" class="relative shadow-2xl">
+            <div class="text-slate-500">POST /v1/licenses/validate</div>
+            <div class="mt-3 flex flex-wrap gap-x-1">
+              <span class="text-slate-500">key:</span>
+              <span class="text-[var(--color-key)]">lk_live_9f2a…c73e</span>
             </div>
-            <div class="p-5 font-mono text-sm leading-relaxed">
-              <div class="text-slate-500">POST /v1/licenses/validate</div>
-              <div class="mt-3 flex flex-wrap gap-x-1">
-                <span class="text-slate-500">key:</span>
-                <span class="text-[var(--color-key)]">lk_live_9f2a…c73e</span>
-              </div>
-              <div class="mt-4 flex items-center gap-2 h-5">
-                <template v-if="!validated">
-                  <span class="w-1.5 h-1.5 rounded-full bg-slate-500 animate-pulse" />
-                  <span class="text-slate-400">checking key…</span>
-                </template>
-                <template v-else>
-                  <CheckIcon class="w-4 h-4 text-[var(--color-accent)]" />
-                  <span class="text-[var(--color-accent)]">valid</span>
-                  <span class="text-slate-500">· plan: pro · expires in 27d</span>
-                </template>
-              </div>
+            <div class="mt-4 flex items-center gap-2 h-5">
+              <template v-if="!validated">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-500 animate-pulse" />
+                <span class="text-slate-400">checking key…</span>
+              </template>
+              <template v-else>
+                <CheckIcon class="w-4 h-4 text-[var(--color-accent)]" />
+                <span class="text-[var(--color-accent)]">valid</span>
+                <span class="text-slate-500">· plan: pro · expires in 27d</span>
+              </template>
             </div>
-          </div>
+          </TerminalWindow>
         </div>
       </ScrollReveal>
     </div>

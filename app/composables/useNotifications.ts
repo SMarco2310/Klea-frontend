@@ -1,4 +1,4 @@
-import { ref, watchEffect, onUnmounted } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
 import { toast } from 'vue-sonner'
 import type { Transaction } from './useEarnings'
 import type { Paginated } from './useApi'
@@ -53,6 +53,7 @@ export function useNotifications() {
   }
 
   function startPolling() {
+    if (import.meta.server) return
     if (pollInterval) clearInterval(pollInterval)
     pollInterval = setInterval(() => {
       fetchRecentTransactions(true)
@@ -66,8 +67,14 @@ export function useNotifications() {
     }
   }
 
+  // Fetch initial data
+  if (import.meta.client) {
+    fetchRecentTransactions(false)
+    startPolling()
+  }
+
   // Restart polling and fetch fresh data when mode changes
-  watchEffect(() => {
+  watch(mode, () => {
     fetchRecentTransactions(false)
     startPolling()
   })

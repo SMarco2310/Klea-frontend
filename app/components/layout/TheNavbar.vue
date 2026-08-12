@@ -16,13 +16,9 @@ const { user, logout } = useAppAuth()
 const { toggleSidebar } = useSidebar()
 const { isDark, toggleDark } = useTheme()
 const { recentTransactions } = useNotifications()
+const { workspace } = useWorkspace()
+const { t, locale, setLocale } = useI18n()
 const switcherOpen = ref(false)
-
-// Tenant switching isn't wired to the backend yet (GET /tenants /
-// POST /me/switch-tenant exist but aren't called from here) — this shows
-// the user's real current tenant, but the dropdown is a single-item list
-// until multi-tenant switching is built.
-const currentTenant = computed(() => user.value?.tenants?.find((t) => t.id === user.value?.current_tenant_id))
 
 async function handleLogout() {
   await logout()
@@ -31,6 +27,11 @@ async function handleLogout() {
 
 function handleWorkspaceSwitch() {
   toast.success('Switched workspace successfully')
+}
+
+function changeLanguage(lang: string, label: string) {
+  setLocale(lang)
+  toast.success(t('navbar.switchedTo', { lang: label }))
 }
 </script>
 
@@ -43,7 +44,7 @@ function handleWorkspaceSwitch() {
     >
       <MenuIcon class="w-5 h-5" />
     </button>
-    <NuxtLink to="/dashboard" class="font-heading font-semibold text-lg cursor-pointer shrink-0">Klea<span class="text-[var(--color-accent)]">.</span></NuxtLink>
+    <NuxtLink :to="workspace.slug ? `/${workspace.slug}/dashboard` : '/dashboard'" class="font-heading font-semibold text-lg cursor-pointer shrink-0">Klea<span class="text-[var(--color-accent)]">.</span></NuxtLink>
 
     <div class="flex items-center gap-1.5 shrink-0">
       <span class="text-[var(--muted-foreground)]">/</span>
@@ -51,13 +52,13 @@ function handleWorkspaceSwitch() {
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <button id="tour-workspace" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md hover:bg-[var(--color-hover)] cursor-pointer transition-colors duration-200">
-            <span class="hidden sm:inline">{{ currentTenant?.name ?? 'Workspace' }}</span>
+            <span class="hidden sm:inline">{{ workspace?.name || $t('navbar.workspace') }}</span>
             <ChevronDownIcon class="w-3.5 h-3.5 text-[var(--muted-foreground)]" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem v-if="currentTenant" class="cursor-pointer" @click="handleWorkspaceSwitch">
-            {{ currentTenant.name }}
+          <DropdownMenuItem v-if="workspace?.name" class="cursor-pointer" @click="handleWorkspaceSwitch">
+            {{ workspace.name }}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -76,7 +77,7 @@ function handleWorkspaceSwitch() {
           <span class="hidden sm:inline">{{ currentApp.name }}</span>
         </template>
         <template v-else>
-          <span class="hidden sm:inline text-[var(--muted-foreground)]">Select App</span>
+          <span class="hidden sm:inline text-[var(--muted-foreground)]">{{ $t('navbar.selectApp') }}</span>
         </template>
         <ChevronDownIcon class="w-3.5 h-3.5 text-[var(--muted-foreground)]" />
       </button>
@@ -89,19 +90,19 @@ function handleWorkspaceSwitch() {
           :class="mode === 'test' ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)] shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
           @click="mode === 'live' && toggle()"
         >
-          Test
+          {{ $t('navbar.test') }}
         </button>
         <button
           class="px-3 py-1 rounded-md text-xs font-medium cursor-pointer transition-all duration-200"
           :class="mode === 'live' ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)] shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
           @click="mode === 'test' && toggle()"
         >
-          Live
+          {{ $t('navbar.live') }}
         </button>
       </div>
 
       <NuxtLink to="/docs" class="hidden lg:flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer">
-        <BookOpenIcon class="w-4 h-4" /> Docs
+        <BookOpenIcon class="w-4 h-4" /> {{ $t('navbar.docs') }}
       </NuxtLink>
 
       <button
@@ -120,13 +121,13 @@ function handleWorkspaceSwitch() {
             aria-label="Change language"
           >
             <LanguagesIcon class="w-4 h-4" />
-            EN
+            {{ locale.toUpperCase() }}
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem class="cursor-pointer font-medium" @click="toast.success('Switched to English')">English (EN)</DropdownMenuItem>
-          <DropdownMenuItem class="cursor-pointer" @click="toast.success('Switched to French')">Français (FR)</DropdownMenuItem>
-          <DropdownMenuItem class="cursor-pointer" @click="toast.success('Switched to Spanish')">Español (ES)</DropdownMenuItem>
+          <DropdownMenuItem class="cursor-pointer font-medium" @click="changeLanguage('en', 'English')">English (EN)</DropdownMenuItem>
+          <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('fr', 'Français')">Français (FR)</DropdownMenuItem>
+          <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('es', 'Español')">Español (ES)</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -139,19 +140,19 @@ function handleWorkspaceSwitch() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" class="w-80 p-0 border border-[var(--color-border-dark)] overflow-hidden">
           <div class="px-4 py-3 bg-[var(--color-surface-muted)] border-b border-[var(--color-border-dark)] flex items-center justify-between">
-            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Recent Payments</h3>
+            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">{{ $t('navbar.recentPayments') }}</h3>
           </div>
           <div class="max-h-80 overflow-y-auto">
             <div v-if="recentTransactions.length === 0" class="px-4 py-8 text-center text-sm text-[var(--muted-foreground)]">
-              No recent payments.
+              {{ $t('navbar.noRecentPayments') }}
             </div>
             <div v-else class="divide-y divide-[var(--color-border-dark)]">
               <div v-for="tx in recentTransactions" :key="tx.id" class="px-4 py-3 hover:bg-[var(--color-surface-muted)] transition-colors cursor-default">
                 <div class="flex items-start justify-between gap-3">
                   <div class="space-y-1">
-                    <p class="text-sm font-medium text-[var(--foreground)]">New Payment</p>
+                    <p class="text-sm font-medium text-[var(--foreground)]">{{ $t('navbar.newPayment') }}</p>
                     <p class="text-xs text-[var(--muted-foreground)]">
-                      {{ tx.currency }} {{ tx.amount.toLocaleString() }} via {{ tx.payment_method }}
+                      {{ tx.currency }} {{ tx.amount.toLocaleString() }} {{ $t('navbar.via') }} {{ tx.payment_method }}
                     </p>
                   </div>
                   <span 
@@ -172,8 +173,8 @@ function handleWorkspaceSwitch() {
             </div>
           </div>
           <div class="p-2 border-t border-[var(--color-border-dark)] bg-[var(--color-surface)]">
-            <NuxtLink to="/earnings" class="block w-full text-center text-xs font-medium text-[var(--color-accent)] hover:underline py-1.5 rounded-md hover:bg-[var(--color-surface-muted)] transition-colors">
-              View all transactions
+            <NuxtLink :to="`/${workspace.slug}/earnings`" class="block w-full text-center text-xs font-medium text-[var(--color-accent)] hover:underline py-1.5 rounded-md hover:bg-[var(--color-surface-muted)] transition-colors">
+              {{ $t('navbar.viewAllTransactions') }}
             </NuxtLink>
           </div>
         </DropdownMenuContent>
@@ -189,10 +190,10 @@ function handleWorkspaceSwitch() {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem class="cursor-pointer lg:hidden" @click="navigateTo('/docs')">Docs</DropdownMenuItem>
-          <DropdownMenuItem class="cursor-pointer" @click="navigateTo('/profile')">Profile</DropdownMenuItem>
-          <DropdownMenuItem class="cursor-pointer" @click="navigateTo('/settings')">Settings</DropdownMenuItem>
-          <DropdownMenuItem class="cursor-pointer" @click="handleLogout">Log out</DropdownMenuItem>
+          <DropdownMenuItem class="cursor-pointer lg:hidden" @click="navigateTo('/docs')">{{ $t('navbar.docs') }}</DropdownMenuItem>
+          <DropdownMenuItem class="cursor-pointer" @click="navigateTo(`/${workspace.slug}/profile`)">{{ $t('navbar.profile') }}</DropdownMenuItem>
+          <DropdownMenuItem class="cursor-pointer" @click="navigateTo(`/${workspace.slug}/settings`)">{{ $t('navbar.settings') }}</DropdownMenuItem>
+          <DropdownMenuItem class="cursor-pointer" @click="handleLogout">{{ $t('navbar.logout') }}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

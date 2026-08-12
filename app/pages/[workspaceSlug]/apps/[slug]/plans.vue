@@ -79,7 +79,9 @@ async function onDrop(event: DragEvent, index: number) {
 
   const newPlans = [...plans.value]
   const [removed] = newPlans.splice(draggedIndex.value, 1)
-  newPlans.splice(index, 0, removed)
+  if (removed) {
+    newPlans.splice(index, 0, removed)
+  }
 
   draggedIndex.value = null
   dragOverIndex.value = null
@@ -420,7 +422,7 @@ async function togglePublish(plan: Plan) {
 
             <div v-if="features.length === 0" class="p-4 rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] text-center">
               <p class="text-xs text-[var(--muted-foreground)]">No features created yet.</p>
-              <NuxtLink :to="`/apps/${currentApp?.slug}/features`" class="text-xs text-teal-500 dark:text-teal-400 hover:underline mt-1 inline-block">
+              <NuxtLink :to="`/${$route.params.workspaceSlug}/apps/${currentApp?.slug}/features`" class="text-xs text-teal-500 dark:text-teal-400 hover:underline mt-1 inline-block">
                 Create features first
               </NuxtLink>
             </div>

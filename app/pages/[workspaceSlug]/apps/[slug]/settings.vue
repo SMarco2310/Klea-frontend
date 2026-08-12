@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import AppHeader from '~/components/dashboard/AppHeader.vue'
 
 const { currentApp, updateApp, deleteApp } = useApps()
+const route = useRoute()
 
 const appName = ref(currentApp.value?.name ?? '')
 const webhookUrl = ref(currentApp.value?.webhook_url ?? '')
@@ -49,7 +50,7 @@ async function confirmDelete() {
   deleteError.value = ''
   try {
     await deleteApp(currentApp.value.id)
-    await navigateTo('/dashboard')
+    await navigateTo(`/${route.params.workspaceSlug}/dashboard`)
   } catch (e) {
     deleteError.value = extractApiErrorMessage(e)
     isDeleting.value = false
