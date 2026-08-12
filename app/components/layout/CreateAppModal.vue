@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
+import { toast } from 'vue-sonner'
 
 const open = defineModel<boolean>('open', { required: true })
 const { createApp, selectApp } = useApps()
@@ -12,13 +13,24 @@ const name = ref('')
 const slug = computed(() =>
   name.value.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 )
+const isSubmitting = ref(false)
+const errorMessage = ref('')
 
-function handleCreate() {
+async function handleCreate() {
   if (!name.value.trim()) return
-  const app = createApp(name.value.trim(), slug.value)
-  name.value = ''
-  open.value = false
-  selectApp(app.slug)
+  isSubmitting.value = true
+  errorMessage.value = ''
+  try {
+    const app = await createApp(name.value.trim(), slug.value)
+    name.value = ''
+    open.value = false
+    selectApp(app.slug)
+    toast.success('Application created successfully')
+  } catch (e) {
+    errorMessage.value = extractApiErrorMessage(e)
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -38,10 +50,15 @@ function handleCreate() {
           <Label for="app-slug">Slug</Label>
           <Input id="app-slug" :model-value="slug" disabled />
         </div>
+        <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2">
+          {{ errorMessage }}
+        </p>
       </div>
       <div class="flex justify-end gap-2">
         <Button variant="ghost" class="cursor-pointer" @click="open = false">Cancel</Button>
-        <Button class="cursor-pointer" :disabled="!name.trim()" @click="handleCreate">Create app</Button>
+        <Button class="cursor-pointer" :disabled="!name.trim() || isSubmitting" @click="handleCreate">
+          {{ isSubmitting ? 'Creating...' : 'Create app' }}
+        </Button>
       </div>
     </DialogContent>
   </Dialog>

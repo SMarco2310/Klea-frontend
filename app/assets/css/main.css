@@ -1,3 +1,6 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -6,19 +9,13 @@
 @theme {
   --font-heading: "Space Grotesk", sans-serif;
   --font-body: "DM Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
-  --color-bg: #0b0f14;
-  --color-surface: #1e293b;
-  --color-surface-muted: #0f172a;
-  --color-accent: #7fb894;
-  --color-accent-foreground: #06170d;
-  --color-border-dark: #27313f;
-
-  --color-bg-light: #f8fafc;
-  --color-surface-light: #ffffff;
-  --color-border-light: #e2e8f0;
-  --color-text-light: #0f172a;
-  --color-text-muted-light: #475569;
+  --ease-spring-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 120ms;
+  --dur-base: 300ms;
+  --dur-reveal: 500ms;
 }
 
 @layer base {
@@ -66,26 +63,27 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --font-heading: var(--font-sans);
 }
 
 :root {
-  --background: oklch(1 0 0);
+  --background: oklch(0.98 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --primary: #3f8a5c;
+  --primary-foreground: #f4fbf7;
+  --secondary: oklch(0.95 0 0);
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
+  --muted: oklch(0.94 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: oklch(0.95 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  --border: oklch(0.88 0 0);
+  --input: oklch(0.88 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -93,7 +91,7 @@
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
+  --sidebar: oklch(0.96 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -101,6 +99,25 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Klea brand tokens — light. --color-accent-foreground isn't set here;
+     it's already mapped in @theme inline from --accent-foreground above. */
+  --color-bg: #e2e8e4;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1f4f2;
+  --color-border-dark: #d7ddd9;
+  --color-accent: #3f8a5c;
+  --color-key: #9c6b2e;
+  --color-hover: rgba(15, 23, 20, 0.045);
+
+  /* Featured pricing-card treatment — light */
+  --plan-card-featured-bg:
+    radial-gradient(130% 100% at 12% -10%, rgba(63, 138, 92, 0.16), transparent 55%),
+    linear-gradient(165deg, #eef6f0 0%, #dfede3 45%, #cde3d4 100%);
+  --plan-card-featured-border: rgba(63, 138, 92, 0.35);
+  --plan-card-cta-bg: #3f8a5c;
+  --plan-card-cta-fg: #f4fbf7;
+  --plan-card-cta-hover: #356f4b;
 }
 
 .dark {
@@ -135,6 +152,24 @@
   --sidebar-accent-foreground: #06170d;
   --sidebar-border: #27313f;
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Klea brand tokens — dark */
+  --color-bg: #0b0f14;
+  --color-surface: #1e293b;
+  --color-surface-muted: #0f172a;
+  --color-border-dark: #27313f;
+  --color-accent: #7fb894;
+  --color-key: #d4a574;
+  --color-hover: rgba(255, 255, 255, 0.06);
+
+  /* Featured pricing-card treatment — dark */
+  --plan-card-featured-bg:
+    radial-gradient(130% 100% at 12% -10%, rgba(127, 184, 148, 0.22), transparent 55%),
+    linear-gradient(165deg, #16291f 0%, #0f2018 50%, #081711 100%);
+  --plan-card-featured-border: rgba(127, 184, 148, 0.35);
+  --plan-card-cta-bg: #ffffff;
+  --plan-card-cta-fg: #0b0f14;
+  --plan-card-cta-hover: #e5e7eb;
 }
 
 @layer base {
@@ -144,4 +179,141 @@
   body {
     @apply bg-[color:var(--background)] text-[color:var(--foreground)];
   }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-black/40 border border-white/10 backdrop-blur-2xl shadow-xl;
+  }
+
+  .bg-grid-pattern {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-size: 64px 64px;
+    background-image: 
+      linear-gradient(to right, color-mix(in oklch, var(--color-foreground) 2.5%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklch, var(--color-foreground) 2.5%, transparent) 1px, transparent 1px);
+  }
+
+  /* Elevated surface: replaces flat single-color cards with a faint diagonal
+     gradient + real shadow, so content lifts off the ambient backdrop. */
+  .surface-card {
+    background-image: linear-gradient(
+      165deg,
+      color-mix(in oklch, var(--color-surface) 100%, white 3%),
+      var(--color-surface) 55%,
+      color-mix(in oklch, var(--color-surface) 100%, black 12%)
+    );
+    border: 1px solid var(--color-border-dark);
+    box-shadow:
+      0 1px 0 0 color-mix(in oklch, white 6%, transparent) inset;
+  }
+
+  .surface-card--interactive {
+    transition: transform var(--dur-base) var(--ease-spring-out),
+      box-shadow var(--dur-base) var(--ease-spring-out),
+      border-color var(--dur-base) var(--ease-spring-out);
+  }
+
+  .surface-card--interactive:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in oklch, var(--color-accent) 40%, var(--color-border-dark));
+    box-shadow:
+      0 1px 0 0 color-mix(in oklch, white 6%, transparent) inset,
+      0 0 0 1px color-mix(in oklch, var(--color-accent) 12%, transparent),
+      0 0 32px -8px color-mix(in oklch, var(--color-accent) 35%, transparent);
+  }
+}
+
+/* Chrome/Safari force a yellow highlight on autofilled inputs, ignoring the
+   actual background — override it to match the theme instead of leaking a
+   raw browser color into a dark UI. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--autofill-fg, var(--foreground));
+  caret-color: var(--autofill-fg, var(--foreground));
+  transition: background-color 0s 600000s, color 0s 600000s;
+  -webkit-box-shadow: 0 0 0 1000px var(--autofill-bg, var(--color-surface)) inset;
+  box-shadow: 0 0 0 1000px var(--autofill-bg, var(--color-surface)) inset;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: var(--dur-fast) !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-panel, header nav {
+    backdrop-filter: none !important;
+    background: var(--color-surface) !important;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Driver.js Custom Theme */
+.klea-tour-theme {
+  background-color: var(--color-surface) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--color-border-dark) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+.klea-tour-theme .driver-popover-title {
+  color: var(--foreground) !important;
+  font-family: inherit !important;
+  font-weight: 600 !important;
+  font-size: 1.125rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.klea-tour-theme .driver-popover-description {
+  color: var(--muted-foreground) !important;
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+}
+
+.klea-tour-theme .driver-popover-footer button {
+  background-color: var(--color-surface-muted) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--color-border-dark) !important;
+  border-radius: 0.375rem !important;
+  padding: 0.375rem 0.75rem !important;
+  font-weight: 500 !important;
+  font-size: 0.75rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+.klea-tour-theme .driver-popover-footer button:hover {
+  background-color: var(--color-hover) !important;
+}
+
+.klea-tour-theme .driver-popover-footer button.driver-popover-next-btn {
+  background-color: var(--color-accent) !important;
+  color: #fff !important;
+  border-color: var(--color-accent) !important;
+}
+
+.klea-tour-theme .driver-popover-footer button.driver-popover-next-btn:hover {
+  opacity: 0.9 !important;
+}
+
+.klea-tour-theme .driver-popover-progress-text {
+  color: var(--muted-foreground) !important;
+  font-size: 0.75rem !important;
 }

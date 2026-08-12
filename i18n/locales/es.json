@@ -1,0 +1,18 @@
+{
+  "navbar": {
+    "docs": "Documentación",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión",
+    "recentPayments": "Pagos recientes",
+    "noRecentPayments": "No hay pagos recientes.",
+    "newPayment": "Nuevo pago",
+    "via": "vía",
+    "viewAllTransactions": "Ver todas las transacciones",
+    "selectApp": "Selec. App",
+    "workspace": "Espacio de trabajo",
+    "test": "Prueba",
+    "live": "En vivo",
+    "switchedTo": "Cambiado a {lang}"
+  }
+}

@@ -2,11 +2,27 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
 
-const { loginWithClerkToken } = useAuth()
+const { loginWithClerkToken, user } = useAppAuth()
 const clerk = useClerk()
 const errorMessage = ref('')
+const started = ref(false)
 
 async function exchangeToken() {
+  if (started.value) return
+  started.value = true
+
+  try {
+    // Clerk's authenticateWithRedirect flow lands here mid-handshake — the
+    // OAuth callback params are in the URL, but no session exists yet until
+    // this actually runs. Without it, clerk.value.session stays null forever.
+    await clerk.value?.handleRedirectCallback({}, async (to: string) => {
+      // Do nothing: we want to handle the navigation manually after backend auth
+    })
+  } catch (e) {
+    errorMessage.value = 'Sign-in did not complete. Please try again.'
+    return
+  }
+
   const session = clerk.value?.session
   if (!session) {
     errorMessage.value = 'Sign-in did not complete. Please try again.'
@@ -19,7 +35,11 @@ async function exchangeToken() {
   }
   try {
     await loginWithClerkToken(clerkToken)
-    await navigateTo('/dashboard')
+    if (user.value?.current_tenant_id) {
+      await navigateTo('/dashboard')
+    } else {
+      await navigateTo('/onboarding')
+    }
   } catch (e) {
     errorMessage.value = 'Could not complete sign-in with our server. Please try again.'
   }

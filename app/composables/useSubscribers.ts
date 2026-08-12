@@ -1,11 +1,19 @@
 // app/composables/useSubscribers.ts
-export function useSubscribers(appId: string) {
-  const { subscribers } = useSeedData()
-  const { mode } = useEnvMode()
+import type { Subscriber } from './useSubscriptions'
 
-  const scoped = computed(() =>
-    subscribers.value.filter((s) => s.appId === appId && s.env === mode.value)
-  )
+export function useSubscribers(appId: number | string) {
+  const { subscriptions, pending, error, fetchSubscriptions } = useSubscriptions(appId)
 
-  return { subscribers: scoped }
+  // The API has no per-application subscribers endpoint — a subscriber only
+  // links to an app through their subscriptions, so "subscribers of this
+  // app" is derived by deduping the subscriber on each app-scoped subscription.
+  const subscribers = computed(() => {
+    const seen = new Map<number, Subscriber>()
+    for (const s of subscriptions.value) {
+      if (s.subscriber && !seen.has(s.subscriber.id)) seen.set(s.subscriber.id, s.subscriber)
+    }
+    return [...seen.values()]
+  })
+
+  return { subscribers, pending, error, fetchSubscribers: fetchSubscriptions }
 }

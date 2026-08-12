@@ -1,16 +1,21 @@
 <!-- app/pages/login.vue -->
 <script setup lang="ts">
 definePageMeta({ layout: 'auth' })
+import { EyeIcon, EyeOffIcon } from '@lucide/vue'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 
+const route = useRoute()
 const email = ref('')
 const password = ref('')
+const showPassword = ref(false)
 const errorMessage = ref('')
 const isSubmitting = ref(false)
-const { login } = useAuth()
+const showResetSuccess = ref(route.query.reset === 'success')
+const { login, user } = useAppAuth()
 const { signIn, isLoaded } = useSignIn()
+const clerk = useClerk()
 
 async function handleSubmit() {
   if (!email.value || !password.value) return
@@ -27,61 +32,101 @@ async function handleSubmit() {
 }
 
 async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
-  if (!isLoaded.value || !signIn.value) return
+  if (!isLoaded.value || !signIn.value) {
+    errorMessage.value = 'Still loading sign-in, please try again in a moment.'
+    return
+  }
   errorMessage.value = ''
+  
+  try {
+    if (clerk.value?.session) {
+      await clerk.value.signOut()
+    }
+  } catch (e) {
+    // Ignore signout errors
+  }
+
   try {
     await signIn.value.authenticateWithRedirect({
       strategy,
       redirectUrl: '/sso-callback',
       redirectUrlComplete: '/sso-callback',
     })
-  } catch (e) {
-    errorMessage.value = 'Could not start sign-in. Please try again.'
+  } catch (e: any) {
+    console.error('OAuth error:', e)
+    errorMessage.value = e?.message || e?.errors?.[0]?.message || 'Could not start sign-in. Please try again.'
   }
 }
 </script>
 
 <template>
-  <div class="bg-[var(--color-surface)] border border-[var(--color-border-dark)] rounded-xl p-8">
-    <h1 class="font-heading text-2xl font-semibold mb-1">Welcome back</h1>
-    <p class="text-slate-400 text-sm mb-6">Log in to your Klea workspace</p>
+  <div class="w-full max-w-sm mx-auto flex flex-col h-full justify-center pb-12">
+    <!-- Logo Placeholder -->
+    <div class="mb-16">
+      <NuxtLink to="/" class="flex items-center gap-2">
+        <span class="text-3xl font-heading font-bold text-white tracking-tight">Klea<span class="text-[var(--color-accent)]">.</span></span>
+      </NuxtLink>
+    </div>
+
+    <h1 class="font-heading text-2xl font-semibold mb-2 text-white">Log in</h1>
+    <p class="text-slate-400 text-sm mb-10">Log in to your Klea workspace</p>
+
+    <p v-if="showResetSuccess" class="text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-md px-3 py-2 mb-4">
+      Password updated — log in with your new password.
+    </p>
 
     <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2 mb-4">
       {{ errorMessage }}
     </p>
 
     <form class="space-y-4" @submit.prevent="handleSubmit">
-      <div class="space-y-2">
-        <Label for="email">Email</Label>
-        <Input id="email" v-model="email" type="email" placeholder="you@example.com" required />
+      <div>
+        <Input id="email" v-model="email" type="email" placeholder="Enter Email" required
+               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white [--autofill-bg:#1a1f26] [--autofill-fg:white] placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
       </div>
-      <div class="space-y-2">
-        <Label for="password">Password</Label>
-        <Input id="password" v-model="password" type="password" placeholder="••••••••" required />
+      <div class="relative">
+        <Input id="password" v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="Enter Password" required
+               class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white [--autofill-bg:#1a1f26] [--autofill-fg:white] placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)] pr-11" />
+        <button
+          type="button"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer"
+          :aria-label="showPassword ? 'Hide password' : 'Show password'"
+          @click="showPassword = !showPassword"
+        >
+          <component :is="showPassword ? EyeOffIcon : EyeIcon" class="w-4 h-4" />
+        </button>
       </div>
-      <Button type="submit" class="w-full cursor-pointer" :disabled="isSubmitting">
+      <div class="text-right -mt-2">
+        <NuxtLink to="/forgot-password" class="text-xs text-slate-400 hover:text-[var(--color-accent)] hover:underline cursor-pointer">Forgot password?</NuxtLink>
+      </div>
+
+      <div class="py-1"></div>
+
+      <Button type="submit" class="w-full cursor-pointer h-11 rounded-lg bg-white text-black hover:bg-slate-200 font-medium" :disabled="isSubmitting">
         {{ isSubmitting ? 'Logging in...' : 'Log in' }}
       </Button>
     </form>
 
-    <div class="flex items-center gap-3 my-6">
-      <div class="h-px bg-[var(--color-border-dark)] flex-1" />
-      <span class="text-xs text-slate-500">or continue with</span>
-      <div class="h-px bg-[var(--color-border-dark)] flex-1" />
+    <div class="flex items-center gap-3 my-8">
+      <div class="h-px bg-white/10 flex-1" />
+      <span class="text-xs text-slate-500">or log in via</span>
+      <div class="h-px bg-white/10 flex-1" />
     </div>
 
-    <div class="space-y-2">
-      <Button variant="secondary" class="w-full cursor-pointer" @click="handleOAuth('oauth_google')">
-        Continue with Google
+    <div class="flex items-center gap-4">
+      <Button variant="secondary" class="flex-1 cursor-pointer h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg gap-2 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="!isLoaded" @click="handleOAuth('oauth_google')">
+        <img src="/images/google.png" alt="Google" class="w-5 h-5 opacity-90" />
+        Google
       </Button>
-      <Button variant="secondary" class="w-full cursor-pointer" @click="handleOAuth('oauth_github')">
-        Continue with GitHub
+      <Button variant="secondary" class="flex-1 cursor-pointer h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg gap-2 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="!isLoaded" @click="handleOAuth('oauth_github')">
+        <img src="/images/github.png" alt="GitHub" class="w-5 h-5 opacity-90" />
+        GitHub
       </Button>
     </div>
 
-    <p class="text-sm text-slate-400 mt-6 text-center">
-      No account?
-      <NuxtLink to="/signup" class="text-[var(--color-accent)] cursor-pointer">Sign up</NuxtLink>
+    <p class="text-sm text-slate-400 mt-10 text-center">
+      Already Have An Account?
+      <NuxtLink to="/signup" class="text-[var(--color-accent)] hover:underline cursor-pointer">Sign up</NuxtLink>
     </p>
   </div>
 </template>

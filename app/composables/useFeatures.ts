@@ -1,21 +1,50 @@
 // app/composables/useFeatures.ts
-export function useFeatures(appId: string) {
-  const { features } = useSeedData()
+export interface Feature {
+  id: number
+  application_id: number
+  name: string
+  code: string
+  description: string
+}
 
-  const scopedFeatures = computed(() => features.value.filter((f) => f.appId === appId))
+import { toValue, type MaybeRefOrGetter } from 'vue'
 
-  function createFeature(input: Omit<import('./useSeedData').Feature, 'id' | 'appId'>) {
-    const feature = { ...input, id: `feat-${Date.now()}`, appId }
+export function useFeatures(appId: MaybeRefOrGetter<number | string>) {
+  const api = useApi()
+  const features = ref<Feature[]>([])
+  const pending = ref(false)
+  const error = ref<string | null>(null)
+
+  async function fetchFeatures() {
+    pending.value = true
+    error.value = null
+    try {
+      const page = await api.get<Paginated<Feature>>('/features')
+      features.value = page.data.filter((f) => f.application_id === Number(toValue(appId)))
+    } catch (e) {
+      error.value = extractApiErrorMessage(e)
+    } finally {
+      pending.value = false
+    }
+  }
+
+  async function createFeature(input: { name: string; code: string; description: string }) {
+    const feature = await api.post<Feature>('/features', { ...input, application_id: Number(toValue(appId)) })
     features.value.push(feature)
     return feature
   }
-  function updateFeature(id: string, patch: Partial<import('./useSeedData').Feature>) {
+
+  async function updateFeature(id: number, patch: Partial<Pick<Feature, 'name' | 'code' | 'description'>>) {
+    const feature = await api.patch<Feature>(`/features/${id}`, patch)
     const idx = features.value.findIndex((f) => f.id === id)
-    if (idx !== -1) features.value[idx] = { ...features.value[idx], ...patch }
+    if (idx !== -1) features.value[idx] = feature
+    return feature
   }
-  function deleteFeature(id: string) {
+
+  async function deleteFeature(id: number) {
+    await api.delete(`/features/${id}`)
     features.value = features.value.filter((f) => f.id !== id)
   }
 
-  return { features: scopedFeatures, createFeature, updateFeature, deleteFeature }
+  return { features, pending, error, fetchFeatures, createFeature, updateFeature, deleteFeature }
 }
