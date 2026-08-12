@@ -24,16 +24,16 @@ const columns = [
 ]
 
 const STATUS_STYLES: Record<string, string> = {
-  active: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-  expired: 'bg-slate-800 text-slate-400 border border-slate-700',
-  cancelled: 'bg-red-500/10 text-red-400 border border-red-500/20',
+  active: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+  expired: 'bg-[var(--color-surface-muted)] text-[var(--muted-foreground)] border border-[var(--color-border-dark)]',
+  cancelled: 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20',
 }
 </script>
 
 <template>
   <div>
     <AppHeader title="Subscriptions" :subtitle="`${subscriptions.length} subscription${subscriptions.length === 1 ? '' : 's'}`" />
-    <p v-if="pending" class="text-sm text-slate-400 mb-4">Loading subscriptions...</p>
+    <p v-if="pending" class="text-sm text-[var(--muted-foreground)] mb-4">Loading subscriptions...</p>
     <div v-else-if="subscriptions.length === 0" class="flex flex-col items-center justify-center">
       <EmptyState
         :icon="ReceiptIcon"
@@ -45,10 +45,10 @@ const STATUS_STYLES: Record<string, string> = {
     <div v-else class="overflow-x-auto rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] p-4 min-h-[calc(100vh-16rem)]">
       <DataTable :columns="columns" :rows="subscriptions">
         <template #cell-email="{ row }">
-          <span class="font-medium text-slate-100">{{ row.subscriber?.email ?? '—' }}</span>
+          <span class="font-medium text-[var(--foreground)]">{{ row.subscriber?.email ?? '—' }}</span>
         </template>
         <template #cell-plan="{ row }">
-          <span class="text-slate-300 font-mono text-xs px-2 py-0.5 rounded bg-slate-800 border border-slate-700/60">
+          <span class="text-[var(--muted-foreground)] font-mono text-xs px-2 py-0.5 rounded bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)]">
             {{ row.plan?.name ?? '—' }}
           </span>
         </template>

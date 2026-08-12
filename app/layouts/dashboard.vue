@@ -22,10 +22,10 @@ const { isSidebarOpen } = useSidebar()
     </ClientOnly>
     <div class="flex flex-1 min-h-0">
       <TheSidebar v-if="isSidebarOpen" />
-      <div class="flex-1 min-w-0 overflow-y-auto bg-[var(--color-bg)] rounded-tl-2xl border-l border-t border-[var(--color-border-dark)] flex flex-col relative">
+      <div class="flex-1 mx-1.5 mb-1.5 min-w-0 overflow-y-auto bg-[var(--color-bg)] rounded-2xl border border-[var(--color-border-dark)] flex flex-col relative">
         <div class="bg-grid-pattern" aria-hidden="true" />
         <div class="relative z-[1] flex flex-col flex-1 w-full">
-          <div class="overflow-hidden rounded-tl-2xl shrink-0">
+          <div class="overflow-hidden rounded-t-2xl shrink-0">
             <TheEnvBanner />
           </div>
           <main class="px-6 py-8 max-w-7xl mx-auto flex-1 w-full">

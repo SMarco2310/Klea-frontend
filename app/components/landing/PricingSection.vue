@@ -51,7 +51,7 @@ const tiers = [
   <section id="pricing" class="relative max-w-6xl mx-auto px-6 py-32 overflow-hidden flex flex-col items-center">
     <!-- Huge background text -->
     <div class="absolute inset-0 flex items-start pt-16 justify-center pointer-events-none select-none -z-10">
-      <h2 class="text-[12rem] md:text-[18rem] font-bold text-white/5 tracking-tighter mix-blend-overlay leading-none">Pricing</h2>
+      <h2 class="text-[12rem] md:text-[18rem] font-bold text-foreground/[0.03] tracking-tighter mix-blend-overlay leading-none">Pricing</h2>
     </div>
 
     <!-- Pricing Cards -->
@@ -65,17 +65,17 @@ const tiers = [
       >
         <div
           class="glass-panel p-8 rounded-[2rem] flex flex-col relative transition-transform duration-300 hover:scale-[1.02] h-full"
-          :class="tier.highlighted ? 'border-[color:var(--color-accent)]/50 bg-[color:var(--color-accent)]/10 shadow-2xl' : 'bg-white/5'"
+          :class="tier.highlighted ? 'border-[color:var(--color-accent)]/50 bg-[color:var(--color-accent)]/10 shadow-2xl' : 'bg-[var(--color-surface)]/60 border border-[color:var(--color-border-dark)]'"
         >
           <div class="mb-8">
-            <p class="text-sm font-medium text-zinc-400 mb-2">{{ tier.name }}</p>
-            <h3 class="font-heading text-4xl font-bold text-white tracking-tight">{{ tier.price }}</h3>
+            <p class="text-sm font-medium text-muted-foreground mb-2">{{ tier.name }}</p>
+            <h3 class="font-heading text-4xl font-bold text-foreground tracking-tight">{{ tier.price }}</h3>
           </div>
           
           <ul class="space-y-4 mb-10 flex-grow">
-            <li v-for="f in tier.features" :key="f" class="flex items-start gap-3 text-sm text-zinc-300">
-              <div class="mt-0.5 bg-white/10 p-0.5 rounded-full shrink-0 flex items-center justify-center h-4 w-4">
-                <CheckIcon class="w-3 h-3 text-white" />
+            <li v-for="f in tier.features" :key="f" class="flex items-start gap-3 text-sm text-muted-foreground">
+              <div class="mt-0.5 bg-foreground/10 p-0.5 rounded-full shrink-0 flex items-center justify-center h-4 w-4">
+                <CheckIcon class="w-3 h-3 text-foreground" />
               </div>
               <span>{{ f }}</span>
             </li>
@@ -83,7 +83,7 @@ const tiers = [
           
           <Button 
             class="w-full rounded-full py-6 text-sm font-semibold transition-colors cursor-pointer" 
-            :class="tier.highlighted ? 'bg-white text-black hover:bg-zinc-200' : 'bg-transparent text-white hover:bg-white/10 border border-white/20'"
+            :class="tier.highlighted ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-emerald-950/20' : 'bg-transparent text-foreground hover:bg-foreground/5 border border-[color:var(--color-border-dark)]'"
           >
             Get Started
           </Button>
@@ -94,7 +94,7 @@ const tiers = [
     <!-- Toggle Billed Yearly -->
     <ScrollReveal direction="up" :delay="400">
       <div
-        class="flex items-center justify-center gap-3 mt-12 relative z-10 bg-slate-900/90 px-6 py-3 rounded-full border border-slate-800 shadow-xl backdrop-blur-md cursor-pointer select-none"
+        class="flex items-center justify-center gap-3 mt-12 relative z-10 bg-[var(--color-surface)]/80 px-6 py-3 rounded-full border border-[color:var(--color-border-dark)] shadow-xl backdrop-blur-md cursor-pointer select-none"
         @click="isYearly = !isYearly"
       >
         <button
@@ -115,7 +115,7 @@ const tiers = [
         <span class="text-sm font-medium text-muted-foreground">
           Billed Yearly
         </span>
-        <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+        <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-500/30">
           Save 20%
         </span>
       </div>

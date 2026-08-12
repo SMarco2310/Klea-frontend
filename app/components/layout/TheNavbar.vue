@@ -4,9 +4,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
-import { BookOpenIcon, GiftIcon, BellIcon, ChevronDownIcon, MenuIcon, SunIcon, MoonIcon, LanguagesIcon, MonitorIcon } from '@lucide/vue'
+import { BookOpenIcon, GiftIcon, BellIcon, ChevronDownIcon, MenuIcon, SunIcon, MoonIcon, LanguagesIcon, MonitorIcon, SettingsIcon, LogOutIcon } from '@lucide/vue'
 import AppSwitcherModal from '~/components/layout/AppSwitcherModal.vue'
 import { toast } from 'vue-sonner'
 
@@ -14,7 +15,7 @@ const { apps, currentApp } = useApps()
 const { mode, toggle } = useEnvMode()
 const { user, logout } = useAppAuth()
 const { toggleSidebar } = useSidebar()
-const { isDark, toggleDark, colorMode } = useTheme()
+const { colorMode } = useTheme()
 const { recentTransactions } = useNotifications()
 const { workspace } = useWorkspace()
 const { t, locale, setLocale } = useI18n()
@@ -87,7 +88,7 @@ function changeLanguage(lang: string, label: string) {
       <div id="tour-env-toggle" class="flex bg-[var(--color-surface)] border border-[var(--color-border-dark)] rounded-lg p-1 shrink-0">
         <button
           class="px-3 py-1 rounded-md text-xs font-medium cursor-pointer transition-all duration-200"
-          :class="mode === 'test' ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)] shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
+          :class="mode === 'test' ? 'bg-amber-400/25 text-amber-700 dark:text-amber-400 shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
           @click="mode === 'live' && toggle()"
         >
           {{ $t('navbar.test') }}
@@ -104,16 +105,6 @@ function changeLanguage(lang: string, label: string) {
       <NuxtLink to="/docs" class="hidden lg:flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer">
         <BookOpenIcon class="w-4 h-4" /> {{ $t('navbar.docs') }}
       </NuxtLink>
-
-      <button
-        class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer transition-colors flex items-center justify-center w-8 h-8 rounded-full hover:bg-[var(--color-surface-muted)]"
-        @click="toggleDark()"
-        aria-label="Toggle theme"
-      >
-        <MonitorIcon v-if="colorMode === 'auto'" class="w-4 h-4" />
-        <MoonIcon v-else-if="colorMode === 'light'" class="w-4 h-4" />
-        <SunIcon v-else class="w-4 h-4" />
-      </button>
 
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
@@ -141,7 +132,7 @@ function changeLanguage(lang: string, label: string) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" class="w-80 p-0 border border-[var(--color-border-dark)] overflow-hidden">
           <div class="px-4 py-3 bg-[var(--color-surface-muted)] border-b border-[var(--color-border-dark)] flex items-center justify-between">
-            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">{{ $t('navbar.recentPayments') }}</h3>
+            <h3 class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">{{ $t('navbar.recentPayments') }}</h3>
           </div>
           <div class="max-h-80 overflow-y-auto">
             <div v-if="recentTransactions.length === 0" class="px-4 py-8 text-center text-sm text-[var(--muted-foreground)]">
@@ -190,11 +181,64 @@ function changeLanguage(lang: string, label: string) {
             {{ user?.name?.[0]?.toUpperCase() ?? 'A' }}
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem class="cursor-pointer lg:hidden" @click="navigateTo('/docs')">{{ $t('navbar.docs') }}</DropdownMenuItem>
-          <DropdownMenuItem class="cursor-pointer" @click="navigateTo(`/${workspace.slug}/profile`)">{{ $t('navbar.profile') }}</DropdownMenuItem>
-          <DropdownMenuItem class="cursor-pointer" @click="navigateTo(`/${workspace.slug}/settings`)">{{ $t('navbar.settings') }}</DropdownMenuItem>
-          <DropdownMenuItem class="cursor-pointer" @click="handleLogout">{{ $t('navbar.logout') }}</DropdownMenuItem>
+        <DropdownMenuContent align="end" class="w-64 p-2 rounded-2xl">
+          <button
+            class="w-full flex items-center gap-3 px-2 py-2 rounded-xl cursor-pointer hover:bg-[var(--color-hover)] transition-colors text-left"
+            @click="navigateTo(`/${workspace.slug}/profile`)"
+          >
+            <span class="w-10 h-10 rounded-full bg-[var(--color-accent)]/15 text-[var(--color-accent)] flex items-center justify-center text-sm font-semibold shrink-0">
+              {{ user?.name?.[0]?.toUpperCase() ?? 'A' }}
+            </span>
+            <span class="min-w-0">
+              <span class="block text-sm font-semibold text-[var(--foreground)] truncate">{{ user?.name ?? 'Account' }}</span>
+              <span class="block text-xs text-[var(--muted-foreground)] truncate">{{ user?.email }}</span>
+            </span>
+          </button>
+
+          <DropdownMenuSeparator />
+
+          <div class="flex items-center gap-1 p-1 mb-1 rounded-xl bg-[var(--color-surface-muted)]">
+            <button
+              class="flex-1 flex items-center justify-center h-8 rounded-lg cursor-pointer transition-colors"
+              :class="colorMode === 'light' ? 'bg-[var(--color-surface)] shadow-sm text-[var(--color-accent)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
+              aria-label="Light mode"
+              @click="colorMode = 'light'"
+            >
+              <SunIcon class="w-4 h-4" />
+            </button>
+            <button
+              class="flex-1 flex items-center justify-center h-8 rounded-lg cursor-pointer transition-colors"
+              :class="colorMode === 'dark' ? 'bg-[var(--color-surface)] shadow-sm text-[var(--color-accent)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
+              aria-label="Dark mode"
+              @click="colorMode = 'dark'"
+            >
+              <MoonIcon class="w-4 h-4" />
+            </button>
+            <button
+              class="flex-1 flex items-center justify-center h-8 rounded-lg cursor-pointer transition-colors"
+              :class="colorMode === 'auto' ? 'bg-[var(--color-surface)] shadow-sm text-[var(--color-accent)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
+              aria-label="System theme"
+              @click="colorMode = 'auto'"
+            >
+              <MonitorIcon class="w-4 h-4" />
+            </button>
+          </div>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem class="cursor-pointer lg:hidden gap-3 px-3 py-2.5 rounded-xl text-sm font-medium" @click="navigateTo('/docs')">
+            <BookOpenIcon class="w-[18px] h-[18px] text-[var(--muted-foreground)]" />
+            {{ $t('navbar.docs') }}
+          </DropdownMenuItem>
+          <DropdownMenuItem class="cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-medium" @click="navigateTo(`/${workspace.slug}/settings`)">
+            <SettingsIcon class="w-[18px] h-[18px] text-[var(--muted-foreground)]" />
+            {{ $t('navbar.settings') }}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem class="cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-medium" @click="handleLogout">
+            <LogOutIcon class="w-[18px] h-[18px] text-[var(--muted-foreground)]" />
+            {{ $t('navbar.logout') }}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

@@ -79,7 +79,7 @@ async function confirmRevoke() {
       </Button>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 items-start">
       <SettingsIdentityCard
         :initial="workspace.name?.[0]?.toUpperCase() || '?'"
         :title="workspace.name || 'Workspace'"

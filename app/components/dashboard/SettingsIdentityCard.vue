@@ -13,7 +13,7 @@ defineProps<{
       {{ initial }}
     </div>
     <h2 class="font-heading font-semibold text-lg leading-tight break-words">{{ title }}</h2>
-    <p v-if="subtitle" class="text-sm text-slate-400 mt-0.5 break-all">{{ subtitle }}</p>
+    <p v-if="subtitle" class="text-sm text-[var(--muted-foreground)] mt-0.5 break-all">{{ subtitle }}</p>
     <div v-if="$slots.default" class="mt-5 pt-5 border-t border-[var(--color-border-dark)] space-y-3">
       <slot />
     </div>

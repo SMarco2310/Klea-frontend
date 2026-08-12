@@ -69,38 +69,11 @@ export function useTour() {
           }
         },
         {
-          element: '#tour-sidebar-plans-access',
+          element: '#tour-first-app-card',
           popover: {
-            title: 'Create Plans',
-            description: 'Define your pricing tiers and what features each plan unlocks.',
-            side: 'right',
-            align: 'center'
-          }
-        },
-        {
-          element: '#tour-sidebar-features',
-          popover: {
-            title: 'Define Features',
-            description: 'Create features that are granted when users subscribe to your plans.',
-            side: 'right',
-            align: 'center'
-          }
-        },
-        {
-          element: '#tour-sidebar-api-keys',
-          popover: {
-            title: 'Generate API Keys',
-            description: 'Get your API keys here to integrate Klea with your checkout flow or backend.',
-            side: 'right',
-            align: 'center'
-          }
-        },
-        {
-          element: '#tour-sidebar-analytics',
-          popover: {
-            title: 'Track Performance',
-            description: 'Monitor your revenue, active subscribers, and conversion rates in real time.',
-            side: 'right',
+            title: 'Open your App',
+            description: 'Click on your app to open its dashboard. Inside, you\'ll find its specific settings like Plans, Features, and API Keys.',
+            side: 'top',
             align: 'center'
           }
         }

@@ -21,8 +21,8 @@ const steps = [
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
       <div
-        class="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] h-px"
-        style="background-image: linear-gradient(90deg, transparent, var(--color-border-dark) 12%, var(--color-border-dark) 88%, transparent)"
+        class="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] h-px opacity-20"
+        style="background-image: linear-gradient(90deg, transparent, var(--color-foreground) 12%, var(--color-foreground) 88%, transparent)"
         aria-hidden="true"
       />
       <ScrollReveal

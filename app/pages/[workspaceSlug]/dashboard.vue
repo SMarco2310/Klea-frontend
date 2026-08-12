@@ -42,7 +42,6 @@ watchEffect(() => {
 })
 
 const createOpen = ref(false)
-const { startTour } = useTour()
 </script>
 
 <template>
@@ -59,9 +58,6 @@ const { startTour } = useTour()
           · {{ mode === 'live' ? 'Live' : 'Test' }} mode
         </p>
       </div>
-      <div class="ml-auto">
-        <Button variant="outline" class="cursor-pointer font-medium" @click="startTour">Take a tour</Button>
-      </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
@@ -72,12 +68,12 @@ const { startTour } = useTour()
 
     <div class="flex items-center justify-between mb-4">
       <h2 class="font-heading text-lg font-semibold">Your apps</h2>
-      <Button class="cursor-pointer gap-1" @click="createOpen = true">
+      <Button id="tour-create-app" class="cursor-pointer gap-1" @click="createOpen = true">
         <PlusIcon class="w-4 h-4" /> New app
       </Button>
     </div>
 
-    <div v-if="apps.length === 0">
+    <div v-if="apps.length === 0" id="tour-first-app-card">
       <EmptyState
         :icon="LayersIcon"
         title="No apps yet"
@@ -86,7 +82,7 @@ const { startTour } = useTour()
         @cta="createOpen = true"
       />
     </div>
-    <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div v-else id="tour-first-app-card" class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <NuxtLink
         v-for="app in apps"
         :key="app.id"

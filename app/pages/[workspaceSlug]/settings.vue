@@ -26,6 +26,7 @@ const errorMessage = ref('')
 const showDeleteConfirm = ref(false)
 const deleteConfirmText = ref('')
 const isDeleting = ref(false)
+const { startTour } = useTour()
 
 async function handleDelete() {
   if (deleteConfirmText.value !== workspace.value.name) return
@@ -78,11 +79,14 @@ const STATUS_STYLES: Record<string, string> = {
 
 <template>
   <div>
-    <h1 class="font-heading text-2xl font-semibold mb-8">Settings</h1>
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="font-heading text-2xl font-semibold">Settings</h1>
+      <Button variant="outline" class="cursor-pointer font-medium" @click="startTour">Take a tour</Button>
+    </div>
 
     <p v-if="pending" class="text-sm text-slate-400 mb-4">Loading workspace...</p>
 
-    <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 items-start">
       <SettingsIdentityCard
         :initial="workspace.name?.[0]?.toUpperCase() || '?'"
         :title="workspace.name || 'Workspace'"

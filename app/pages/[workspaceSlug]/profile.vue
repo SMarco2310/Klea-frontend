@@ -83,7 +83,7 @@ async function savePassword() {
   <div>
     <h1 class="font-heading text-2xl font-semibold mb-8">Profile</h1>
 
-    <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 items-start">
       <SettingsIdentityCard
         :initial="user?.name?.[0]?.toUpperCase() ?? '?'"
         :title="user?.name ?? 'Your account'"

@@ -12,10 +12,10 @@ defineProps<{
 <template>
   <section class="rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] p-6">
     <div class="flex items-center gap-2 mb-1">
-      <component :is="icon" class="w-4 h-4 text-slate-400" />
+      <component :is="icon" class="w-4 h-4 text-[var(--muted-foreground)]" />
       <h2 class="font-heading font-semibold">{{ title }}</h2>
     </div>
-    <p v-if="description" class="text-sm text-slate-400 mb-5">{{ description }}</p>
+    <p v-if="description" class="text-sm text-[var(--muted-foreground)] mb-5">{{ description }}</p>
     <div class="space-y-4">
       <slot />
     </div>

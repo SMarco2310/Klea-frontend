@@ -67,7 +67,7 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
+  --background: oklch(0.98 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -75,15 +75,15 @@
   --popover-foreground: oklch(0.145 0 0);
   --primary: #3f8a5c;
   --primary-foreground: #f4fbf7;
-  --secondary: oklch(0.97 0 0);
+  --secondary: oklch(0.95 0 0);
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
+  --muted: oklch(0.94 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: oklch(0.95 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  --border: oklch(0.88 0 0);
+  --input: oklch(0.88 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -91,7 +91,7 @@
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
+  --sidebar: oklch(0.96 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -102,10 +102,10 @@
 
   /* Klea brand tokens — light. --color-accent-foreground isn't set here;
      it's already mapped in @theme inline from --accent-foreground above. */
-  --color-bg: #f4f6f5;
+  --color-bg: #e2e8e4;
   --color-surface: #ffffff;
-  --color-surface-muted: #f8faf9;
-  --color-border-dark: #e1e6e3;
+  --color-surface-muted: #f1f4f2;
+  --color-border-dark: #d7ddd9;
   --color-accent: #3f8a5c;
   --color-key: #9c6b2e;
   --color-hover: rgba(15, 23, 20, 0.045);
@@ -193,8 +193,8 @@
     pointer-events: none;
     background-size: 64px 64px;
     background-image: 
-      linear-gradient(to right, color-mix(in oklch, var(--color-foreground) 4%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklch, var(--color-foreground) 4%, transparent) 1px, transparent 1px);
+      linear-gradient(to right, color-mix(in oklch, var(--color-foreground) 2.5%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklch, var(--color-foreground) 2.5%, transparent) 1px, transparent 1px);
   }
 
   /* Elevated surface: replaces flat single-color cards with a faint diagonal
@@ -208,8 +208,7 @@
     );
     border: 1px solid var(--color-border-dark);
     box-shadow:
-      0 1px 0 0 color-mix(in oklch, white 6%, transparent) inset,
-      0 12px 32px -16px rgba(0, 0, 0, 0.55);
+      0 1px 0 0 color-mix(in oklch, white 6%, transparent) inset;
   }
 
   .surface-card--interactive {
@@ -223,7 +222,6 @@
     border-color: color-mix(in oklch, var(--color-accent) 40%, var(--color-border-dark));
     box-shadow:
       0 1px 0 0 color-mix(in oklch, white 6%, transparent) inset,
-      0 20px 40px -18px rgba(0, 0, 0, 0.6),
       0 0 0 1px color-mix(in oklch, var(--color-accent) 12%, transparent),
       0 0 32px -8px color-mix(in oklch, var(--color-accent) 35%, transparent);
   }

@@ -7,7 +7,7 @@ const { mode } = useEnvMode()
 <template>
   <div
     v-if="mode === 'test'"
-    class="w-full bg-amber-500/10 border-b border-amber-500/30 text-amber-700 dark:text-amber-300 text-sm px-4 py-2 flex items-center gap-2"
+    class="w-full bg-amber-400/25 border-b border-amber-500/40 text-amber-600 dark:text-amber-300 text-sm px-4 py-2 flex items-center gap-2"
   >
     <FlaskConicalIcon class="w-4 h-4" />
     Test mode — sandbox data and keys only. Switch to Live in the top bar to go real.
