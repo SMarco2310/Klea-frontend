@@ -37,7 +37,7 @@ const currencyVal = ref('NGN')
 const intervalVal = ref<'month' | 'year'>('month')
 const yearlyDiscountVal = ref(20)
 const selectedFeatureIds = ref<number[]>([])
-const featureLimits = ref<Record<number, number | null>>({})
+const featureLimits = ref<Record<number, number | undefined>>({})
 
 const isSaving = ref(false)
 const errorMessage = ref('')
@@ -62,7 +62,7 @@ watchEffect(() => {
       intervalVal.value = existing.duration_days >= 180 ? 'year' : 'month'
       yearlyDiscountVal.value = existing.yearly_discount_percent ?? 20
       selectedFeatureIds.value = (existing.features ?? []).map(f => {
-        featureLimits.value[f.id] = f.pivot?.limit ?? null
+        featureLimits.value[f.id] = f.pivot?.limit ?? undefined
         return f.id
       })
       isInitialized.value = true
@@ -123,13 +123,13 @@ async function handleSave(publish: boolean) {
     const toAttachOrUpdate = selectedFeatureIds.value.filter((id) => {
       if (!currentFeatureIds.has(id)) return true // newly selected
       const existing = currentFeatures.find((f: any) => f.id === id)
-      return existing && existing.pivot?.limit !== (featureLimits.value[id] || null) // limit changed
+      return existing && existing.pivot?.limit !== (featureLimits.value[id] ?? null) // limit changed
     })
     
     const toDetach = [...currentFeatureIds].filter((id) => !selectedFeatureIds.value.includes(id))
     
     for (const id of toAttachOrUpdate) {
-      await attachFeature(savedPlan.id, id, featureLimits.value[id] || null)
+      await attachFeature(savedPlan.id, id, featureLimits.value[id] ?? null)
     }
     for (const id of toDetach) {
       await detachFeature(savedPlan.id, id)
