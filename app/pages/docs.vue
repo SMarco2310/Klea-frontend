@@ -11,7 +11,7 @@ const apiBase = config.public.apiBaseUrl
 
 const searchQuery = ref('')
 const searchInputRef = ref<HTMLInputElement | null>(null)
-const { isDark, toggleDark, colorMode } = useTheme()
+const { colorMode } = useTheme()
 
 const sections = [
   { id: 'quickstart', icon: RocketIcon, label: 'Quickstart' },
@@ -107,7 +107,13 @@ const listPlansResponse = `{
       "position": 1,
       "is_active": true,
       "features": [
-        { "id": 4, "code": "api_calls", "pivot": { "limit": 10000 } }
+        { 
+          "id": 4, 
+          "name": "API Access", 
+          "code": "api_calls", 
+          "description": "Full access to the REST API", 
+          "pivot": { "limit": 10000 } 
+        }
       ]
     }
   ],
@@ -213,7 +219,13 @@ const webhookPayload = `{
   "subscriber_external_id": "user_482",
   "plan_id": 1,
   "features": [
-    { "id": 4, "code": "api_calls", "limit": 10000 }
+    { 
+      "id": 4, 
+      "name": "API Access", 
+      "code": "api_calls", 
+      "description": "Full access to the REST API", 
+      "limit": 10000 
+    }
   ],
   "transaction": {
     "id": 456,
@@ -308,15 +320,32 @@ const validationErrorSample = `{
             </div>
           </div>
 
-          <button
-            class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer transition-colors flex items-center justify-center w-9 h-9 rounded-lg border border-[var(--color-border-dark)] hover:bg-[var(--color-surface-muted)] shrink-0"
-            @click="toggleDark()"
-            aria-label="Toggle theme"
-          >
-            <MonitorIcon v-if="colorMode === 'auto'" class="w-4 h-4" />
-            <MoonIcon v-else-if="colorMode === 'light'" class="w-4 h-4" />
-            <SunIcon v-else class="w-4 h-4" />
-          </button>
+          <div class="flex items-center gap-1 p-1 rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] shrink-0">
+            <button
+              class="flex items-center justify-center w-7 h-7 rounded-md cursor-pointer transition-colors"
+              :class="colorMode === 'light' ? 'bg-[var(--color-surface)] shadow-sm text-[var(--color-accent)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
+              aria-label="Light mode"
+              @click="colorMode = 'light'"
+            >
+              <SunIcon class="w-4 h-4" />
+            </button>
+            <button
+              class="flex items-center justify-center w-7 h-7 rounded-md cursor-pointer transition-colors"
+              :class="colorMode === 'dark' ? 'bg-[var(--color-surface)] shadow-sm text-[var(--color-accent)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
+              aria-label="Dark mode"
+              @click="colorMode = 'dark'"
+            >
+              <MoonIcon class="w-4 h-4" />
+            </button>
+            <button
+              class="flex items-center justify-center w-7 h-7 rounded-md cursor-pointer transition-colors"
+              :class="colorMode === 'auto' ? 'bg-[var(--color-surface)] shadow-sm text-[var(--color-accent)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
+              aria-label="System theme"
+              @click="colorMode = 'auto'"
+            >
+              <MonitorIcon class="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </header>

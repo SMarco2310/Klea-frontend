@@ -16,6 +16,11 @@ const { workspace } = useWorkspace()
 const { apps } = useApps()
 const { mode } = useEnvMode()
 const api = useApi()
+const { startTourIfFirstVisit } = useTour()
+
+onMounted(() => {
+  startTourIfFirstVisit()
+})
 
 const totalApiKeys = ref(0)
 const totalSubscribers = ref(0)

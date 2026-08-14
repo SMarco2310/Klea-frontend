@@ -16,7 +16,7 @@ const { isSidebarOpen } = useSidebar()
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-[var(--color-surface)]">
+  <div class="h-screen flex flex-col bg-[var(--color-surface)] overflow-hidden">
     <ClientOnly>
       <TheNavbar />
     </ClientOnly>
@@ -28,7 +28,7 @@ const { isSidebarOpen } = useSidebar()
           <div class="overflow-hidden rounded-t-2xl shrink-0">
             <TheEnvBanner />
           </div>
-          <main class="px-6 py-8 max-w-7xl mx-auto flex-1 w-full">
+          <main class="px-6 py-8 max-w-[1600px] mx-auto flex-1 w-full">
             <slot />
           </main>
         </div>

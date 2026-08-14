@@ -8,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] p-6 lg:sticky lg:top-8">
+  <div class="rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] p-6">
     <div class="w-12 h-12 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center text-lg font-heading font-semibold text-[var(--color-accent)] mb-4">
       {{ initial }}
     </div>

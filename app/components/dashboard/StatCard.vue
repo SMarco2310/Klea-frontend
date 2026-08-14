@@ -19,29 +19,29 @@ const showTrend = computed(() => (props.trend?.length ?? 0) > 1)
 </script>
 
 <template>
-  <div class="p-5 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)]">
-    <div class="flex items-center justify-between mb-3">
-      <span class="text-xs uppercase tracking-wide text-[var(--muted-foreground)]">{{ label }}</span>
-      <component :is="icon" class="w-4 h-4 text-[var(--muted-foreground)]" />
+  <div class="p-7 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)]">
+    <div class="flex items-center justify-between mb-4">
+      <span class="text-sm uppercase tracking-wide text-[var(--muted-foreground)]">{{ label }}</span>
+      <component :is="icon" class="w-5 h-5 text-[var(--muted-foreground)]" />
     </div>
     <div class="flex items-end justify-between gap-3">
       <div class="min-w-0">
-        <div class="text-3xl font-heading font-bold" :class="valueClass">{{ value === null ? '—' : value }}</div>
-        <div v-if="sublabel" class="text-xs text-[var(--muted-foreground)] mt-1">{{ sublabel }}</div>
+        <div class="text-4xl font-heading font-bold" :class="valueClass">{{ value === null ? '—' : value }}</div>
+        <div v-if="sublabel" class="text-sm text-[var(--muted-foreground)] mt-1.5">{{ sublabel }}</div>
         <div
           v-if="delta !== null && delta !== undefined"
-          class="flex items-center gap-1 text-xs font-medium mt-1.5"
+          class="flex items-center gap-1 text-sm font-medium mt-2"
           :class="delta >= 0 ? 'text-emerald-400' : 'text-red-400'"
         >
-          <component :is="delta >= 0 ? TrendingUpIcon : TrendingDownIcon" class="w-3 h-3" />
+          <component :is="delta >= 0 ? TrendingUpIcon : TrendingDownIcon" class="w-3.5 h-3.5" />
           {{ delta >= 0 ? '+' : '' }}{{ delta }}% vs last month
         </div>
       </div>
-      <div v-if="showTrend" class="w-16 h-8 shrink-0 -mb-1">
+      <div v-if="showTrend" class="w-20 h-10 shrink-0 -mb-1">
         <LineChart
           :data="trend || []"
           :categories="{ amount: { name: label, color: 'var(--color-accent)' } }"
-          :height="32"
+          :height="40"
           :padding="{ top: 2, right: 2, bottom: 2, left: 2 }"
           :hide-legend="true"
           :hide-tooltip="true"

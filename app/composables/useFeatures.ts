@@ -5,6 +5,9 @@ export interface Feature {
   name: string
   code: string
   description: string
+  pivot?: {
+    limit: number | null
+  }
 }
 
 import { toValue, type MaybeRefOrGetter } from 'vue'

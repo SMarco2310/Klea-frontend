@@ -3,16 +3,34 @@ import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
 import { useRouter } from 'vue-router'
 
+// Persists across sessions (same pattern as auth_token) so the tour only
+// ever auto-fires once per account, not once per browser tab/localStorage.
+const hasSeenTour = () => useCookie<boolean>('klea_has_seen_tour', {
+  default: () => false,
+  maxAge: 60 * 60 * 24 * 365,
+})
+
 export function useTour() {
   const router = useRouter()
 
+  const isOnDashboard = () => /^\/[^/]+\/dashboard\/?$/.test(router.currentRoute.value.path)
+
   const startTour = () => {
-    // If not on dashboard, navigate there first
-    if (router.currentRoute.value.path !== '/dashboard') {
-      router.push('/dashboard').then(() => setTimeout(initTour, 500))
+    if (!isOnDashboard()) {
+      const workspaceSlug = router.currentRoute.value.params.workspaceSlug
+      const target = workspaceSlug ? `/${workspaceSlug}/dashboard` : '/dashboard'
+      router.push(target).then(() => setTimeout(initTour, 500))
     } else {
       initTour()
     }
+  }
+
+  /** Auto-starts the tour once, ever, the first time a user reaches the dashboard. Safe to call on every dashboard mount. */
+  const startTourIfFirstVisit = () => {
+    const seen = hasSeenTour()
+    if (seen.value) return
+    seen.value = true
+    setTimeout(initTour, 500)
   }
 
   const initTour = () => {
@@ -83,5 +101,5 @@ export function useTour() {
     tour.drive()
   }
 
-  return { startTour }
+  return { startTour, startTourIfFirstVisit }
 }

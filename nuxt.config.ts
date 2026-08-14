@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     defaultLocale: 'en',
   },
   shiki: {
-    defaultTheme: 'github-dark',
+    defaultTheme: 'vitesse-dark',
     // nuxt-shiki only bundles languages listed here — nothing lazy-loads on
     // demand, so every lang= used anywhere in the app (CodeBlock/LanguageTabs
     // usages, docs.vue's multi-language samples) must be listed explicitly

@@ -95,10 +95,15 @@ const toggleExpand = () => {
 :deep(pre.shiki) {
   margin: 0;
   background: transparent !important;
+  filter: brightness(1.2);
 }
 
 :deep(pre.shiki code) {
   display: block;
+}
+
+:deep(pre.shiki span) {
+  background-color: transparent !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar {

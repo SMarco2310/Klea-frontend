@@ -30,7 +30,7 @@ function handleWorkspaceSwitch() {
   toast.success('Switched workspace successfully')
 }
 
-function changeLanguage(lang: string, label: string) {
+function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
   setLocale(lang)
   toast.success(t('navbar.switchedTo', { lang: label }))
 }

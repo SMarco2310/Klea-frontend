@@ -60,42 +60,60 @@ async function confirmDelete() {
 
 <template>
   <div v-if="currentApp">
-    <AppHeader title="App settings" subtitle="General configuration and danger zone" />
-    <div class="max-w-xl">
-
-      <div class="space-y-6 mb-4">
-        <!-- General Settings -->
-        <div class="space-y-2">
-          <Label for="app-name">App Name</Label>
-          <Input id="app-name" v-model="appName" placeholder="Your amazing app" />
+    <AppHeader title="App settings" subtitle="Manage your application settings and configurations" />
+    
+    <div class="max-w-3xl pb-12 space-y-6 mt-4">
+      <!-- General Settings Card -->
+      <div class="bg-[var(--color-surface)] border border-[var(--color-border-dark)] rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-[var(--color-border-dark)]">
+           <h3 class="font-semibold text-[var(--foreground)]">General Configuration</h3>
         </div>
+        <div class="p-6 space-y-6">
+          <div class="space-y-2 max-w-md">
+            <Label for="app-name">App Name</Label>
+            <Input id="app-name" v-model="appName" placeholder="Your amazing app" />
+          </div>
 
-        <!-- Webhook Settings -->
-        <div>
-          <div class="flex items-center gap-2 mb-1">
-            <WebhookIcon class="w-4 h-4 text-slate-400" />
-            <h3 class="font-medium">Webhook endpoint</h3>
+          <div class="pt-6 border-t border-[var(--color-border-dark)] max-w-xl">
+            <div class="flex items-center gap-2 mb-1">
+              <WebhookIcon class="w-4 h-4 text-[var(--muted-foreground)]" />
+              <h3 class="font-medium text-sm text-[var(--foreground)]">Webhook endpoint</h3>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] mb-3">We'll POST subscription events to this URL.</p>
+            <div class="space-y-2">
+              <Label for="webhook-url">Endpoint URL</Label>
+              <Input id="webhook-url" v-model="webhookUrl" placeholder="https://yourapp.com/webhooks/klea" class="font-mono text-sm" />
+            </div>
           </div>
-          <p class="text-sm text-slate-400 mb-4">We'll POST subscription events to this URL.</p>
-          <div class="space-y-2">
-            <Label for="webhook-url">Endpoint URL</Label>
-            <Input id="webhook-url" v-model="webhookUrl" placeholder="https://yourapp.com/webhooks/klea" />
-          </div>
+
+          <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2">
+            {{ errorMessage }}
+          </p>
+        </div>
+        <div class="px-6 py-4 bg-[var(--color-surface-muted)] border-t border-[var(--color-border-dark)] flex justify-end">
+          <Button class="cursor-pointer" :disabled="isSaving" @click="saveSettings">
+            {{ isSaving ? 'Saving...' : 'Save changes' }}
+          </Button>
         </div>
       </div>
-      <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2 mb-4">
-        {{ errorMessage }}
-      </p>
-      <Button class="cursor-pointer" :disabled="isSaving" @click="saveSettings">
-        {{ isSaving ? 'Saving...' : 'Save changes' }}
-      </Button>
 
-      <div class="mt-10 pt-6 border-t border-[var(--color-border-dark)]">
-        <h3 class="font-medium text-red-400 mb-1">Danger zone</h3>
-        <p class="text-sm text-slate-400 mb-4">Deleting an app removes it and its data permanently. This can't be undone.</p>
-        <Button variant="destructive" class="cursor-pointer gap-1.5" @click="deleteOpen = true">
-          <TrashIcon class="w-4 h-4" /> Delete app
-        </Button>
+      <!-- Danger Zone Card -->
+      <div class="bg-red-500/5 border border-red-500/20 rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-red-500/20 flex items-center gap-2">
+           <TrashIcon class="w-4 h-4 text-red-500" />
+           <h3 class="font-semibold text-red-500">Danger Zone</h3>
+        </div>
+        <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h4 class="font-medium text-[var(--foreground)] mb-1">Delete Application</h4>
+            <p class="text-sm text-[var(--muted-foreground)]">
+              Permanently remove this app and all of its data. This cannot be undone.
+            </p>
+          </div>
+          <Button variant="destructive" class="cursor-pointer gap-1.5 shrink-0" @click="deleteOpen = true">
+            Delete {{ currentApp.name }}
+          </Button>
+        </div>
       </div>
     </div>
 
@@ -110,7 +128,7 @@ async function confirmDelete() {
         <p v-if="deleteError" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2">
           {{ deleteError }}
         </p>
-        <div class="flex justify-end gap-2">
+        <div class="flex justify-end gap-2 mt-4">
           <Button variant="ghost" class="cursor-pointer" :disabled="isDeleting" @click="deleteOpen = false">Cancel</Button>
           <Button variant="destructive" class="cursor-pointer" :disabled="isDeleting" @click="confirmDelete">
             {{ isDeleting ? 'Deleting...' : 'Delete app' }}

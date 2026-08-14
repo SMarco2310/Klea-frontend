@@ -1,10 +1,10 @@
 <!-- app/components/dashboard/DataTable.vue -->
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends Record<string, any>">
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '~/components/ui/table'
 
 defineProps<{
   columns: { key: string; label: string }[]
-  rows: Record<string, unknown>[]
+  rows: T[]
 }>()
 </script>
 
