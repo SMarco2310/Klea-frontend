@@ -72,7 +72,7 @@ const maskedSecret = computed(() =>
           </span>
           <div class="min-w-0">
             <div class="font-medium text-sm">Signing secret</div>
-            <div class="text-xs text-slate-500">Verify a delivery really came from Klea</div>
+            <div class="text-xs text-slate-500">Verify a delivery really came from <span class="notranslate">Klea</span></div>
           </div>
         </div>
         <div

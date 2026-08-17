@@ -46,11 +46,11 @@ async function handleSubmit() {
   <div class="w-full max-w-sm mx-auto flex flex-col h-full justify-center pb-12">
     <div class="mb-16">
       <NuxtLink to="/" class="flex items-center gap-2">
-        <span class="text-3xl font-heading font-bold text-white tracking-tight">Klea<span class="text-[var(--color-accent)]">.</span></span>
+        <span class="notranslate text-3xl font-heading font-bold text-white tracking-tight">Klea<span class="text-[var(--color-accent)]">.</span></span>
       </NuxtLink>
     </div>
 
-    <h1 class="font-heading text-2xl font-semibold mb-2 text-white">Welcome to Klea</h1>
+    <h1 class="font-heading text-2xl font-semibold mb-2 text-white">Welcome to <span class="notranslate">Klea</span></h1>
     <p class="text-slate-400 text-sm mb-10">Let's set up your workspace to get started.</p>
 
     <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2 mb-4">

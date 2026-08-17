@@ -49,7 +49,7 @@ onUnmounted(() => {
       <div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-black/20 dark:via-white/20 to-transparent pointer-events-none" />
 
       <!-- Brand Logo -->
-      <NuxtLink to="/" class="font-heading font-bold text-xl tracking-tight text-foreground flex items-center cursor-pointer select-none">
+      <NuxtLink to="/" class="notranslate font-heading font-bold text-xl tracking-tight text-foreground flex items-center cursor-pointer select-none">
         <span>Klea</span>
         <span class="text-[var(--color-accent)] font-extrabold text-2xl leading-none">.</span>
       </NuxtLink>

@@ -64,12 +64,12 @@ async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
     <!-- Logo Placeholder -->
     <div class="mb-16">
       <NuxtLink to="/" class="flex items-center gap-2">
-        <span class="text-3xl font-heading font-bold text-white tracking-tight">Klea<span class="text-[var(--color-accent)]">.</span></span>
+        <span class="notranslate text-3xl font-heading font-bold text-white tracking-tight">Klea<span class="text-[var(--color-accent)]">.</span></span>
       </NuxtLink>
     </div>
 
     <h1 class="font-heading text-2xl font-semibold mb-2 text-white">Log in</h1>
-    <p class="text-slate-400 text-sm mb-10">Log in to your Klea workspace</p>
+    <p class="text-slate-400 text-sm mb-10">Log in to your <span class="notranslate">Klea</span> workspace</p>
 
     <p v-if="showResetSuccess" class="text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-md px-3 py-2 mb-4">
       Password updated — log in with your new password.

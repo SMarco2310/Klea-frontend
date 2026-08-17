@@ -45,7 +45,7 @@ function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
     >
       <MenuIcon class="w-5 h-5" />
     </button>
-    <NuxtLink :to="workspace.slug ? `/${workspace.slug}/dashboard` : '/dashboard'" class="font-heading font-semibold text-lg cursor-pointer shrink-0">Klea<span class="text-[var(--color-accent)]">.</span></NuxtLink>
+    <NuxtLink :to="workspace.slug ? `/${workspace.slug}/dashboard` : '/dashboard'" class="notranslate font-heading font-semibold text-lg cursor-pointer shrink-0">Klea<span class="text-[var(--color-accent)]">.</span></NuxtLink>
 
     <div class="flex items-center gap-1.5 shrink-0">
       <span class="text-[var(--muted-foreground)]">/</span>

@@ -306,7 +306,7 @@ const validationErrorSample = `{
   <div class="h-screen flex flex-col">
     <header class="shrink-0 border-b border-[var(--color-border-dark)] bg-[var(--color-surface)]">
       <div class="max-w-5xl mx-auto px-6 py-4 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-10 items-center">
-        <NuxtLink to="/" class="font-heading font-bold text-xl tracking-tight text-[var(--foreground)] flex items-center cursor-pointer select-none">
+        <NuxtLink to="/" class="notranslate font-heading font-bold text-xl tracking-tight text-[var(--foreground)] flex items-center cursor-pointer select-none">
           <span>Klea</span>
           <span class="text-[var(--color-accent)] font-extrabold text-2xl leading-none">.</span>
         </NuxtLink>
@@ -402,9 +402,9 @@ const validationErrorSample = `{
     <div class="space-y-16 text-[var(--foreground)] overflow-y-auto py-10">
       <section>
         <p class="text-xs uppercase tracking-wide text-[var(--color-accent)] mb-2">Developer guide</p>
-        <h1 class="font-heading text-3xl font-bold mb-4">Integrate Klea in minutes</h1>
+        <h1 class="font-heading text-3xl font-bold mb-4">Integrate <span class="notranslate">Klea</span> in minutes</h1>
         <p class="text-[var(--muted-foreground)]">
-          Klea handles subscriptions and payments for your app. Create an application, generate an API
+          <span class="notranslate">Klea</span> handles subscriptions and payments for your app. Create an application, generate an API
           key, define a plan, and call one endpoint to start a subscriber's subscription.
         </p>
       </section>
@@ -412,7 +412,7 @@ const validationErrorSample = `{
       <section id="quickstart">
         <h2 class="font-heading text-2xl font-semibold mb-4">Quickstart</h2>
         <ol class="list-decimal list-inside space-y-2 text-[var(--muted-foreground)]">
-          <li><NuxtLink to="/signup" class="text-[var(--color-accent)] hover:underline">Create a Klea account</NuxtLink> — this also creates your first workspace.</li>
+          <li><NuxtLink to="/signup" class="text-[var(--color-accent)] hover:underline">Create a <span class="notranslate">Klea</span> account</NuxtLink> — this also creates your first workspace.</li>
           <li>From the dashboard, create an <strong class="text-[var(--foreground)]">Application</strong> for the app you're integrating.</li>
           <li>Under that application, generate an <strong class="text-[var(--foreground)]">API key</strong> — the secret is shown once, so store it now.</li>
           <li>Define at least one <strong class="text-[var(--foreground)]">plan</strong> (price, duration, features) under the application.</li>
@@ -518,7 +518,7 @@ const validationErrorSample = `{
       <section id="webhooks">
         <h2 class="font-heading text-2xl font-semibold mb-4">Webhooks</h2>
         <p class="text-[var(--muted-foreground)] mb-4">
-          Set a <strong class="text-[var(--foreground)]">webhook URL</strong> on your application (Settings tab) and Klea
+          Set a <strong class="text-[var(--foreground)]">webhook URL</strong> on your application (Settings tab) and <span class="notranslate">Klea</span>
           <code class="bg-[var(--color-surface)] px-1 rounded">POST</code>s to it once a subscriber's payment settles. There is currently one event,
           <code class="bg-[var(--color-surface)] px-1 rounded">subscription.payment_result</code>. If no webhook URL is configured, nothing is sent — no error is raised.
         </p>
@@ -526,7 +526,7 @@ const validationErrorSample = `{
         <DocsCodeBlock :code="webhookPayload" lang="json" />
 
         <p class="text-[var(--muted-foreground)] mt-6 mb-1">
-          Every delivery includes an <code class="bg-[var(--color-surface)] px-1 rounded">X-Klea-Signature</code> header so you can verify it came from Klea.
+          Every delivery includes an <code class="bg-[var(--color-surface)] px-1 rounded">X-Klea-Signature</code> header so you can verify it came from <span class="notranslate">Klea</span>.
           <strong class="text-[var(--foreground)]">Important:</strong> the signature is an HMAC-SHA256 of the transaction's numeric
           <code class="bg-[var(--color-surface)] px-1 rounded">id</code> as a string — <em>not</em> a hash of the request body — using the
           <code class="bg-[var(--color-surface)] px-1 rounded">webhook_secret</code> shown on your application's settings. This differs from most webhook

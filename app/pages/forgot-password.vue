@@ -30,7 +30,7 @@ async function handleSubmit() {
     <!-- Logo Placeholder -->
     <div class="mb-16">
       <NuxtLink to="/" class="flex items-center gap-2">
-        <span class="text-3xl font-heading font-bold text-white tracking-tight">Klea<span class="text-[var(--color-accent)]">.</span></span>
+        <span class="notranslate text-3xl font-heading font-bold text-white tracking-tight">Klea<span class="text-[var(--color-accent)]">.</span></span>
       </NuxtLink>
     </div>
 
