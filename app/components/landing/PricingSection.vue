@@ -93,31 +93,28 @@ const tiers = [
 
     <!-- Toggle Billed Yearly -->
     <ScrollReveal direction="up" :delay="400">
-      <div
-        class="flex items-center justify-center gap-3 mt-12 relative z-10 bg-[var(--color-surface)]/80 px-6 py-3 rounded-full border border-[color:var(--color-border-dark)] shadow-xl backdrop-blur-md cursor-pointer select-none"
-        @click="isYearly = !isYearly"
-      >
-        <button
-          type="button"
-          role="switch"
-          :aria-checked="isYearly"
-          aria-label="Toggle yearly billing"
-          class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
-          style="transition-duration: var(--dur-base)"
-          :class="isYearly ? 'bg-emerald-500' : 'bg-slate-700'"
-        >
-          <span
-            class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition"
-            style="transition-duration: var(--dur-base); transition-timing-function: var(--ease-spring-bounce)"
-            :class="isYearly ? 'translate-x-5' : 'translate-x-0'"
-          />
-        </button>
-        <span class="text-sm font-medium text-muted-foreground">
-          Billed Yearly
-        </span>
-        <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-500/30">
-          Save 20%
-        </span>
+      <div class="flex justify-center mt-12 relative z-10 select-none">
+        <div class="inline-flex items-center p-1.5 bg-[var(--color-surface)]/80 rounded-full border border-[color:var(--color-border-dark)] shadow-xl backdrop-blur-md">
+          <button
+            type="button"
+            @click="isYearly = false"
+            class="px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer"
+            :class="!isYearly ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'"
+          >
+            Monthly
+          </button>
+          <button
+            type="button"
+            @click="isYearly = true"
+            class="flex items-center gap-2 px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer"
+            :class="isYearly ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'"
+          >
+            Annually
+            <span class="px-2.5 py-0.5 text-[11px] font-bold rounded-md shadow-sm border border-primary/20" :class="isYearly ? 'bg-white/20 text-white' : 'bg-primary text-primary-foreground'">
+              Save 25%
+            </span>
+          </button>
+        </div>
       </div>
     </ScrollReveal>
   </section>

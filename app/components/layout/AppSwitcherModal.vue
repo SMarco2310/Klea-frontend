@@ -38,8 +38,8 @@ function pick(slug: string) {
       </div>
 
       <!-- Search -->
-      <div class="p-4 border-b border-[var(--color-border-dark)] bg-[var(--color-surface-muted)]">
-        <div class="relative flex items-center bg-[var(--color-surface)] border border-[var(--color-border-dark)] rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[var(--color-accent)] transition-all">
+      <div class="p-4 border-b border-[var(--color-border-dark)]">
+        <div class="relative flex items-center bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[var(--color-accent)] transition-all">
           <SearchIcon class="w-4 h-4 text-[var(--muted-foreground)] ml-3 shrink-0" />
           <input
             v-model="search"
@@ -57,7 +57,7 @@ function pick(slug: string) {
             v-for="app in filtered"
             :key="app.id"
             class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-[var(--color-hover)] transition-colors cursor-pointer text-left group"
-            :class="app.slug === currentSlug ? 'bg-[var(--color-surface-muted)]' : ''"
+            :class="app.slug === currentSlug ? 'bg-[var(--color-hover)]' : ''"
             @click="pick(app.slug)"
           >
             <div class="flex items-center gap-3 min-w-0">
@@ -79,7 +79,7 @@ function pick(slug: string) {
       </div>
 
       <!-- Footer -->
-      <div class="px-6 py-4 border-t border-[var(--color-border-dark)] bg-[var(--color-surface-muted)] flex justify-end">
+      <div class="px-6 py-4 border-t border-[var(--color-border-dark)] flex justify-end">
         <Button variant="ghost" class="cursor-pointer" @click="open = false">Cancel</Button>
       </div>
     </DialogContent>

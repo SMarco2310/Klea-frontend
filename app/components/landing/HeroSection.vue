@@ -27,7 +27,7 @@ onMounted(() => {
             <span class="text-[var(--color-accent)]">in one API call.</span>
           </h1>
           <p class="text-muted-foreground text-lg mt-6 max-w-lg leading-relaxed">
-            Create an app, generate a key, define a plan — your subscribers get
+            Create an app, generate a key, define a plan your subscribers get
             licensed automatically the moment they pay.
           </p>
           <div class="flex flex-wrap items-center gap-4 mt-10">

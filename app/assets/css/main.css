@@ -123,9 +123,9 @@
 .dark {
   --background: #0b0f14;
   --foreground: oklch(0.985 0 0);
-  --card: #1e293b;
+  --card: #16202c;
   --card-foreground: oklch(0.985 0 0);
-  --popover: #1e293b;
+  --popover: #16202c;
   --popover-foreground: oklch(0.985 0 0);
   --primary: #7fb894;
   --primary-foreground: #06170d;
@@ -155,7 +155,7 @@
 
   /* Klea brand tokens — dark */
   --color-bg: #0b0f14;
-  --color-surface: #1e293b;
+  --color-surface: #16202c;
   --color-surface-muted: #0f172a;
   --color-border-dark: #27313f;
   --color-accent: #7fb894;

@@ -75,9 +75,14 @@ onUnmounted(() => {
             @click="toggleDark()"
             aria-label="Toggle theme"
           >
-            <MonitorIcon v-if="colorMode === 'auto'" class="w-4 h-4" />
-            <MoonIcon v-else-if="colorMode === 'light'" class="w-4 h-4" />
-            <SunIcon v-else class="w-4 h-4" />
+            <ClientOnly>
+              <MonitorIcon v-if="colorMode === 'auto'" class="w-4 h-4" />
+              <MoonIcon v-else-if="colorMode === 'light'" class="w-4 h-4" />
+              <SunIcon v-else class="w-4 h-4" />
+              <template #fallback>
+                <div class="w-4 h-4" />
+              </template>
+            </ClientOnly>
           </button>
   
           <DropdownMenu>

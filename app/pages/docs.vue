@@ -2,9 +2,10 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { RocketIcon, KeyRoundIcon, FlaskConicalIcon, ListIcon, TerminalIcon, WebhookIcon, ListChecksIcon, SearchIcon, MoonIcon, SunIcon, ExternalLinkIcon, MonitorIcon } from '@lucide/vue'
+import { RocketIcon, KeyRoundIcon, FlaskConicalIcon, ListIcon, TerminalIcon, WebhookIcon, ListChecksIcon, SearchIcon, MoonIcon, SunIcon, ExternalLinkIcon, MonitorIcon, LanguagesIcon } from '@lucide/vue'
 import DocsCodeBlock from '~/components/Docs/CodeBlock.vue'
 import DocsLanguageTabs from '~/components/Docs/LanguageTabs.vue'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '~/components/ui/dropdown-menu'
 
 const config = useRuntimeConfig()
 const apiBase = config.public.apiBaseUrl
@@ -12,6 +13,11 @@ const apiBase = config.public.apiBaseUrl
 const searchQuery = ref('')
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const { colorMode } = useTheme()
+const { setLocale } = useI18n()
+
+function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
+  setLocale(lang)
+}
 
 const sections = [
   { id: 'quickstart', icon: RocketIcon, label: 'Quickstart' },
@@ -346,6 +352,22 @@ const validationErrorSample = `{
               <MonitorIcon class="w-4 h-4" />
             </button>
           </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                class="flex items-center justify-center w-[36px] h-[36px] rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer transition-colors shrink-0"
+                aria-label="Change language"
+              >
+                <LanguagesIcon class="w-4 h-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" class="w-40 border-[var(--color-border-dark)] bg-[var(--color-surface)]/95 backdrop-blur-xl">
+              <DropdownMenuItem class="cursor-pointer font-medium" @click="changeLanguage('en', 'English')">English (EN)</DropdownMenuItem>
+              <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('fr', 'Français')">Français (FR)</DropdownMenuItem>
+              <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('es', 'Español')">Español (ES)</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

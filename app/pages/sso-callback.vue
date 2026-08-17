@@ -1,6 +1,5 @@
-<!-- app/pages/sso-callback.vue -->
 <script setup lang="ts">
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'auth' })
 
 const { loginWithClerkToken, user } = useAppAuth()
 const clerk = useClerk()
