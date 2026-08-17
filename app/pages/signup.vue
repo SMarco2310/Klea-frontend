@@ -17,9 +17,29 @@ const { register, user } = useAppAuth()
 const { signIn, isLoaded } = useSignIn()
 const clerk = useClerk()
 
+function getPasswordError(value: string): string {
+  if (value.length < 8) return 'Password must be at least 8 characters.'
+  if (!/[A-Z]/.test(value)) return 'Password must contain at least one uppercase letter.'
+  if (!/[a-z]/.test(value)) return 'Password must contain at least one lowercase letter.'
+  if (!/[0-9]/.test(value)) return 'Password must contain at least one number.'
+  if (!/[^A-Za-z0-9]/.test(value)) return 'Password must contain at least one special character.'
+  return ''
+}
+
 async function handleSubmit() {
   if (!name.value || !email.value || !password.value || !passwordConfirmation.value) return
   errorMessage.value = ''
+
+  const passwordError = getPasswordError(password.value)
+  if (passwordError) {
+    errorMessage.value = passwordError
+    return
+  }
+  if (password.value !== passwordConfirmation.value) {
+    errorMessage.value = 'Passwords do not match.'
+    return
+  }
+
   isSubmitting.value = true
   try {
     await register(name.value, email.value, password.value, passwordConfirmation.value)
