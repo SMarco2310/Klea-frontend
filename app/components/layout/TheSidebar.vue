@@ -33,7 +33,7 @@ const activeAppTabs = computed(() => {
 </script>
 
 <template>
-  <aside class="w-75 shrink-0 bg-[var(--color-surface)] overflow-y-auto">
+  <aside class="w-75 shrink-0 bg-[var(--color-surface)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
     <nav class="p-4">
       <div class="mb-6">
         <h3 class="px-3 text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-2">
@@ -44,8 +44,11 @@ const activeAppTabs = computed(() => {
             <NuxtLink
               :to="item.to"
               class="flex items-center gap-3 px-3.5 py-3 rounded-md text-sm cursor-pointer transition-colors duration-200"
-              active-class="bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
-              :class="!$route.path.startsWith(item.to) && 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
+              :class="[
+                $route.path.startsWith(item.to)
+                  ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)]'
+                  : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'
+              ]"
             >
               <component :is="item.icon" class="w-[18px] h-[18px]" />
               {{ item.label }}
@@ -64,8 +67,11 @@ const activeAppTabs = computed(() => {
               :id="`tour-sidebar-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`"
               :to="item.to"
               class="flex items-center gap-3 px-3.5 py-3 rounded-md text-sm cursor-pointer transition-colors duration-200"
-              active-class="bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
-              :class="!$route.path.startsWith(item.to) && 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
+              :class="[
+                $route.path.startsWith(item.to)
+                  ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)]'
+                  : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'
+              ]"
             >
               <component :is="item.icon" class="w-[18px] h-[18px]" />
               {{ item.label }}

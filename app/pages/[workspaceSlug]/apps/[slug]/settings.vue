@@ -19,6 +19,14 @@ const errorMessage = ref('')
 const deleteOpen = ref(false)
 const isDeleting = ref(false)
 const deleteError = ref('')
+const deleteConfirmText = ref('')
+
+watch(deleteOpen, (isOpen) => {
+  if (!isOpen) {
+    deleteConfirmText.value = ''
+    deleteError.value = ''
+  }
+})
 
 // Update refs if currentApp changes
 watch(currentApp, (newApp) => {
@@ -125,12 +133,29 @@ async function confirmDelete() {
             This permanently deletes the app, its plans, features, subscribers, and API keys. This can't be undone.
           </DialogDescription>
         </DialogHeader>
+
+        <div class="py-2 space-y-2">
+          <Label for="confirm-delete" class="text-sm font-normal text-[var(--muted-foreground)]">
+            To confirm, type <strong class="text-[var(--foreground)] font-semibold select-all">{{ currentApp.name }}</strong> below
+          </Label>
+          <Input 
+            id="confirm-delete" 
+            v-model="deleteConfirmText" 
+            :placeholder="currentApp.name"
+          />
+        </div>
+
         <p v-if="deleteError" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2">
           {{ deleteError }}
         </p>
         <div class="flex justify-end gap-2 mt-4">
           <Button variant="ghost" class="cursor-pointer" :disabled="isDeleting" @click="deleteOpen = false">Cancel</Button>
-          <Button variant="destructive" class="cursor-pointer" :disabled="isDeleting" @click="confirmDelete">
+          <Button 
+            variant="destructive" 
+            class="cursor-pointer" 
+            :disabled="isDeleting || deleteConfirmText !== currentApp.name" 
+            @click="confirmDelete"
+          >
             {{ isDeleting ? 'Deleting...' : 'Delete app' }}
           </Button>
         </div>
