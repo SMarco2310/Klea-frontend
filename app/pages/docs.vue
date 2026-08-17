@@ -13,10 +13,10 @@ const apiBase = config.public.apiBaseUrl
 const searchQuery = ref('')
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const { colorMode } = useTheme()
-const { setLocale } = useI18n()
+const { setLanguage } = useGoogleTranslate()
 
-function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
-  setLocale(lang)
+function changeLanguage(lang: 'en' | 'fr' | 'es') {
+  setLanguage(lang)
 }
 
 const sections = [
@@ -363,9 +363,9 @@ const validationErrorSample = `{
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" class="w-40 border-[var(--color-border-dark)] bg-[var(--color-surface)]/95 backdrop-blur-xl">
-              <DropdownMenuItem class="cursor-pointer font-medium" @click="changeLanguage('en', 'English')">English (EN)</DropdownMenuItem>
-              <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('fr', 'Français')">Français (FR)</DropdownMenuItem>
-              <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('es', 'Español')">Español (ES)</DropdownMenuItem>
+              <DropdownMenuItem class="cursor-pointer font-medium" @click="changeLanguage('en')">English (EN)</DropdownMenuItem>
+              <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('fr')">Français (FR)</DropdownMenuItem>
+              <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('es')">Español (ES)</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

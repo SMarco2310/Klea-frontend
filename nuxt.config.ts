@@ -3,15 +3,11 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@clerk/nuxt', 'nuxt-shiki', 'nuxt-charts', '@nuxtjs/i18n'],
-  i18n: {
-    locales: [
-      { code: 'en', language: 'en-US', file: 'en.json' },
-      { code: 'fr', language: 'fr-FR', file: 'fr.json' },
-      { code: 'es', language: 'es-ES', file: 'es.json' }
-    ],
-    defaultLocale: 'en',
-  },
+  // Language switching is handled by Google's Website Translator widget
+  // (app/plugins/google-translate.client.ts + useGoogleTranslate), not
+  // @nuxtjs/i18n — that only ever covered navbar strings, never the
+  // sidebar or page content, and running both would fight each other.
+  modules: ['@clerk/nuxt', 'nuxt-shiki', 'nuxt-charts'],
   shiki: {
     defaultTheme: 'vitesse-dark',
     // nuxt-shiki only bundles languages listed here — nothing lazy-loads on

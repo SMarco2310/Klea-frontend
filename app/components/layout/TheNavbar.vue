@@ -18,7 +18,7 @@ const { toggleSidebar } = useSidebar()
 const { colorMode } = useTheme()
 const { recentTransactions } = useNotifications()
 const { workspace } = useWorkspace()
-const { t, locale, setLocale } = useI18n()
+const { currentLang, setLanguage } = useGoogleTranslate()
 const switcherOpen = ref(false)
 
 async function handleLogout() {
@@ -31,8 +31,8 @@ function handleWorkspaceSwitch() {
 }
 
 function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
-  setLocale(lang)
-  toast.success(t('navbar.switchedTo', { lang: label }))
+  setLanguage(lang)
+  toast.success(`Switched to ${label}`)
 }
 </script>
 
@@ -53,7 +53,7 @@ function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <button id="tour-workspace" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md hover:bg-[var(--color-hover)] cursor-pointer transition-colors duration-200">
-            <span class="hidden sm:inline">{{ workspace?.name || $t('navbar.workspace') }}</span>
+            <span class="hidden sm:inline">{{ workspace?.name || 'Workspace' }}</span>
             <ChevronDownIcon class="w-3.5 h-3.5 text-[var(--muted-foreground)]" />
           </button>
         </DropdownMenuTrigger>
@@ -78,7 +78,7 @@ function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
           <span class="hidden sm:inline">{{ currentApp.name }}</span>
         </template>
         <template v-else>
-          <span class="hidden sm:inline text-[var(--muted-foreground)]">{{ $t('navbar.selectApp') }}</span>
+          <span class="hidden sm:inline text-[var(--muted-foreground)]">Select App</span>
         </template>
         <ChevronDownIcon class="w-3.5 h-3.5 text-[var(--muted-foreground)]" />
       </button>
@@ -91,19 +91,19 @@ function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
           :class="mode === 'test' ? 'bg-amber-400/25 text-amber-700 dark:text-amber-400 shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
           @click="mode === 'live' && toggle()"
         >
-          {{ $t('navbar.test') }}
+          Test
         </button>
         <button
           class="px-3 py-1 rounded-md text-xs font-medium cursor-pointer transition-all duration-200"
           :class="mode === 'live' ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)] shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
           @click="mode === 'test' && toggle()"
         >
-          {{ $t('navbar.live') }}
+          Live
         </button>
       </div>
 
       <NuxtLink to="/docs" class="hidden lg:flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer">
-        <BookOpenIcon class="w-4 h-4" /> {{ $t('navbar.docs') }}
+        <BookOpenIcon class="w-4 h-4" /> Docs
       </NuxtLink>
 
       <DropdownMenu>
@@ -113,7 +113,7 @@ function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
             aria-label="Change language"
           >
             <LanguagesIcon class="w-4 h-4" />
-            {{ locale.toUpperCase() }}
+            {{ currentLang.toUpperCase() }}
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -132,19 +132,19 @@ function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" class="w-80 p-0 border border-[var(--color-border-dark)] overflow-hidden">
           <div class="px-4 py-3 bg-[var(--color-surface-muted)] border-b border-[var(--color-border-dark)] flex items-center justify-between">
-            <h3 class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">{{ $t('navbar.recentPayments') }}</h3>
+            <h3 class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Recent Payments</h3>
           </div>
           <div class="max-h-80 overflow-y-auto">
             <div v-if="recentTransactions.length === 0" class="px-4 py-8 text-center text-sm text-[var(--muted-foreground)]">
-              {{ $t('navbar.noRecentPayments') }}
+              No recent payments.
             </div>
             <div v-else class="divide-y divide-[var(--color-border-dark)]">
               <div v-for="tx in recentTransactions" :key="tx.id" class="px-4 py-3 hover:bg-[var(--color-surface-muted)] transition-colors cursor-default">
                 <div class="flex items-start justify-between gap-3">
                   <div class="space-y-1">
-                    <p class="text-sm font-medium text-[var(--foreground)]">{{ $t('navbar.newPayment') }}</p>
+                    <p class="text-sm font-medium text-[var(--foreground)]">New Payment</p>
                     <p class="text-xs text-[var(--muted-foreground)]">
-                      {{ tx.currency }} {{ tx.amount.toLocaleString() }} {{ $t('navbar.via') }} {{ tx.payment_method }}
+                      {{ tx.currency }} {{ tx.amount.toLocaleString() }} via {{ tx.payment_method }}
                     </p>
                   </div>
                   <span 
@@ -166,7 +166,7 @@ function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
           </div>
           <div class="p-2 border-t border-[var(--color-border-dark)] bg-[var(--color-surface)]">
             <NuxtLink :to="`/${workspace.slug}/earnings`" class="block w-full text-center text-xs font-medium text-[var(--color-accent)] hover:underline py-1.5 rounded-md hover:bg-[var(--color-surface-muted)] transition-colors">
-              {{ $t('navbar.viewAllTransactions') }}
+              View all transactions
             </NuxtLink>
           </div>
         </DropdownMenuContent>
@@ -228,16 +228,16 @@ function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
 
           <DropdownMenuItem class="cursor-pointer lg:hidden gap-3 px-3 py-2.5 rounded-xl text-sm font-medium" @click="navigateTo('/docs')">
             <BookOpenIcon class="w-[18px] h-[18px] text-[var(--muted-foreground)]" />
-            {{ $t('navbar.docs') }}
+            Docs
           </DropdownMenuItem>
           <DropdownMenuItem class="cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-medium" @click="navigateTo(`/${workspace.slug}/settings`)">
             <SettingsIcon class="w-[18px] h-[18px] text-[var(--muted-foreground)]" />
-            {{ $t('navbar.settings') }}
+            Settings
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem class="cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-medium" @click="handleLogout">
             <LogOutIcon class="w-[18px] h-[18px] text-[var(--muted-foreground)]" />
-            {{ $t('navbar.logout') }}
+            Log out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

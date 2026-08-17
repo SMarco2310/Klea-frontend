@@ -134,7 +134,7 @@
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
   --accent: #7fb894;
-  --accent-foreground: #06170d;
+  --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: #27313f;
   --input: oklch(1 0 0 / 15%);
@@ -316,4 +316,11 @@ input:-webkit-autofill:focus {
 .klea-tour-theme .driver-popover-progress-text {
   color: var(--muted-foreground) !important;
   font-size: 0.75rem !important;
+}
+
+/* Google Translate widget's own mount point (app.vue) — only the little
+   inline gadget/select it renders there is hidden; Google's translation
+   banner itself is left as-is. */
+#google_translate_element {
+  display: none;
 }
