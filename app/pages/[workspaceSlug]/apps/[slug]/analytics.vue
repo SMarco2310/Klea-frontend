@@ -10,6 +10,11 @@ import EmptyState from '~/components/dashboard/EmptyState.vue'
 const { currentApp } = useApps()
 const appId = computed(() => currentApp.value?.id ?? 0)
 const timeRange = ref(30)
+const { continueTourInAppIfFlagged } = useTour()
+
+onMounted(() => {
+  continueTourInAppIfFlagged()
+})
 const {
   activeSubs,
   revenue,

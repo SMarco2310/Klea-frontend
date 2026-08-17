@@ -8,6 +8,7 @@ import { toast } from 'vue-sonner'
 
 const open = defineModel<boolean>('open', { required: true })
 const { createApp, selectApp } = useApps()
+const { markCreateAppStepDone } = useTour()
 
 const name = ref('')
 const slug = computed(() =>
@@ -24,6 +25,7 @@ async function handleCreate() {
     const app = await createApp(name.value.trim(), slug.value)
     name.value = ''
     open.value = false
+    markCreateAppStepDone()
     selectApp(app.slug)
     toast.success('Application created successfully')
   } catch (e) {
