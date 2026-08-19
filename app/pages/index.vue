@@ -10,10 +10,13 @@ import PricingSection from '~/components/landing/PricingSection.vue'
 import CtaBanner from '~/components/landing/CtaBanner.vue'
 import LandingFooter from '~/components/landing/LandingFooter.vue'
 import ScrollReveal from '~/components/landing/ScrollReveal.vue'
+import GridBeams from '~/components/landing/GridBeams.vue'
 </script>
 
 <template>
   <div class="overflow-x-hidden">
+    <GridBeams />
+
     <LandingNavbar />
     
     <HeroSection />

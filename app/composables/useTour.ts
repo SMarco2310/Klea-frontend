@@ -56,7 +56,15 @@ export function useTour() {
   function continueTourInAppIfFlagged() {
     if (sessionStorage.getItem(APP_TOUR_FLAG) !== '1') return
     sessionStorage.removeItem(APP_TOUR_FLAG)
-    setTimeout(initAppTour, 500)
+
+    // Every step of the app tour points at a sidebar link, but the sidebar is
+    // collapsed by default and rendered with v-if — so its elements aren't in
+    // the DOM at all until it's open. Open it first, then wait a tick for the
+    // render before driver.js goes looking for those targets.
+    const { isSidebarOpen } = useSidebar()
+    isSidebarOpen.value = true
+
+    nextTick(() => setTimeout(initAppTour, 500))
   }
 
   const initDashboardTour = () => {
@@ -66,11 +74,18 @@ export function useTour() {
       allowClose: true,
       overlayColor: 'rgba(0, 0, 0, 0.75)',
       popoverClass: 'klea-tour-theme',
-      // Covers: user reaches the create-app step, then closes the tour
-      // (X / Escape) without creating one. Without this, a later,
-      // unrelated app creation would incorrectly hand off to the app tour.
-      onDestroyed: () => {
-        isAwaitingAppCreation.value = false
+      // The create-app step is the tour's last one, and it explicitly asks the
+      // user to go and create an app — so the tour ending *there* (Done, X,
+      // Escape, or clicking through to the highlighted button) must NOT cancel
+      // the handoff, otherwise the app-section tour never fires.
+      //
+      // Ending anywhere earlier means the user bailed out, so the pending
+      // handoff is dropped: a later, unrelated app creation shouldn't suddenly
+      // launch the app tour.
+      onDestroyed: (_element, step) => {
+        if (step?.element !== '#tour-create-app') {
+          isAwaitingAppCreation.value = false
+        }
       },
       steps: [
         {
@@ -128,10 +143,18 @@ export function useTour() {
   }
 
   const initAppTour = () => {
+    const { isSidebarOpen } = useSidebar()
+
     const tour = driver({
       showProgress: true,
       animate: true,
       allowClose: true,
+      // Every step below targets a sidebar link. If the user collapses the
+      // sidebar part-way through, the remaining targets leave the DOM and the
+      // tour would highlight nothing — so re-open it before each step.
+      onHighlightStarted: () => {
+        isSidebarOpen.value = true
+      },
       overlayColor: 'rgba(0, 0, 0, 0.75)',
       popoverClass: 'klea-tour-theme',
       steps: [

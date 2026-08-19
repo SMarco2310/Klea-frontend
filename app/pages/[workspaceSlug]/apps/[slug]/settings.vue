@@ -1,12 +1,14 @@
 <!-- app/pages/apps/[slug]/settings.vue -->
 <script setup lang="ts">
 definePageMeta({ layout: 'dashboard', middleware: 'auth' })
-import { WebhookIcon, TrashIcon } from '@lucide/vue'
+import { WebhookIcon, TrashIcon, EyeIcon, EyeOffIcon, CopyIcon, CheckIcon, RefreshCwIcon } from '@lucide/vue'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { Button } from '~/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '~/components/ui/dialog'
 import AppHeader from '~/components/dashboard/AppHeader.vue'
+import { toast } from 'vue-sonner'
+import type { App } from '~/composables/useApps'
 
 const { currentApp, updateApp, deleteApp } = useApps()
 const route = useRoute()
@@ -15,6 +17,50 @@ const appName = ref(currentApp.value?.name ?? '')
 const webhookUrl = ref(currentApp.value?.webhook_url ?? '')
 const isSaving = ref(false)
 const errorMessage = ref('')
+
+const webhookSecret = computed(() => currentApp.value?.webhook_secret ?? null)
+const secretVisible = ref(false)
+const copiedSecret = ref(false)
+const regenerateOpen = ref(false)
+const isRegenerating = ref(false)
+
+const maskedSecret = computed(() =>
+  webhookSecret.value ? `${webhookSecret.value.slice(0, 6)}${'•'.repeat(24)}` : null
+)
+
+/**
+ * The signing secret is shared with the receiving app, so it has to be
+ * unguessable — 32 random bytes from the platform CSPRNG, hex encoded.
+ */
+function generateSecret(): string {
+  const bytes = new Uint8Array(32)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+async function copySecret() {
+  if (!webhookSecret.value) return
+  await navigator.clipboard.writeText(webhookSecret.value)
+  copiedSecret.value = true
+  toast.success('Signing secret copied to clipboard')
+  setTimeout(() => { copiedSecret.value = false }, 2000)
+}
+
+async function confirmRegenerate() {
+  if (!currentApp.value) return
+  isRegenerating.value = true
+  errorMessage.value = ''
+  try {
+    await updateApp(currentApp.value.id, { webhook_secret: generateSecret() })
+    secretVisible.value = true
+    regenerateOpen.value = false
+    toast.success('Signing secret regenerated — update it in your app')
+  } catch (e) {
+    errorMessage.value = extractApiErrorMessage(e)
+  } finally {
+    isRegenerating.value = false
+  }
+}
 
 const deleteOpen = ref(false)
 const isDeleting = ref(false)
@@ -41,10 +87,27 @@ async function saveSettings() {
   isSaving.value = true
   errorMessage.value = ''
   try {
-    await updateApp(currentApp.value.id, { 
+    const patch: Partial<Pick<App, 'name' | 'webhook_url' | 'webhook_secret'>> = {
       name: appName.value,
-      webhook_url: webhookUrl.value || null 
-    })
+      webhook_url: webhookUrl.value || null,
+    }
+
+    // An endpoint is useless without a secret to sign deliveries with, so the
+    // first time one is set we mint the secret alongside it. Never overwrite an
+    // existing secret here — that would silently break a live integration.
+    const mintedSecret = Boolean(webhookUrl.value) && !currentApp.value.webhook_secret
+    if (mintedSecret) {
+      patch.webhook_secret = generateSecret()
+    }
+
+    await updateApp(currentApp.value.id, patch)
+
+    if (mintedSecret) {
+      secretVisible.value = true
+      toast.success('Settings saved — signing secret generated')
+    } else {
+      toast.success('Settings saved successfully')
+    }
   } catch (e) {
     errorMessage.value = extractApiErrorMessage(e)
   } finally {
@@ -57,7 +120,9 @@ async function confirmDelete() {
   isDeleting.value = true
   deleteError.value = ''
   try {
+    const deletedName = currentApp.value.name
     await deleteApp(currentApp.value.id)
+    toast.success(`${deletedName} deleted successfully`)
     await navigateTo(`/${route.params.workspaceSlug}/dashboard`)
   } catch (e) {
     deleteError.value = extractApiErrorMessage(e)
@@ -92,6 +157,46 @@ async function confirmDelete() {
               <Label for="webhook-url">Endpoint URL</Label>
               <Input id="webhook-url" v-model="webhookUrl" placeholder="https://yourapp.com/webhooks/klea" class="font-mono text-sm" />
             </div>
+
+            <div class="space-y-2 mt-4">
+              <Label>Signing secret</Label>
+
+              <div v-if="webhookSecret" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)]">
+                <code class="text-xs font-mono flex-1 truncate">{{ secretVisible ? webhookSecret : maskedSecret }}</code>
+                <button
+                  type="button"
+                  class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer shrink-0"
+                  :aria-label="secretVisible ? 'Hide secret' : 'Show secret'"
+                  @click="secretVisible = !secretVisible"
+                >
+                  <component :is="secretVisible ? EyeOffIcon : EyeIcon" class="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer shrink-0"
+                  aria-label="Copy signing secret"
+                  @click="copySecret"
+                >
+                  <component :is="copiedSecret ? CheckIcon : CopyIcon" class="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer shrink-0"
+                  aria-label="Regenerate signing secret"
+                  @click="regenerateOpen = true"
+                >
+                  <RefreshCwIcon class="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <p v-else class="text-xs text-[var(--muted-foreground)]">
+                Generated automatically once you save an endpoint URL.
+              </p>
+
+              <p class="text-xs text-[var(--muted-foreground)]">
+                Sign deliveries with this secret to verify they came from Klea. Copy it into your app's environment.
+              </p>
+            </div>
           </div>
 
           <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2">
@@ -124,6 +229,25 @@ async function confirmDelete() {
         </div>
       </div>
     </div>
+
+    <Dialog v-model:open="regenerateOpen">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Regenerate signing secret?</DialogTitle>
+          <DialogDescription>
+            The current secret stops working immediately. Any app verifying deliveries with it will
+            reject every webhook until you update it with the new value.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div class="flex justify-end gap-2 mt-4">
+          <Button variant="ghost" class="cursor-pointer" :disabled="isRegenerating" @click="regenerateOpen = false">Cancel</Button>
+          <Button variant="destructive" class="cursor-pointer" :disabled="isRegenerating" @click="confirmRegenerate">
+            {{ isRegenerating ? 'Regenerating...' : 'Regenerate secret' }}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
 
     <Dialog v-model:open="deleteOpen">
       <DialogContent>

@@ -23,7 +23,9 @@ export default defineNuxtConfig({
   // completes the "dev browser" cookie handshake that authenticateWithRedirect
   // requires. Skipping it makes every OAuth sign-in 400 with
   // dev_browser_unauthenticated before it can even redirect to the provider.
-  css: ['~/assets/css/main.css'],
+  // vue-sonner ships its own stylesheet; without it toasts render unpositioned
+  // (full width, below the fold) instead of floating in the corner.
+  css: ['~/assets/css/main.css', 'vue-sonner/style.css'],
   vite: {
     plugins: [tailwindcss()],
   },
