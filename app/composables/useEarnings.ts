@@ -35,13 +35,15 @@ export function useEarnings() {
     error.value = null
     try {
       const [summaryRes, txRes] = await Promise.all([
-        api.get<{ data: { total_amount: number; transaction_count: number } }>(`/transactions/summary?environment=${mode.value}`),
+        // api.get<T> already unwraps the {data, success, message} envelope
+        // (see useApi.ts request()), so T is the summary payload itself.
+        api.get<{ total_amount: number; transaction_count: number }>(`/transactions/summary?environment=${mode.value}`),
         api.get<Paginated<Transaction>>(`/transactions?environment=${mode.value}`),
         fetchWallet()
       ])
 
-      grossVolume.value = summaryRes.data.total_amount
-      successfulCount.value = summaryRes.data.transaction_count
+      grossVolume.value = summaryRes.total_amount
+      successfulCount.value = summaryRes.transaction_count
 
       // txRes is the unwrapped Paginated<Transaction> envelope: `.data` holds the
       // rows, `.meta.total` holds the server-side row count.

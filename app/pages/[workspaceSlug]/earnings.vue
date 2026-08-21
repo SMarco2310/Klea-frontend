@@ -10,9 +10,11 @@ const { transactions, totalBalance, grossVolume, refunded, avgTransaction, trans
 const { mode } = useEnvMode()
 const { currency: walletCurrency, withdrawable, entries: walletEntries } = useWallet()
 
-watchEffect(() => {
-  fetchEarnings()
-})
+// fetchEarnings only reads mode.value after its first `await`, past the point
+// Vue tracks synchronous dependencies inside watchEffect — so watchEffect
+// would run once and never react to a test/live toggle. Watch `mode`
+// explicitly instead.
+watch(mode, () => fetchEarnings(), { immediate: true })
 </script>
 
 <template>
