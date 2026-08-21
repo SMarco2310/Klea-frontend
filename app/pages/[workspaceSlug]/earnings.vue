@@ -8,7 +8,7 @@ import EmptyState from '~/components/dashboard/EmptyState.vue'
 
 const { transactions, totalBalance, grossVolume, refunded, avgTransaction, transactionCount, successfulCount, appCount, fetchEarnings } = useEarnings()
 const { mode } = useEnvMode()
-const { entries: walletEntries } = useWallet()
+const { currency: walletCurrency, withdrawable, entries: walletEntries } = useWallet()
 
 watchEffect(() => {
   fetchEarnings()
@@ -26,8 +26,10 @@ watchEffect(() => {
       <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-400 mb-2">
         <WalletIcon class="w-4 h-4" /> Total balance
       </div>
-      <div class="text-4xl font-heading font-bold">{{ formatCurrency(totalBalance) }}</div>
-      <div class="text-xs text-[var(--color-accent)] mt-1">All-time net</div>
+      <div class="text-4xl font-heading font-bold">{{ formatCurrency(totalBalance, walletCurrency) }}</div>
+      <div class="text-xs mt-1" :class="withdrawable ? 'text-[var(--color-accent)]' : 'text-yellow-400'">
+        {{ withdrawable ? 'Withdrawable' : 'Test balance — not withdrawable' }}
+      </div>
 
       <div class="grid grid-cols-3 gap-6 mt-6 pt-6 border-t border-[var(--color-border-dark)]">
         <div>

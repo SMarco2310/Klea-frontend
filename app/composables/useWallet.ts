@@ -20,12 +20,15 @@ export function useWallet() {
   const api = useApi()
   const { mode } = useEnvMode()
 
-  const balance = ref('0.00')
-  const currency = ref('XOF')
-  const withdrawable = ref(false)
-  const entries = ref<WalletEntry[]>([])
-  const pending = ref(false)
-  const error = ref<string | null>(null)
+  // useState (not module-scope ref) so the wallet state is shared across every
+  // call site within a request, and isolated per-request during SSR — a plain
+  // module-level ref would leak one user's balance into another user's render.
+  const balance = useState('wallet-balance', () => '0.00')
+  const currency = useState('wallet-currency', () => 'XOF')
+  const withdrawable = useState('wallet-withdrawable', () => false)
+  const entries = useState<WalletEntry[]>('wallet-entries', () => [])
+  const pending = useState('wallet-pending', () => false)
+  const error = useState<string | null>('wallet-error', () => null)
 
   async function fetchWallet() {
     pending.value = true

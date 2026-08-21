@@ -42,14 +42,12 @@ export function useEarnings() {
 
       grossVolume.value = summaryRes.data.total_amount
       successfulCount.value = summaryRes.data.transaction_count
-      
-      // @ts-expect-error backend returns Paginated, useApi unwraps data envelope but meta is at top level
-      // Actually, useApi.get<T> returns `res.data`. If `T` is Paginated, `res.data` is just the `Paginated<T>` object
-      // wait, `Paginated<Transaction>` has `.data` for the array and `.meta` for pagination!
+
+      // txRes is the unwrapped Paginated<Transaction> envelope: `.data` holds the
+      // rows, `.meta.total` holds the server-side row count.
       transactions.value = txRes.data
-      // @ts-expect-error meta exists on the unwrapped envelope if we defined Paginated correctly
       transactionCount.value = (txRes as any).meta?.total ?? txRes.data.length
-      
+
     } catch (e) {
       error.value = extractApiErrorMessage(e)
     } finally {
