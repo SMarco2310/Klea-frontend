@@ -1,7 +1,7 @@
 <!-- app/pages/settings.vue -->
 <script setup lang="ts">
 definePageMeta({ layout: 'dashboard', middleware: 'auth' })
-import { Building2Icon, CreditCardIcon, SaveIcon, EyeIcon, EyeOffIcon } from '@lucide/vue'
+import { Building2Icon, SaveIcon } from '@lucide/vue'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { Button } from '~/components/ui/button'
@@ -16,9 +16,6 @@ const { fetchCurrentUser } = useAppAuth()
 const name = ref('')
 const slug = ref('')
 const currency = ref('XOF')
-const semoaApiKey = ref('')
-const semoaMerchantId = ref('')
-const showApiKey = ref(false)
 const isSaving = ref(false)
 const saved = ref(false)
 const errorMessage = ref('')
@@ -46,8 +43,6 @@ watch(workspace, (w) => {
   name.value = w.name
   slug.value = w.slug
   currency.value = w.currency
-  semoaApiKey.value = w.semoaApiKey
-  semoaMerchantId.value = w.semoaMerchantId
 }, { immediate: true })
 
 async function handleSave() {
@@ -58,8 +53,6 @@ async function handleSave() {
       name: name.value,
       slug: slug.value,
       currency: currency.value,
-      semoaApiKey: semoaApiKey.value,
-      semoaMerchantId: semoaMerchantId.value,
     })
     saved.value = true
     setTimeout(() => { saved.value = false }, 2000)
@@ -132,32 +125,6 @@ const STATUS_STYLES: Record<string, string> = {
                 <SelectItem value="GBP">British Pound (GBP)</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-        </SettingsSection>
-
-        <SettingsSection :icon="CreditCardIcon" title="Payment gateway" description="Semoa credentials used to process payments for your subscribers.">
-          <div class="space-y-2">
-            <Label for="semoa-key">Semoa API key</Label>
-            <div class="relative">
-              <Input
-                id="semoa-key"
-                v-model="semoaApiKey"
-                :type="showApiKey ? 'text' : 'password'"
-                placeholder="semoa_live_..."
-              />
-              <button
-                type="button"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer"
-                :aria-label="showApiKey ? 'Hide API key' : 'Show API key'"
-                @click="showApiKey = !showApiKey"
-              >
-                <component :is="showApiKey ? EyeOffIcon : EyeIcon" class="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-          <div class="space-y-2">
-            <Label for="semoa-merchant">Semoa merchant ID</Label>
-            <Input id="semoa-merchant" v-model="semoaMerchantId" placeholder="M-XXXXXX" />
           </div>
         </SettingsSection>
 

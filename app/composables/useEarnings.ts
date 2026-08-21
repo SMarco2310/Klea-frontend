@@ -21,7 +21,8 @@ export function useEarnings() {
   const pending = ref(false)
   const error = ref<string | null>(null)
 
-  const totalBalance = ref(0)
+  const { balance: walletBalance, fetchWallet } = useWallet()
+  const totalBalance = computed(() => Number(walletBalance.value))
   const grossVolume = ref(0)
   const refunded = ref(0) // Assuming refund tracking might be added later, currently 0
   const transactionCount = ref(0)
@@ -35,9 +36,10 @@ export function useEarnings() {
     try {
       const [summaryRes, txRes] = await Promise.all([
         api.get<{ data: { total_amount: number; transaction_count: number } }>(`/transactions/summary?environment=${mode.value}`),
-        api.get<Paginated<Transaction>>(`/transactions?environment=${mode.value}`)
+        api.get<Paginated<Transaction>>(`/transactions?environment=${mode.value}`),
+        fetchWallet()
       ])
-      
+
       grossVolume.value = summaryRes.data.total_amount
       successfulCount.value = summaryRes.data.transaction_count
       

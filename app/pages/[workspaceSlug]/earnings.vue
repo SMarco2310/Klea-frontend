@@ -8,6 +8,7 @@ import EmptyState from '~/components/dashboard/EmptyState.vue'
 
 const { transactions, totalBalance, grossVolume, refunded, avgTransaction, transactionCount, successfulCount, appCount, fetchEarnings } = useEarnings()
 const { mode } = useEnvMode()
+const { entries: walletEntries } = useWallet()
 
 watchEffect(() => {
   fetchEarnings()
@@ -40,6 +41,24 @@ watchEffect(() => {
         <div>
           <div class="text-xs uppercase tracking-wide text-slate-400 mb-1">Avg. transaction</div>
           <div class="text-xl font-semibold">{{ avgTransaction === null ? '—' : formatCurrency(avgTransaction) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="walletEntries.length" class="mt-8">
+      <h2 class="font-heading text-lg font-semibold mb-3">Wallet activity</h2>
+      <div class="rounded-xl border border-[var(--color-border-dark)] divide-y divide-[var(--color-border-dark)]">
+        <div v-for="entry in walletEntries" :key="entry.id" class="flex items-center justify-between px-4 py-3">
+          <div>
+            <p class="text-sm">{{ entry.description }}</p>
+            <p class="text-xs text-[var(--muted-foreground)]">{{ new Date(entry.created_at).toLocaleString() }}</p>
+          </div>
+          <span
+            class="font-mono text-sm"
+            :class="entry.type === 'credit' ? 'text-[var(--color-accent)]' : 'text-[var(--muted-foreground)]'"
+          >
+            {{ entry.type === 'credit' ? '+' : '−' }}{{ entry.amount }}
+          </span>
         </div>
       </div>
     </div>
