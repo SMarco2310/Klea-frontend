@@ -176,7 +176,10 @@ async function handleLogout() {
               <td class="px-4 py-3 font-mono">{{ row.amount_requested }}</td>
               <td class="px-4 py-3 font-mono text-slate-400">{{ row.fee_amount }}</td>
               <td class="px-4 py-3 font-mono font-medium">{{ row.amount_net }}</td>
-              <td class="px-4 py-3 text-slate-300">{{ row.destination }}</td>
+              <td class="px-4 py-3 text-slate-300">
+                <div>{{ row.destination }}</div>
+                <div class="text-xs text-slate-500">{{ row.destination_type === 'mobile_money' ? 'Mobile money' : 'Bank account' }}</div>
+              </td>
               <td class="px-4 py-3">
                 <div>{{ row.requester.name }}</div>
                 <div class="text-xs text-slate-500">{{ row.requester.email }}</div>

@@ -18,6 +18,7 @@ export interface PayoutRequest {
   fee_amount: string
   amount_net: string
   destination: string
+  destination_type: 'mobile_money' | 'bank_account'
   status: PayoutStatus
   created_at: string
   wallet: {
