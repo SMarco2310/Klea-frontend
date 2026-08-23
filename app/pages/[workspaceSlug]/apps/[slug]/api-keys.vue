@@ -220,7 +220,11 @@ function lastUsedLabel(key: { last_used_at: string | null }) {
               </p>
             </div>
             <p class="text-xs text-slate-500">
-              Requests authenticate with the two joined by a dot: <code class="font-mono">{{ revealedFullKey }}</code>
+              Requests authenticate with the two joined by a dot:
+              <!-- break-all like the two fields above: the joined form is ~70
+                   chars with no spaces, so without it the line overflows the
+                   dialog instead of wrapping. -->
+              <code class="font-mono break-all block mt-1">{{ revealedFullKey }}</code>
             </p>
           </div>
           <div class="flex justify-end">
