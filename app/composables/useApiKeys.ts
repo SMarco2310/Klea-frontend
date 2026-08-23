@@ -45,7 +45,14 @@ export function useApiKeys(appId: number | string) {
     all.value.push(created)
     // public_id and secret are only ever concatenated here, at creation —
     // the secret can't be recovered from the API again after this.
-    return { record: created, fullKey: `${created.public_id}.${created.secret}` }
+    return {
+      record: created,
+      publishableKey: created.public_id,
+      secretKey: created.secret,
+      // Kept for the "how they join" hint in the dialog; the wire format is
+      // unchanged, this is only how it is presented.
+      fullKey: `${created.public_id}.${created.secret}`,
+    }
   }
 
   async function revokeApiKey(id: number) {

@@ -21,8 +21,11 @@ watchEffect(() => {
 
 const createOpen = ref(false)
 const name = ref('')
-const revealedKey = ref<string | null>(null)
-const copied = ref(false)
+const revealedPublishableKey = ref<string | null>(null)
+const revealedSecretKey = ref<string | null>(null)
+const revealedFullKey = ref<string | null>(null)
+const copiedPublishable = ref(false)
+const copiedSecret = ref(false)
 const isCreating = ref(false)
 const errorMessage = ref('')
 
@@ -34,8 +37,10 @@ async function handleCreate() {
   isCreating.value = true
   errorMessage.value = ''
   try {
-    const { fullKey } = await createApiKey(name.value.trim())
-    revealedKey.value = fullKey
+    const { publishableKey, secretKey, fullKey } = await createApiKey(name.value.trim())
+    revealedPublishableKey.value = publishableKey
+    revealedSecretKey.value = secretKey
+    revealedFullKey.value = fullKey
     name.value = ''
   } catch (e) {
     errorMessage.value = extractApiErrorMessage(e)
@@ -44,17 +49,27 @@ async function handleCreate() {
   }
 }
 
-async function copyKey() {
-  if (!revealedKey.value) return
-  await navigator.clipboard.writeText(revealedKey.value)
-  copied.value = true
-  setTimeout(() => { copied.value = false }, 2000)
+async function copyPublishableKey() {
+  if (!revealedPublishableKey.value) return
+  await navigator.clipboard.writeText(revealedPublishableKey.value)
+  copiedPublishable.value = true
+  setTimeout(() => { copiedPublishable.value = false }, 2000)
+}
+
+async function copySecretKey() {
+  if (!revealedSecretKey.value) return
+  await navigator.clipboard.writeText(revealedSecretKey.value)
+  copiedSecret.value = true
+  setTimeout(() => { copiedSecret.value = false }, 2000)
 }
 
 function closeDialog() {
   createOpen.value = false
-  revealedKey.value = null
-  copied.value = false
+  revealedPublishableKey.value = null
+  revealedSecretKey.value = null
+  revealedFullKey.value = null
+  copiedPublishable.value = false
+  copiedSecret.value = false
   errorMessage.value = ''
 }
 
@@ -155,7 +170,7 @@ function lastUsedLabel(key: { last_used_at: string | null }) {
 
     <Dialog v-model:open="createOpen">
       <DialogContent>
-        <template v-if="!revealedKey">
+        <template v-if="!revealedSecretKey">
           <DialogHeader>
             <DialogTitle>New API key</DialogTitle>
             <DialogDescription>Give this key a name so you can identify it later.</DialogDescription>
@@ -179,18 +194,33 @@ function lastUsedLabel(key: { last_used_at: string | null }) {
         <template v-else>
           <DialogHeader>
             <DialogTitle>Key created</DialogTitle>
-            <DialogDescription>Copy this key now — you won't be able to see it again.</DialogDescription>
+            <DialogDescription>Copy these now — the secret won't be shown again.</DialogDescription>
           </DialogHeader>
-          <div class="py-2">
-            <div class="flex items-center gap-2 p-3 rounded-lg bg-[var(--color-surface-muted)] border border-amber-400/30">
-              <code class="text-sm font-mono flex-1 break-all select-all">{{ revealedKey }}</code>
-              <button class="text-slate-400 hover:text-white cursor-pointer shrink-0" aria-label="Copy key" @click="copyKey">
-                <component :is="copied ? CheckIcon : CopyIcon" class="w-4 h-4" />
-              </button>
+          <div class="py-2 space-y-3">
+            <div class="space-y-1.5">
+              <Label>Publishable key</Label>
+              <div class="flex items-center gap-2 p-3 rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)]">
+                <code class="text-sm font-mono flex-1 break-all select-all">{{ revealedPublishableKey }}</code>
+                <button class="text-slate-400 hover:text-white cursor-pointer shrink-0" aria-label="Copy publishable key" @click="copyPublishableKey">
+                  <component :is="copiedPublishable ? CheckIcon : CopyIcon" class="w-4 h-4" />
+                </button>
+              </div>
             </div>
-            <p class="flex items-center gap-1.5 text-xs text-amber-400 mt-3">
-              <ShieldAlertIcon class="w-3.5 h-3.5 shrink-0" />
-              This key won't be shown again — copy it now.
+            <div class="space-y-1.5">
+              <Label>Secret key</Label>
+              <div class="flex items-center gap-2 p-3 rounded-lg bg-[var(--color-surface-muted)] border border-amber-400/30">
+                <code class="text-sm font-mono flex-1 break-all select-all">{{ revealedSecretKey }}</code>
+                <button class="text-slate-400 hover:text-white cursor-pointer shrink-0" aria-label="Copy secret key" @click="copySecretKey">
+                  <component :is="copiedSecret ? CheckIcon : CopyIcon" class="w-4 h-4" />
+                </button>
+              </div>
+              <p class="flex items-center gap-1.5 text-xs text-amber-400">
+                <ShieldAlertIcon class="w-3.5 h-3.5 shrink-0" />
+                This secret won't be shown again — copy it now.
+              </p>
+            </div>
+            <p class="text-xs text-slate-500">
+              Requests authenticate with the two joined by a dot: <code class="font-mono">{{ revealedFullKey }}</code>
             </p>
           </div>
           <div class="flex justify-end">
