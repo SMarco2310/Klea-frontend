@@ -6,12 +6,11 @@ import { ArrowLeftIcon, AlertTriangleIcon, LogOutIcon } from '@lucide/vue'
 import { Button } from '~/components/ui/button'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
 
-const { admin, fetchCurrentAdmin, logout } = useAdminAuth()
+const { admin, logout } = useAdminAuth()
 const { wallets, platformLiability, pending, error, fetchWallets } = useAdminWallets()
 
-if (!admin.value) {
-  fetchCurrentAdmin().catch(() => {})
-}
+// The admin middleware already resolved (and validated) the operator, so
+// there is no second fetch here — a rejected token redirects before render.
 fetchWallets()
 
 async function handleLogout() {
@@ -79,8 +78,10 @@ async function handleLogout() {
               :class="wallet.has_drift ? 'bg-red-500/5 hover:bg-red-500/10' : 'hover:bg-white/5'"
             >
               <td class="px-4 py-3">
-                <div class="font-medium">{{ wallet.tenant.name }}</div>
-                <div class="text-xs text-slate-500">{{ wallet.tenant.slug }}</div>
+                <!-- tenant is null for a soft-deleted workspace. Its balance
+                     is still platform liability, so the row must render. -->
+                <div class="font-medium">{{ wallet.tenant?.name ?? 'Deleted workspace' }}</div>
+                <div class="text-xs text-slate-500">{{ wallet.tenant?.slug ?? `wallet #${wallet.id}` }}</div>
               </td>
               <td class="px-4 py-3">
                 <span

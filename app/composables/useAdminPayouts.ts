@@ -21,7 +21,10 @@ export interface PayoutRequest {
   status: PayoutStatus
   created_at: string
   wallet: {
-    tenant: { id: number; name: string; slug: string }
+    // Nullable: Tenants uses SoftDeletes and the backend emits `tenant: null`
+    // for a deleted workspace. A wallet can outlive its tenant while still
+    // holding money the platform owes.
+    tenant: { id: number; name: string; slug: string } | null
   }
   requester: { id: number; name: string; email: string }
 }
@@ -33,7 +36,7 @@ export interface AdminWallet {
   computed_balance: string
   has_drift: boolean
   currency: string
-  tenant: { id: number; name: string; slug: string }
+  tenant: { id: number; name: string; slug: string } | null
 }
 
 export interface WalletsOverview {

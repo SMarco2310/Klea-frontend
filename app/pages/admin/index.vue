@@ -11,12 +11,11 @@ import { Label } from '~/components/ui/label'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
 import type { PayoutRequest, PayoutStatus } from '~/composables/useAdminPayouts'
 
-const { admin, fetchCurrentAdmin, logout } = useAdminAuth()
+const { admin, logout } = useAdminAuth()
 const { requests, pending, error, statusFilter, fetchPayoutRequests, approve, reject, markPaid } = useAdminPayouts()
 
-if (!admin.value) {
-  fetchCurrentAdmin().catch(() => {})
-}
+// The admin middleware already resolved (and validated) the operator, so
+// there is no second fetch here — a rejected token redirects before render.
 fetchPayoutRequests(statusFilter.value)
 
 const statusOptions: { value: PayoutStatus | 'all'; label: string }[] = [
@@ -166,8 +165,10 @@ async function handleLogout() {
           <tbody class="divide-y divide-[var(--color-border-dark)]">
             <tr v-for="row in requests" :key="row.id" class="hover:bg-white/5 transition-colors">
               <td class="px-4 py-3">
-                <div class="font-medium">{{ row.wallet.tenant.name }}</div>
-                <div class="text-xs text-slate-500">{{ row.wallet.tenant.slug }}</div>
+                <!-- tenant is null for a soft-deleted workspace. Its wallet
+                     can still hold money we owe, so the row must render. -->
+                <div class="font-medium">{{ row.wallet.tenant?.name ?? 'Deleted workspace' }}</div>
+                <div class="text-xs text-slate-500">{{ row.wallet.tenant?.slug ?? `wallet #${row.wallet.id}` }}</div>
               </td>
               <!-- Amounts are decimal:2 strings from the API — displayed
                    as-is, never Number()'d or reformatted (float handling of
