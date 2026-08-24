@@ -10,10 +10,10 @@ import {
 } from '~/components/ui/dropdown-menu'
 
 const { isDark, toggleDark, colorMode } = useTheme()
-const { setLanguage } = useGoogleTranslate()
+const { availableLocales, setLocale } = useLocale()
 
-function changeLanguage(lang: 'en' | 'fr' | 'es') {
-  setLanguage(lang)
+function changeLanguage(code: string) {
+  setLocale(code)
 }
 
 const isScrolled = ref(false)
@@ -95,9 +95,14 @@ onUnmounted(() => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" class="w-40 border-[var(--color-border-dark)] bg-[var(--color-surface)]/95 backdrop-blur-xl">
-              <DropdownMenuItem class="cursor-pointer font-medium" @click="changeLanguage('en')">English (EN)</DropdownMenuItem>
-              <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('fr')">Français (FR)</DropdownMenuItem>
-              <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('es')">Español (ES)</DropdownMenuItem>
+              <DropdownMenuItem
+                v-for="l in availableLocales"
+                :key="l.code"
+                class="cursor-pointer"
+                @click="changeLanguage(l.code)"
+              >
+                {{ l.name }} ({{ l.code.toUpperCase() }})
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

@@ -317,10 +317,3 @@ input:-webkit-autofill:focus {
   color: var(--muted-foreground) !important;
   font-size: 0.75rem !important;
 }
-
-/* Google Translate widget's own mount point (app.vue) — only the little
-   inline gadget/select it renders there is hidden; Google's translation
-   banner itself is left as-is. */
-#google_translate_element {
-  display: none;
-}

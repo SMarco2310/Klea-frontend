@@ -13,10 +13,10 @@ const apiBase = config.public.apiBaseUrl
 const searchQuery = ref('')
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const { colorMode } = useTheme()
-const { setLanguage } = useGoogleTranslate()
+const { availableLocales, setLocale } = useLocale()
 
-function changeLanguage(lang: 'en' | 'fr' | 'es') {
-  setLanguage(lang)
+function changeLanguage(code: string) {
+  setLocale(code)
 }
 
 const sections = [
@@ -363,9 +363,12 @@ const validationErrorSample = `{
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" class="w-40 border-[var(--color-border-dark)] bg-[var(--color-surface)]/95 backdrop-blur-xl">
-              <DropdownMenuItem class="cursor-pointer font-medium" @click="changeLanguage('en')">English (EN)</DropdownMenuItem>
-              <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('fr')">Français (FR)</DropdownMenuItem>
-              <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('es')">Español (ES)</DropdownMenuItem>
+              <DropdownMenuItem
+                v-for="l in availableLocales"
+                :key="l.code"
+                class="cursor-pointer"
+                @click="changeLanguage(l.code)"
+              >{{ l.name }}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

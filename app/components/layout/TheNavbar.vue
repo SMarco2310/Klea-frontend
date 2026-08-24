@@ -18,7 +18,7 @@ const { toggleSidebar } = useSidebar()
 const { colorMode } = useTheme()
 const { recentTransactions } = useNotifications()
 const { workspace } = useWorkspace()
-const { currentLang, setLanguage } = useGoogleTranslate()
+const { locale, availableLocales, setLocale } = useLocale()
 const switcherOpen = ref(false)
 
 async function handleLogout() {
@@ -30,8 +30,8 @@ function handleWorkspaceSwitch() {
   toast.success('Switched workspace successfully')
 }
 
-function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
-  setLanguage(lang)
+function changeLanguage(code: string, label: string) {
+  setLocale(code)
   toast.success(`Switched to ${label}`)
 }
 </script>
@@ -113,13 +113,19 @@ function changeLanguage(lang: 'en' | 'fr' | 'es', label: string) {
             aria-label="Change language"
           >
             <LanguagesIcon class="w-4 h-4" />
-            {{ currentLang.toUpperCase() }}
+            {{ locale.toUpperCase() }}
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem class="cursor-pointer font-medium" @click="changeLanguage('en', 'English')">English (EN)</DropdownMenuItem>
-          <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('fr', 'Français')">Français (FR)</DropdownMenuItem>
-          <DropdownMenuItem class="cursor-pointer" @click="changeLanguage('es', 'Español')">Español (ES)</DropdownMenuItem>
+          <DropdownMenuItem
+            v-for="l in availableLocales"
+            :key="l.code"
+            class="cursor-pointer"
+            :class="{ 'font-medium': l.code === locale }"
+            @click="changeLanguage(l.code, l.name)"
+          >
+            {{ l.name }} ({{ l.code.toUpperCase() }})
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
