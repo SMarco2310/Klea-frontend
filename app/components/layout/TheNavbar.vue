@@ -19,6 +19,7 @@ const { colorMode } = useTheme()
 const { recentTransactions } = useNotifications()
 const { workspace } = useWorkspace()
 const { locale, availableLocales, setLocale } = useLocale()
+const { t } = useI18n()
 const switcherOpen = ref(false)
 
 async function handleLogout() {
@@ -27,12 +28,12 @@ async function handleLogout() {
 }
 
 function handleWorkspaceSwitch() {
-  toast.success('Switched workspace successfully')
+  toast.success(t('nav.workspaceSwitched'))
 }
 
 function changeLanguage(code: string, label: string) {
   setLocale(code)
-  toast.success(`Switched to ${label}`)
+  toast.success(t('nav.languageSwitched', { language: label }))
 }
 </script>
 
@@ -41,7 +42,7 @@ function changeLanguage(code: string, label: string) {
     <button
       class="flex items-center justify-center w-8 h-8 rounded-md hover:bg-[var(--color-hover)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer transition-colors duration-200 shrink-0 relative z-50"
       @click="toggleSidebar"
-      aria-label="Toggle Sidebar"
+      :aria-label="$t('nav.toggleSidebar')"
     >
       <MenuIcon class="w-5 h-5" />
     </button>
@@ -53,7 +54,7 @@ function changeLanguage(code: string, label: string) {
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <button id="tour-workspace" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md hover:bg-[var(--color-hover)] cursor-pointer transition-colors duration-200">
-            <span class="hidden sm:inline">{{ workspace?.name || 'Workspace' }}</span>
+            <span class="hidden sm:inline">{{ workspace?.name || $t('nav.workspaceFallback') }}</span>
             <ChevronDownIcon class="w-3.5 h-3.5 text-[var(--muted-foreground)]" />
           </button>
         </DropdownMenuTrigger>
@@ -78,7 +79,7 @@ function changeLanguage(code: string, label: string) {
           <span class="hidden sm:inline">{{ currentApp.name }}</span>
         </template>
         <template v-else>
-          <span class="hidden sm:inline text-[var(--muted-foreground)]">Select App</span>
+          <span class="hidden sm:inline text-[var(--muted-foreground)]">{{ $t('nav.selectApp') }}</span>
         </template>
         <ChevronDownIcon class="w-3.5 h-3.5 text-[var(--muted-foreground)]" />
       </button>
@@ -91,26 +92,26 @@ function changeLanguage(code: string, label: string) {
           :class="mode === 'test' ? 'bg-amber-400/25 text-amber-700 dark:text-amber-400 shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
           @click="mode === 'live' && toggle()"
         >
-          Test
+          {{ $t('nav.testMode') }}
         </button>
         <button
           class="px-3 py-1 rounded-md text-xs font-medium cursor-pointer transition-all duration-200"
           :class="mode === 'live' ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)] shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
           @click="mode === 'test' && toggle()"
         >
-          Live
+          {{ $t('nav.liveMode') }}
         </button>
       </div>
 
       <NuxtLink to="/docs" class="hidden lg:flex items-center gap-1.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer">
-        <BookOpenIcon class="w-4 h-4" /> Docs
+        <BookOpenIcon class="w-4 h-4" /> {{ $t('nav.docs') }}
       </NuxtLink>
 
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <button
             class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer transition-colors flex items-center gap-1.5 justify-center h-8 px-2.5 rounded-md hover:bg-[var(--color-surface-muted)] text-xs font-medium"
-            aria-label="Change language"
+            :aria-label="$t('nav.changeLanguage')"
           >
             <LanguagesIcon class="w-4 h-4" />
             {{ locale.toUpperCase() }}
@@ -131,26 +132,26 @@ function changeLanguage(code: string, label: string) {
 
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
-          <button class="relative w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--color-surface-muted)] cursor-pointer transition-colors" aria-label="Notifications">
+          <button class="relative w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--color-surface-muted)] cursor-pointer transition-colors" :aria-label="$t('nav.notifications')">
             <BellIcon class="w-4 h-4 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors" />
             <span v-if="recentTransactions.length > 0" class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 border-2 border-[var(--color-surface)]"></span>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" class="w-80 p-0 border border-[var(--color-border-dark)] overflow-hidden">
           <div class="px-4 py-3 bg-[var(--color-surface-muted)] border-b border-[var(--color-border-dark)] flex items-center justify-between">
-            <h3 class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Recent Payments</h3>
+            <h3 class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">{{ $t('nav.recentPayments') }}</h3>
           </div>
           <div class="max-h-80 overflow-y-auto">
             <div v-if="recentTransactions.length === 0" class="px-4 py-8 text-center text-sm text-[var(--muted-foreground)]">
-              No recent payments.
+              {{ $t('nav.noRecentPayments') }}
             </div>
             <div v-else class="divide-y divide-[var(--color-border-dark)]">
               <div v-for="tx in recentTransactions" :key="tx.id" class="px-4 py-3 hover:bg-[var(--color-surface-muted)] transition-colors cursor-default">
                 <div class="flex items-start justify-between gap-3">
                   <div class="space-y-1">
-                    <p class="text-sm font-medium text-[var(--foreground)]">New Payment</p>
+                    <p class="text-sm font-medium text-[var(--foreground)]">{{ $t('nav.newPayment') }}</p>
                     <p class="text-xs text-[var(--muted-foreground)]">
-                      {{ tx.currency }} {{ tx.amount.toLocaleString() }} via {{ tx.payment_method }}
+                      {{ tx.currency }} {{ tx.amount.toLocaleString() }} {{ $t('nav.via') }} {{ tx.payment_method }}
                     </p>
                   </div>
                   <span 
@@ -172,7 +173,7 @@ function changeLanguage(code: string, label: string) {
           </div>
           <div class="p-2 border-t border-[var(--color-border-dark)] bg-[var(--color-surface)]">
             <NuxtLink :to="`/${workspace.slug}/earnings`" class="block w-full text-center text-xs font-medium text-[var(--color-accent)] hover:underline py-1.5 rounded-md hover:bg-[var(--color-surface-muted)] transition-colors">
-              View all transactions
+              {{ $t('nav.viewAllTransactions') }}
             </NuxtLink>
           </div>
         </DropdownMenuContent>
@@ -182,7 +183,7 @@ function changeLanguage(code: string, label: string) {
         <DropdownMenuTrigger as-child>
           <button
             class="w-8 h-8 rounded-full bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] flex items-center justify-center text-xs font-semibold cursor-pointer"
-            :aria-label="`Account menu for ${user?.name ?? 'user'}`"
+            :aria-label="user?.name ? $t('nav.accountMenuFor', { name: user.name }) : $t('nav.accountMenuForUser')"
           >
             {{ user?.name?.[0]?.toUpperCase() ?? 'A' }}
           </button>
@@ -196,7 +197,7 @@ function changeLanguage(code: string, label: string) {
               {{ user?.name?.[0]?.toUpperCase() ?? 'A' }}
             </span>
             <span class="min-w-0">
-              <span class="block text-sm font-semibold text-[var(--foreground)] truncate">{{ user?.name ?? 'Account' }}</span>
+              <span class="block text-sm font-semibold text-[var(--foreground)] truncate">{{ user?.name ?? $t('nav.accountFallback') }}</span>
               <span class="block text-xs text-[var(--muted-foreground)] truncate">{{ user?.email }}</span>
             </span>
           </button>
@@ -207,7 +208,7 @@ function changeLanguage(code: string, label: string) {
             <button
               class="flex-1 flex items-center justify-center h-8 rounded-lg cursor-pointer transition-colors"
               :class="colorMode === 'light' ? 'bg-[var(--color-surface)] shadow-sm text-[var(--color-accent)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
-              aria-label="Light mode"
+              :aria-label="$t('nav.lightMode')"
               @click="colorMode = 'light'"
             >
               <SunIcon class="w-4 h-4" />
@@ -215,7 +216,7 @@ function changeLanguage(code: string, label: string) {
             <button
               class="flex-1 flex items-center justify-center h-8 rounded-lg cursor-pointer transition-colors"
               :class="colorMode === 'dark' ? 'bg-[var(--color-surface)] shadow-sm text-[var(--color-accent)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
-              aria-label="Dark mode"
+              :aria-label="$t('nav.darkMode')"
               @click="colorMode = 'dark'"
             >
               <MoonIcon class="w-4 h-4" />
@@ -223,7 +224,7 @@ function changeLanguage(code: string, label: string) {
             <button
               class="flex-1 flex items-center justify-center h-8 rounded-lg cursor-pointer transition-colors"
               :class="colorMode === 'auto' ? 'bg-[var(--color-surface)] shadow-sm text-[var(--color-accent)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
-              aria-label="System theme"
+              :aria-label="$t('nav.systemTheme')"
               @click="colorMode = 'auto'"
             >
               <MonitorIcon class="w-4 h-4" />
@@ -234,16 +235,16 @@ function changeLanguage(code: string, label: string) {
 
           <DropdownMenuItem class="cursor-pointer lg:hidden gap-3 px-3 py-2.5 rounded-xl text-sm font-medium" @click="navigateTo('/docs')">
             <BookOpenIcon class="w-[18px] h-[18px] text-[var(--muted-foreground)]" />
-            Docs
+            {{ $t('nav.docs') }}
           </DropdownMenuItem>
           <DropdownMenuItem class="cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-medium" @click="navigateTo(`/${workspace.slug}/settings`)">
             <SettingsIcon class="w-[18px] h-[18px] text-[var(--muted-foreground)]" />
-            Settings
+            {{ $t('nav.settings') }}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem class="cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-medium" @click="handleLogout">
             <LogOutIcon class="w-[18px] h-[18px] text-[var(--muted-foreground)]" />
-            Log out
+            {{ $t('nav.logOut') }}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
