@@ -5,9 +5,9 @@
     <div class="max-w-6xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
       <span class="font-mono text-xs">© 2026 <span class="notranslate">Klea</span><span class="text-[var(--color-accent)]">.</span></span>
       <div class="flex gap-4">
-        <NuxtLink to="/docs" class="hover:text-foreground cursor-pointer">Docs</NuxtLink>
-        <NuxtLink to="/login" class="hover:text-foreground cursor-pointer">Login</NuxtLink>
-        <NuxtLink to="/signup" class="hover:text-foreground cursor-pointer">Signup</NuxtLink>
+        <NuxtLink to="/docs" class="hover:text-foreground cursor-pointer">{{ $t('landing.footer.docs') }}</NuxtLink>
+        <NuxtLink to="/login" class="hover:text-foreground cursor-pointer">{{ $t('landing.footer.login') }}</NuxtLink>
+        <NuxtLink to="/signup" class="hover:text-foreground cursor-pointer">{{ $t('landing.footer.signup') }}</NuxtLink>
       </div>
     </div>
   </footer>

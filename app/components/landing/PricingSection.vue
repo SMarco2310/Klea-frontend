@@ -5,60 +5,65 @@ import { Button } from '~/components/ui/button'
 import { CheckIcon } from '@lucide/vue'
 import ScrollReveal from '~/components/landing/ScrollReveal.vue'
 
+const { t } = useI18n()
+
 const isYearly = ref(false)
 
-const tiers = [
-  { 
-    name: 'Free Plan', 
-    price: 'Free', 
+const tiers = computed(() => [
+  {
+    key: 'free',
+    name: t('landing.pricing.free.name'),
+    price: t('landing.pricing.free.price'),
     features: [
-      'Send up to 2 transfers per month', 
-      'Basic transaction history', 
-      'Email support', 
-      'Limited currency support (NGN, ZAR, KES)', 
-      'Basic security features'
-    ], 
-    highlighted: false 
+      t('landing.pricing.free.feature1'),
+      t('landing.pricing.free.feature2'),
+      t('landing.pricing.free.feature3'),
+      t('landing.pricing.free.feature4'),
+      t('landing.pricing.free.feature5'),
+    ],
+    highlighted: false,
   },
-  { 
-    name: 'Standard Plan', 
-    price: '$9.99/m', 
+  {
+    key: 'standard',
+    name: t('landing.pricing.standard.name'),
+    price: t('landing.pricing.standard.price'),
     features: [
-      'Unlimited transfers', 
-      'Transaction history with export options', 
-      'Priority email support', 
-      'Expanded African currency support', 
-      'Advanced security features'
-    ], 
-    highlighted: true 
+      t('landing.pricing.standard.feature1'),
+      t('landing.pricing.standard.feature2'),
+      t('landing.pricing.standard.feature3'),
+      t('landing.pricing.standard.feature4'),
+      t('landing.pricing.standard.feature5'),
+    ],
+    highlighted: true,
   },
-  { 
-    name: 'Pro Plan', 
-    price: '$19.99/m', 
+  {
+    key: 'pro',
+    name: t('landing.pricing.pro.name'),
+    price: t('landing.pricing.pro.price'),
     features: [
-      'Unlimited transfers with priority processing', 
-      'Comprehensive transaction analytics', 
-      '24/7 priority support', 
-      'Full African currency support', 
-      'Enhanced security features'
-    ], 
-    highlighted: false 
+      t('landing.pricing.pro.feature1'),
+      t('landing.pricing.pro.feature2'),
+      t('landing.pricing.pro.feature3'),
+      t('landing.pricing.pro.feature4'),
+      t('landing.pricing.pro.feature5'),
+    ],
+    highlighted: false,
   },
-]
+])
 </script>
 
 <template>
   <section id="pricing" class="relative max-w-6xl mx-auto px-6 py-32 overflow-hidden flex flex-col items-center">
     <!-- Huge background text -->
     <div class="absolute inset-0 flex items-start pt-16 justify-center pointer-events-none select-none -z-10">
-      <h2 class="text-[12rem] md:text-[18rem] font-bold text-foreground/[0.03] tracking-tighter mix-blend-overlay leading-none">Pricing</h2>
+      <h2 class="text-[12rem] md:text-[18rem] font-bold text-foreground/[0.03] tracking-tighter mix-blend-overlay leading-none">{{ $t('landing.pricing.title') }}</h2>
     </div>
 
     <!-- Pricing Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 w-full mt-16 md:mt-24">
       <ScrollReveal
         v-for="(tier, idx) in tiers"
-        :key="tier.name"
+        :key="tier.key"
         direction="up"
         :delay="idx * 120"
         :duration="700"
@@ -81,11 +86,11 @@ const tiers = [
             </li>
           </ul>
           
-          <Button 
-            class="w-full rounded-full py-6 text-sm font-semibold transition-colors cursor-pointer" 
+          <Button
+            class="w-full rounded-full py-6 text-sm font-semibold transition-colors cursor-pointer"
             :class="tier.highlighted ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-emerald-950/20' : 'bg-transparent text-foreground hover:bg-foreground/5 border border-[color:var(--color-border-dark)]'"
           >
-            Get Started
+            {{ $t('landing.pricing.getStarted') }}
           </Button>
         </div>
       </ScrollReveal>
@@ -101,7 +106,7 @@ const tiers = [
             class="px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer"
             :class="!isYearly ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'"
           >
-            Monthly
+            {{ $t('landing.pricing.monthly') }}
           </button>
           <button
             type="button"
@@ -109,9 +114,9 @@ const tiers = [
             class="flex items-center gap-2 px-6 py-2 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer"
             :class="isYearly ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'"
           >
-            Annually
+            {{ $t('landing.pricing.annually') }}
             <span class="px-2.5 py-0.5 text-[11px] font-bold rounded-md shadow-sm border border-primary/20" :class="isYearly ? 'bg-white/20 text-white' : 'bg-primary text-primary-foreground'">
-              Save 25%
+              {{ $t('landing.pricing.save25') }}
             </span>
           </button>
         </div>

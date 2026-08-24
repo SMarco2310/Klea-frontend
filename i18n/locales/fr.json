@@ -52,5 +52,126 @@
   "env": {
     "testModeBanner": "Mode test — données et clés de test uniquement. Passez en mode En direct dans la barre supérieure pour utiliser des données réelles.",
     "liveModeBanner": "Mode en direct — des transactions réelles sont en cours de traitement."
+  },
+  "landing": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "docs": "Documentation",
+      "pricing": "Tarifs",
+      "toggleTheme": "Changer de thème",
+      "changeLanguage": "Changer de langue",
+      "login": "Connexion",
+      "getStarted": "Commencer"
+    },
+    "hero": {
+      "eyebrow": "Infrastructure de licences pour SaaS",
+      "titleLine1": "Émettez et validez",
+      "titleLine2": "des licences logicielles",
+      "titleAccent": "en un seul appel API.",
+      "subtitle": "Créez une application, générez une clé, définissez un forfait — vos abonnés sont licenciés automatiquement dès qu'ils paient.",
+      "ctaPrimary": "Commencer gratuitement",
+      "ctaSecondary": "Voir la documentation",
+      "noCreditCard": "Aucune carte bancaire requise · Mode test inclus",
+      "terminalTitle": "validate-license.sh",
+      "terminalChecking": "vérification de la clé…",
+      "terminalValid": "valide"
+    },
+    "features": {
+      "eyebrow": "La surface de l'API",
+      "title": "Tout ce qu'il faut pour licencier votre logiciel",
+      "apiFirst": {
+        "title": "Licences pilotées par API",
+        "desc": "Émettez et validez des clés de licence avec quelques appels REST."
+      },
+      "testLive": {
+        "title": "Modes Test et En direct",
+        "desc": "Testez tout en bac à sable avant que ça touche des paiements réels."
+      },
+      "webhooks": {
+        "title": "Webhooks",
+        "desc": "Soyez notifié dès qu'un abonnement change d'état."
+      },
+      "plans": {
+        "title": "Forfaits et fonctionnalités",
+        "desc": "Modélisez vos niveaux de prix et limitez les fonctionnalités par forfait."
+      },
+      "analytics": {
+        "title": "Statistiques",
+        "desc": "Suivez les revenus, les abonnés actifs et le taux de réussite."
+      },
+      "wallet": {
+        "title": "Passerelle de paiement",
+        "desc": "Klea collecte les paiements sur un compte de plateforme unique — les développeurs disposent d'un solde de portefeuille interne."
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "Quatre étapes",
+      "title": "De zéro à licencié",
+      "step1": {
+        "title": "Créez une application",
+        "desc": "Enregistrez votre application depuis le tableau de bord de l'espace de travail."
+      },
+      "step2": {
+        "title": "Générez une clé API",
+        "desc": "Commencez en mode Test avec une clé bac à sable."
+      },
+      "step3": {
+        "title": "Définissez un forfait",
+        "desc": "Fixez le prix, la durée et les fonctionnalités limitées."
+      },
+      "step4": {
+        "title": "Passez en direct",
+        "desc": "Basculez en mode En direct quand vous êtes prêt pour des paiements réels."
+      }
+    },
+    "codePreview": {
+      "eyebrow": "Une seule requête",
+      "title": "Authentifiez-vous avec un jeton porteur",
+      "terminalTitle": "auth.sh"
+    },
+    "pricing": {
+      "title": "Tarifs",
+      "getStarted": "Commencer",
+      "monthly": "Mensuel",
+      "annually": "Annuel",
+      "save25": "Économisez 25 %",
+      "free": {
+        "name": "Forfait Gratuit",
+        "price": "Gratuit",
+        "feature1": "Jusqu'à 2 transferts par mois",
+        "feature2": "Historique des transactions de base",
+        "feature3": "Support par e-mail",
+        "feature4": "Prise en charge limitée des devises (NGN, ZAR, KES)",
+        "feature5": "Fonctionnalités de sécurité de base"
+      },
+      "standard": {
+        "name": "Forfait Standard",
+        "price": "9,99 $/m",
+        "feature1": "Transferts illimités",
+        "feature2": "Historique des transactions avec options d'exportation",
+        "feature3": "Support par e-mail prioritaire",
+        "feature4": "Prise en charge élargie des devises africaines",
+        "feature5": "Fonctionnalités de sécurité avancées"
+      },
+      "pro": {
+        "name": "Forfait Pro",
+        "price": "19,99 $/m",
+        "feature1": "Transferts illimités avec traitement prioritaire",
+        "feature2": "Analyses complètes des transactions",
+        "feature3": "Support prioritaire 24h/24, 7j/7",
+        "feature4": "Prise en charge complète des devises africaines",
+        "feature5": "Fonctionnalités de sécurité renforcées"
+      }
+    },
+    "cta": {
+      "title": "Commencez à émettre des licences dès aujourd'hui",
+      "subtitle": "Aucune carte bancaire requise pour commencer en mode Test.",
+      "button": "Commencer gratuitement"
+    },
+    "footer": {
+      "docs": "Documentation",
+      "login": "Connexion",
+      "signup": "Inscription"
+    }
   }
 }

@@ -2,20 +2,22 @@
 <script setup lang="ts">
 import ScrollReveal from '~/components/landing/ScrollReveal.vue'
 
-const steps = [
-  { n: '01', title: 'Create an app', desc: 'Register your app from the workspace dashboard.' },
-  { n: '02', title: 'Generate an API key', desc: 'Start in Test mode with a sandbox key.' },
-  { n: '03', title: 'Define a plan', desc: 'Set price, duration, and gated features.' },
-  { n: '04', title: 'Go live', desc: 'Flip to Live mode when you are ready for real payments.' },
-]
+const { t } = useI18n()
+
+const steps = computed(() => [
+  { n: '01', title: t('landing.howItWorks.step1.title'), desc: t('landing.howItWorks.step1.desc') },
+  { n: '02', title: t('landing.howItWorks.step2.title'), desc: t('landing.howItWorks.step2.desc') },
+  { n: '03', title: t('landing.howItWorks.step3.title'), desc: t('landing.howItWorks.step3.desc') },
+  { n: '04', title: t('landing.howItWorks.step4.title'), desc: t('landing.howItWorks.step4.desc') },
+])
 </script>
 
 <template>
   <section class="max-w-5xl mx-auto px-6 py-24">
     <ScrollReveal direction="up" :duration="700">
       <div class="text-center mb-14">
-        <span class="text-xs font-mono text-[var(--color-accent)] uppercase tracking-widest">Four steps</span>
-        <h2 class="font-heading text-3xl md:text-4xl font-semibold mt-3 tracking-[-0.015em] leading-[1.15]">From zero to licensed</h2>
+        <span class="text-xs font-mono text-[var(--color-accent)] uppercase tracking-widest">{{ $t('landing.howItWorks.eyebrow') }}</span>
+        <h2 class="font-heading text-3xl md:text-4xl font-semibold mt-3 tracking-[-0.015em] leading-[1.15]">{{ $t('landing.howItWorks.title') }}</h2>
       </div>
     </ScrollReveal>
 

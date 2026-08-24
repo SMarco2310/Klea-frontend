@@ -57,13 +57,13 @@ onUnmounted(() => {
       <!-- Center Navigation Links -->
       <div class="hidden md:flex items-center gap-8 text-sm font-medium">
         <a href="#features" class="text-foreground opacity-70 hover:opacity-100 cursor-pointer transition-opacity duration-200">
-          Features
+          {{ $t('landing.nav.features') }}
         </a>
         <NuxtLink to="/docs" class="text-foreground opacity-70 hover:opacity-100 cursor-pointer transition-opacity duration-200">
-          Docs
+          {{ $t('landing.nav.docs') }}
         </NuxtLink>
         <a href="#pricing" class="text-foreground opacity-70 hover:opacity-100 cursor-pointer transition-opacity duration-200">
-          Pricing
+          {{ $t('landing.nav.pricing') }}
         </a>
       </div>
 
@@ -73,7 +73,7 @@ onUnmounted(() => {
           <button
             class="text-foreground opacity-70 hover:opacity-100 cursor-pointer transition-colors flex items-center justify-center w-8 h-8 rounded-md hover:bg-foreground/5"
             @click="toggleDark()"
-            aria-label="Toggle theme"
+            :aria-label="$t('landing.nav.toggleTheme')"
           >
             <ClientOnly>
               <MonitorIcon v-if="colorMode === 'auto'" class="w-4 h-4" />
@@ -89,7 +89,7 @@ onUnmounted(() => {
             <DropdownMenuTrigger asChild>
               <button
                 class="text-foreground opacity-70 hover:opacity-100 cursor-pointer transition-colors flex items-center justify-center w-8 h-8 rounded-md hover:bg-foreground/5"
-                aria-label="Change language"
+                :aria-label="$t('landing.nav.changeLanguage')"
               >
                 <LanguagesIcon class="w-4 h-4" />
               </button>
@@ -108,13 +108,13 @@ onUnmounted(() => {
         </div>
 
         <NuxtLink to="/login" class="text-sm font-medium text-foreground opacity-70 hover:opacity-100 cursor-pointer transition-opacity">
-          Login
+          {{ $t('landing.nav.login') }}
         </NuxtLink>
         <NuxtLink
           to="/signup"
           class="px-4 py-2 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer transition-all duration-200 active:scale-[0.97] active:duration-75 shadow-md shadow-emerald-950/40"
         >
-          Get started
+          {{ $t('landing.nav.getStarted') }}
         </NuxtLink>
       </div>
     </nav>

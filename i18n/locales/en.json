@@ -52,5 +52,126 @@
   "env": {
     "testModeBanner": "Test mode — sandbox data and keys only. Switch to Live in the top bar to go real.",
     "liveModeBanner": "Live mode — real transactions are being processed."
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "docs": "Docs",
+      "pricing": "Pricing",
+      "toggleTheme": "Toggle theme",
+      "changeLanguage": "Change language",
+      "login": "Login",
+      "getStarted": "Get started"
+    },
+    "hero": {
+      "eyebrow": "Licensing infrastructure for SaaS",
+      "titleLine1": "Issue and validate",
+      "titleLine2": "software licenses",
+      "titleAccent": "in one API call.",
+      "subtitle": "Create an app, generate a key, define a plan your subscribers get licensed automatically the moment they pay.",
+      "ctaPrimary": "Get started free",
+      "ctaSecondary": "View docs",
+      "noCreditCard": "No credit card · Test mode included",
+      "terminalTitle": "validate-license.sh",
+      "terminalChecking": "checking key…",
+      "terminalValid": "valid"
+    },
+    "features": {
+      "eyebrow": "The API surface",
+      "title": "Everything you need to license software",
+      "apiFirst": {
+        "title": "API-first licensing",
+        "desc": "Issue and validate license keys with a few REST calls."
+      },
+      "testLive": {
+        "title": "Test & Live modes",
+        "desc": "Sandbox everything before it touches real payments."
+      },
+      "webhooks": {
+        "title": "Webhooks",
+        "desc": "Get notified the moment a subscription changes state."
+      },
+      "plans": {
+        "title": "Plans & features",
+        "desc": "Model pricing tiers and gate features per plan."
+      },
+      "analytics": {
+        "title": "Analytics",
+        "desc": "Track revenue, active subscribers, and success rate."
+      },
+      "wallet": {
+        "title": "Payment gateway",
+        "desc": "Klea collects payments into one platform account — developers hold an internal wallet balance."
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "Four steps",
+      "title": "From zero to licensed",
+      "step1": {
+        "title": "Create an app",
+        "desc": "Register your app from the workspace dashboard."
+      },
+      "step2": {
+        "title": "Generate an API key",
+        "desc": "Start in Test mode with a sandbox key."
+      },
+      "step3": {
+        "title": "Define a plan",
+        "desc": "Set price, duration, and gated features."
+      },
+      "step4": {
+        "title": "Go live",
+        "desc": "Flip to Live mode when you are ready for real payments."
+      }
+    },
+    "codePreview": {
+      "eyebrow": "One request",
+      "title": "Authenticate with a bearer token",
+      "terminalTitle": "auth.sh"
+    },
+    "pricing": {
+      "title": "Pricing",
+      "getStarted": "Get Started",
+      "monthly": "Monthly",
+      "annually": "Annually",
+      "save25": "Save 25%",
+      "free": {
+        "name": "Free Plan",
+        "price": "Free",
+        "feature1": "Send up to 2 transfers per month",
+        "feature2": "Basic transaction history",
+        "feature3": "Email support",
+        "feature4": "Limited currency support (NGN, ZAR, KES)",
+        "feature5": "Basic security features"
+      },
+      "standard": {
+        "name": "Standard Plan",
+        "price": "$9.99/m",
+        "feature1": "Unlimited transfers",
+        "feature2": "Transaction history with export options",
+        "feature3": "Priority email support",
+        "feature4": "Expanded African currency support",
+        "feature5": "Advanced security features"
+      },
+      "pro": {
+        "name": "Pro Plan",
+        "price": "$19.99/m",
+        "feature1": "Unlimited transfers with priority processing",
+        "feature2": "Comprehensive transaction analytics",
+        "feature3": "24/7 priority support",
+        "feature4": "Full African currency support",
+        "feature5": "Enhanced security features"
+      }
+    },
+    "cta": {
+      "title": "Start shipping licenses today",
+      "subtitle": "No credit card required to get started in Test mode.",
+      "button": "Get started free"
+    },
+    "footer": {
+      "docs": "Docs",
+      "login": "Login",
+      "signup": "Signup"
+    }
   }
 }
