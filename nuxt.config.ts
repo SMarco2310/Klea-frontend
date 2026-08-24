@@ -3,11 +3,25 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  // Language switching is handled by Google's Website Translator widget
-  // (app/plugins/google-translate.client.ts + useGoogleTranslate), not
-  // @nuxtjs/i18n — that only ever covered navbar strings, never the
-  // sidebar or page content, and running both would fight each other.
-  modules: ['@clerk/nuxt', 'nuxt-shiki', 'nuxt-charts'],
+  // Language switching is handled by @nuxtjs/i18n. It replaces the previous
+  // Google Website Translator widget, which injected an unremovable banner
+  // bar into every page.
+  modules: ['@clerk/nuxt', 'nuxt-shiki', 'nuxt-charts', '@nuxtjs/i18n'],
+  i18n: {
+    strategy: 'no_prefix',
+    defaultLocale: 'en',
+    locales: [
+      { code: 'en', name: 'English', file: 'en.json' },
+      { code: 'fr', name: 'Français', file: 'fr.json' },
+    ],
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'klea_locale',
+      // Do NOT redirect on the root path: URLs stay identical across locales
+      // and a redirect would fight the existing routing.
+      redirectOn: 'no prefix',
+    },
+  },
   shiki: {
     defaultTheme: 'vitesse-dark',
     // nuxt-shiki only bundles languages listed here — nothing lazy-loads on
