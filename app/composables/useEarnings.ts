@@ -27,6 +27,8 @@ export function useEarnings() {
   const refunded = ref(0) // Assuming refund tracking might be added later, currently 0
   const transactionCount = ref(0)
   const successfulCount = ref(0)
+  const paidCount = ref(0)
+  const freeSignupCount = ref(0)
   const avgTransaction = computed(() => transactionCount.value === 0 ? null : grossVolume.value / transactionCount.value)
   const appCount = computed(() => apps.value.length)
 
@@ -37,13 +39,22 @@ export function useEarnings() {
       const [summaryRes, txRes] = await Promise.all([
         // api.get<T> already unwraps the {data, success, message} envelope
         // (see useApi.ts request()), so T is the summary payload itself.
-        api.get<{ total_amount: number; transaction_count: number }>(`/transactions/summary?environment=${mode.value}`),
+        api.get<{
+          total_amount: number
+          transaction_count: number
+          paid_transaction_count: number
+          free_signup_count: number
+        }>(`/transactions/summary?environment=${mode.value}`),
         api.get<Paginated<Transaction>>(`/transactions?environment=${mode.value}`),
         fetchWallet()
       ])
 
       grossVolume.value = summaryRes.total_amount
       successfulCount.value = summaryRes.transaction_count
+      // Free signups are real customers that brought no money. Shown apart from
+      // paid conversions so neither number misleads.
+      paidCount.value = summaryRes.paid_transaction_count ?? summaryRes.transaction_count
+      freeSignupCount.value = summaryRes.free_signup_count ?? 0
 
       // txRes is the unwrapped Paginated<Transaction> envelope: `.data` holds the
       // rows, `.meta.total` holds the server-side row count.
@@ -61,6 +72,8 @@ export function useEarnings() {
     transactions,
     totalBalance,
     grossVolume,
+    paidCount,
+    freeSignupCount,
     refunded,
     avgTransaction,
     transactionCount,

@@ -1,7 +1,7 @@
 <!-- app/pages/earnings.vue -->
 <script setup lang="ts">
 definePageMeta({ layout: 'dashboard', middleware: 'auth' })
-import { WalletIcon, CreditCardIcon, BanknoteIcon, Layers2Icon, ArrowUpFromLineIcon } from '@lucide/vue'
+import { WalletIcon, CreditCardIcon, BanknoteIcon, Layers2Icon, UsersIcon, ArrowUpFromLineIcon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 import { formatCurrency } from '~/utils/format'
 import StatCard from '~/components/dashboard/StatCard.vue'
@@ -13,7 +13,7 @@ import { Label } from '~/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import type { DestinationType } from '~/composables/usePayouts'
 
-const { transactions, totalBalance, grossVolume, refunded, avgTransaction, transactionCount, successfulCount, appCount, fetchEarnings } = useEarnings()
+const { transactions, totalBalance, grossVolume, refunded, avgTransaction, transactionCount, paidCount, freeSignupCount, appCount, fetchEarnings } = useEarnings()
 const { mode } = useEnvMode()
 const { currency: walletCurrency, withdrawable, balance: walletBalance, entries: walletEntries, fetchWallet } = useWallet()
 const { user } = useAppAuth()
@@ -272,9 +272,13 @@ const statusLabels: Record<string, string> = {
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 mt-8">
+    <!-- Paid and free are shown apart: a free signup is a real customer but
+         moved no money, so folding it into "Paid" would overstate conversions
+         and hiding it would undercount the customer base. -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 mt-8">
       <StatCard label="Transactions" :value="transactionCount" :icon="CreditCardIcon" />
-      <StatCard label="Successful" :value="successfulCount" :icon="BanknoteIcon" />
+      <StatCard label="Paid" :value="paidCount" :icon="BanknoteIcon" />
+      <StatCard label="Free signups" :value="freeSignupCount" :icon="UsersIcon" />
       <StatCard label="Apps" :value="appCount" :icon="Layers2Icon" />
     </div>
 
