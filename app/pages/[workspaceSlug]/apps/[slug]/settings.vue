@@ -15,6 +15,7 @@ const route = useRoute()
 
 const appName = ref(currentApp.value?.name ?? '')
 const webhookUrl = ref(currentApp.value?.webhook_url ?? '')
+const redirectUrl = ref(currentApp.value?.redirect_url ?? '')
 const isSaving = ref(false)
 const errorMessage = ref('')
 
@@ -79,6 +80,7 @@ watch(currentApp, (newApp) => {
   if (newApp) {
     appName.value = newApp.name
     webhookUrl.value = newApp.webhook_url ?? ''
+    redirectUrl.value = newApp.redirect_url ?? ''
   }
 })
 
@@ -87,9 +89,10 @@ async function saveSettings() {
   isSaving.value = true
   errorMessage.value = ''
   try {
-    const patch: Partial<Pick<App, 'name' | 'webhook_url' | 'webhook_secret'>> = {
+    const patch: Partial<Pick<App, 'name' | 'webhook_url' | 'webhook_secret' | 'redirect_url'>> = {
       name: appName.value,
       webhook_url: webhookUrl.value || null,
+      redirect_url: redirectUrl.value || null,
     }
 
     // An endpoint is useless without a secret to sign deliveries with, so the
@@ -156,6 +159,17 @@ async function confirmDelete() {
             <div class="space-y-2">
               <Label for="webhook-url">Endpoint URL</Label>
               <Input id="webhook-url" v-model="webhookUrl" placeholder="https://yourapp.com/webhooks/klea" class="font-mono text-sm" />
+            </div>
+
+            <!-- Different from the webhook above: this is where the customer's
+                 BROWSER returns after paying, not where we POST the result. -->
+            <div class="space-y-2 mt-4">
+              <Label for="redirect-url">Return URL</Label>
+              <Input id="redirect-url" v-model="redirectUrl" placeholder="https://yourapp.com/payment/done" class="font-mono text-sm" />
+              <p class="text-xs text-[var(--muted-foreground)]">
+                Where we send your customer's browser after they pay. Arriving here does not
+                confirm payment — wait for the webhook above before granting access.
+              </p>
             </div>
 
             <div class="space-y-2 mt-4">

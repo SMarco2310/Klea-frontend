@@ -6,6 +6,8 @@ export interface App {
   slug: string
   status: 'active' | 'inactive'
   webhook_url: string | null
+  // Where the customer's browser returns after paying (not the webhook).
+  redirect_url: string | null
   webhook_secret: string | null
 }
 
@@ -40,7 +42,7 @@ export function useApps() {
     return app
   }
 
-  async function updateApp(id: number, patch: Partial<Pick<App, 'name' | 'slug' | 'status' | 'webhook_url' | 'webhook_secret'>>) {
+  async function updateApp(id: number, patch: Partial<Pick<App, 'name' | 'slug' | 'status' | 'webhook_url' | 'webhook_secret' | 'redirect_url'>>) {
     const app = await api.patch<App>(`/applications/${id}`, patch)
     const idx = apps.value.findIndex((a) => a.id === id)
     if (idx !== -1) apps.value[idx] = app
