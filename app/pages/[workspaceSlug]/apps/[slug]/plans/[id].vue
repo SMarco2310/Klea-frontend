@@ -8,6 +8,7 @@ import { Label } from '~/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import AppHeader from '~/components/dashboard/AppHeader.vue'
 import { toast } from 'vue-sonner'
+import type { BillingPeriod } from '~/composables/usePlans'
 
 const route = useRoute()
 const { currentApp } = useApps()
@@ -31,10 +32,19 @@ const CURRENCIES = [
   { code: 'XAF', label: 'XAF (FCFA)' },
 ]
 
+const BILLING_PERIODS: { value: BillingPeriod; label: string }[] = [
+  { value: 'one_time', label: 'One-time — pay once, keep forever' },
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'quarterly', label: 'Quarterly' },
+  { value: 'yearly', label: 'Yearly' },
+  { value: 'custom', label: 'Custom' },
+]
+
 const name = ref('')
 const price = ref(0)
 const currencyVal = ref('NGN')
-const intervalVal = ref<'month' | 'year'>('month')
+const billingPeriodVal = ref<BillingPeriod>('monthly')
+const customDurationDays = ref(30)
 const yearlyDiscountVal = ref(20)
 const selectedFeatureIds = ref<number[]>([])
 const featureLimits = ref<Record<number, number | undefined>>({})
@@ -59,7 +69,10 @@ watchEffect(() => {
       name.value = existing.name
       price.value = existing.price
       currencyVal.value = existing.currency || 'NGN'
-      intervalVal.value = existing.duration_days >= 180 ? 'year' : 'month'
+      billingPeriodVal.value = existing.billing_period ?? 'monthly'
+      if (existing.billing_period === 'custom' && typeof existing.duration_days === 'number') {
+        customDurationDays.value = existing.duration_days
+      }
       yearlyDiscountVal.value = existing.yearly_discount_percent ?? 20
       selectedFeatureIds.value = (existing.features ?? []).map(f => {
         featureLimits.value[f.id] = f.pivot?.limit ?? undefined
@@ -87,18 +100,27 @@ function isFeatureSelected(featureId: number) {
 
 async function handleSave(publish: boolean) {
   if (!name.value.trim()) return
+  if (billingPeriodVal.value === 'custom' && (!customDurationDays.value || customDurationDays.value < 1)) {
+    errorMessage.value = 'Enter a number of days for a custom billing period.'
+    return
+  }
 
   isSaving.value = true
   errorMessage.value = ''
   try {
-    const durationDays = intervalVal.value === 'year' ? 365 : 30
+    // The server derives duration_days for every period except "custom" —
+    // only send it there; sending it otherwise would be ignored at best.
+    const periodPayload = billingPeriodVal.value === 'custom'
+      ? { billing_period: billingPeriodVal.value, duration_days: customDurationDays.value }
+      : { billing_period: billingPeriodVal.value }
+
     let savedPlan
     if (!isNew.value && planId.value) {
       savedPlan = await updatePlan(planId.value, {
         name: name.value.trim(),
         price: price.value,
         currency: currencyVal.value,
-        duration_days: durationDays,
+        ...periodPayload,
         yearly_discount_percent: yearlyDiscountVal.value,
         is_active: publish,
       })
@@ -108,7 +130,7 @@ async function handleSave(publish: boolean) {
         name: name.value.trim(),
         price: price.value,
         currency: currencyVal.value,
-        duration_days: durationDays,
+        ...periodPayload,
         yearly_discount_percent: yearlyDiscountVal.value,
         is_active: publish,
       })
@@ -194,16 +216,24 @@ async function handleSave(publish: boolean) {
           </div>
 
           <div class="space-y-2">
-            <Label for="plan-interval">Interval</Label>
-            <Select v-model="intervalVal">
-              <SelectTrigger id="plan-interval">
-                <SelectValue placeholder="Select interval" />
+            <Label for="plan-billing">Billing</Label>
+            <Select v-model="billingPeriodVal">
+              <SelectTrigger id="plan-billing">
+                <SelectValue placeholder="Select billing period" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="month">Monthly</SelectItem>
-                <SelectItem value="year">Yearly</SelectItem>
+                <SelectItem v-for="p in BILLING_PERIODS" :key="p.value" :value="p.value">
+                  {{ p.label }}
+                </SelectItem>
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        <div v-if="billingPeriodVal === 'custom'" class="grid grid-cols-3 gap-4">
+          <div class="space-y-2">
+            <Label for="plan-duration-days">Duration (days)</Label>
+            <Input id="plan-duration-days" v-model.number="customDurationDays" type="number" min="1" placeholder="30" />
           </div>
         </div>
 

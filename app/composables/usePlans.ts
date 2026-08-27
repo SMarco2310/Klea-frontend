@@ -2,13 +2,16 @@
 import { toValue, type MaybeRefOrGetter } from 'vue'
 import type { Feature } from './useFeatures'
 
+export type BillingPeriod = 'one_time' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
+
 export interface Plan {
   id: number
   application_id: number
   name: string
   price: number
   currency: string
-  duration_days: number
+  billing_period: BillingPeriod
+  duration_days: number | null
   grace_period_days: number
   yearly_discount_percent: number
   position: number
@@ -41,7 +44,8 @@ export function usePlans(appId: MaybeRefOrGetter<number | string>) {
     name: string
     price: number
     currency: string
-    duration_days: number
+    billing_period: BillingPeriod
+    duration_days?: number
     yearly_discount_percent: number
     is_active?: boolean
   }) {
@@ -50,7 +54,7 @@ export function usePlans(appId: MaybeRefOrGetter<number | string>) {
     return plan
   }
 
-  async function updatePlan(id: number, patch: Partial<Pick<Plan, 'name' | 'price' | 'currency' | 'duration_days' | 'yearly_discount_percent' | 'is_active'>>) {
+  async function updatePlan(id: number, patch: Partial<Pick<Plan, 'name' | 'price' | 'currency' | 'billing_period' | 'duration_days' | 'yearly_discount_percent' | 'is_active'>>) {
     const plan = await api.patch<Plan>(`/plans/${id}`, patch)
     const idx = plans.value.findIndex((p) => p.id === id)
     if (idx !== -1) plans.value[idx] = { ...plans.value[idx], ...plan }

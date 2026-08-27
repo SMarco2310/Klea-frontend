@@ -4,7 +4,7 @@ definePageMeta({ layout: 'dashboard', middleware: 'auth' })
 import { LayersIcon, PlusIcon, PencilIcon, Trash2Icon, EyeIcon, LayoutListIcon, InfoIcon, GripVerticalIcon } from '@lucide/vue'
 import { Button } from '~/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '~/components/ui/dialog'
-import { formatCurrency } from '~/utils/format'
+import { formatCurrency, formatBillingPeriod } from '~/utils/format'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
 import AppHeader from '~/components/dashboard/AppHeader.vue'
 import PlanPreviewGrid from '~/components/plans/PlanPreviewGrid.vue'
@@ -212,7 +212,7 @@ async function togglePublish(plan: Plan) {
                   </span>
                 </div>
                 <div class="text-sm text-[var(--muted-foreground)]">
-                  {{ formatCurrency(plan.price, plan.currency || 'NGN') }} / {{ plan.duration_days >= 180 ? 'year' : 'month' }}
+                  {{ formatCurrency(plan.price, plan.currency || 'NGN') }} &middot; {{ formatBillingPeriod(plan.billing_period, plan.duration_days) }}
                 </div>
               </div>
             </div>
