@@ -37,7 +37,9 @@ watchEffect(() => {
 
 // Cycled across whatever plans this app actually has — not a fixed
 // Basic/Pro/Enterprise set.
-const PLAN_COLORS = ['#7fb894', '#d4a574', '#38bdf8', '#a78bfa', '#f472b6']
+// Saturated and hue-separated so adjacent slices stay distinguishable — the
+// previous muted green/tan pair read as one washed-out band on a dark card.
+const PLAN_COLORS = ['#10b981', '#f59e0b', '#38bdf8', '#a78bfa', '#f472b6']
 const planCategories = computed(() => {
   const cats: Record<string, { name: string; color: string }> = {}
   planDistribution.value.forEach((p, i) => {
@@ -56,7 +58,7 @@ const transactionStatusCounts = computed(() => {
 
 const transactionCategories = {
   Succeeded: { name: 'Succeeded', color: '#10b981' },
-  Pending: { name: 'Pending', color: '#334155' }
+  Pending: { name: 'Pending', color: '#64748b' }
 }
 </script>
 
