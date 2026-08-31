@@ -6,6 +6,7 @@ import { formatCurrency, formatDate } from '~/utils/format'
 import StatCard from '~/components/dashboard/StatCard.vue'
 import AppHeader from '~/components/dashboard/AppHeader.vue'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
+import DonutBreakdown from '~/components/dashboard/DonutBreakdown.vue'
 
 const { currentApp } = useApps()
 const appId = computed(() => currentApp.value?.id ?? 0)
@@ -127,18 +128,24 @@ const transactionCategories = {
         <div v-if="planCounts.length === 0" class="flex-grow flex items-center justify-center min-h-[200px]">
           <p class="text-sm text-slate-500">No active subscriptions yet</p>
         </div>
-        <div v-else class="flex-grow flex items-center justify-center min-h-[200px]">
-          <DonutChart :data="planCounts" :radius="65" :arc-width="20" :categories="planCategories" />
-        </div>
+        <DonutBreakdown
+          v-else
+          :values="planCounts"
+          :categories="planCategories"
+          total-label="subscriptions"
+        />
       </div>
       <div class="p-6 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] h-full min-h-[320px] flex flex-col">
         <h3 class="text-sm font-medium text-slate-300 mb-4">Transaction status</h3>
         <div v-if="transactionStatusCounts.length === 0" class="flex-grow flex items-center justify-center min-h-[200px]">
           <p class="text-sm text-slate-500">No transactions yet</p>
         </div>
-        <div v-else class="flex-grow flex items-center justify-center min-h-[200px]">
-          <DonutChart :data="transactionStatusCounts" :radius="65" :arc-width="20" :categories="transactionCategories" />
-        </div>
+        <DonutBreakdown
+          v-else
+          :values="transactionStatusCounts"
+          :categories="transactionCategories"
+          total-label="transactions"
+        />
       </div>
     </div>
 
