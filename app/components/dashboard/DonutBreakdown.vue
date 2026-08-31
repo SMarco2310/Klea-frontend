@@ -35,13 +35,13 @@ const rows = computed(() =>
 <template>
   <div class="flex-grow flex flex-col items-center justify-center gap-5">
     <div class="relative shrink-0">
-      <!-- padAngle separates the segments, so adjacent slices read as distinct
-           blocks rather than one continuous ring. -->
+      <!-- No padAngle: vue-chrts hardcodes corner-radius to the donut radius
+           (DonutChart.js:82) with no prop to override it, so any gap exposes
+           heavily rounded segment ends. Segments meeting flush hides them. -->
       <DonutChart
         :data="values"
         :radius="78"
         :arc-width="26"
-        :pad-angle="0.06"
         :categories="categories"
         :hide-legend="true"
       />
