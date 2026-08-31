@@ -1,75 +1,79 @@
-# Nuxt Minimal Starter
+# Klea — dashboard
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Nuxt 3 frontend for Klea. Two audiences share one app:
 
-## Setup
+- **Tenants** (developers) manage applications, plans, features, API keys and
+  their wallet.
+- **Operators** run the platform at `/admin` — reviewing payouts and watching
+  total liability. Not linked from the tenant navigation; reached by URL.
 
-Make sure to install dependencies:
+## Getting started
 
 ```bash
-# npm
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
+npm run dev      # http://localhost:3001
 ```
 
-## Development Server
+The API must be running on `http://localhost:8001` (see `../../Backend/klea-backend`).
 
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
+```
+NUXT_PUBLIC_API_BASE_URL=http://localhost:8001
 ```
 
-## Production
+## Things worth knowing before you edit
 
-Build the application for production:
+**`useApi()` already unwraps the response envelope.** It returns `res.data`, so
+type calls with the inner type:
+
+```ts
+api.get<Plan[]>('/plans')            // correct
+api.get<{ data: Plan[] }>('/plans')  // every field comes back undefined
+```
+
+That mistake has shipped here before and the build does not catch it.
+
+**Shared composable state uses `useState`,** never a bare `ref` inside the
+composable (each caller gets its own copy) or a module-scope `ref` (leaks between
+SSR requests). Both have caused real bugs.
+
+**Money arrives as strings.** Prices and balances are `decimal:2` and serialise
+as strings. Display them as-is; do not `Number()` them for rendering.
+
+**Operator and tenant sessions are separate.** `admin_token` and `auth_token` are
+different cookies, so logging into one does not disturb the other.
+
+## Verification
 
 ```bash
-# npm
 npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+There is **no test suite and no typecheck** — `vue-tsc` is not installed. A green
+build is not evidence that a page renders; three runtime bugs have shipped past
+one. Check pages in a browser, and treat "it builds" as the floor rather than the
+bar.
 
-```bash
-# npm
-npm run preview
+Installing `vue-tsc` and adding a `typecheck` script is the smallest change with
+real payoff here.
 
-# pnpm
-pnpm preview
+## Structure
 
-# yarn
-yarn preview
-
-# bun
-bun run preview
+```
+app/
+  components/   ui/ (shadcn-style primitives), dashboard/, layout/, landing/
+  composables/  one per API resource — useApps, usePlans, usePayouts, useAdminAuth…
+  layouts/      default (bare), dashboard (tenant), admin (operator), auth
+  middleware/   auth.global, admin
+  pages/        [workspaceSlug]/… tenant area, admin/… operator console
+i18n/locales/   en.json / fr.json — keep both in sync
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Run `npm run check:locales` before committing translation changes: a missing
+French key falls back to English silently, which is how the previous i18n attempt
+ended up half-translated.
+
+## Integration docs
+
+`/docs` in the running app is the developer-facing integration guide — plans,
+entitlements, webhooks, the payment flow and its pitfalls. Update it when the
+public API changes; it has twice described behaviour that no longer existed.
