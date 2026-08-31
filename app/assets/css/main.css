@@ -317,3 +317,16 @@ input:-webkit-autofill:focus {
   color: var(--muted-foreground) !important;
   font-size: 0.75rem !important;
 }
+
+/* Chart chrome (unovis, via nuxt-charts).
+   The defaults draw near-white gridlines and tick labels, which on our dark
+   cards compete with the data instead of receding behind it. These pull the
+   chrome back so the series is what reads. */
+:root {
+  --vis-axis-grid-color: color-mix(in oklab, var(--color-border-dark) 70%, transparent);
+  --vis-axis-grid-line-width: 1;
+  --vis-axis-tick-color: transparent;
+  --vis-axis-domain-color: transparent;
+  --vis-axis-tick-label-color: var(--muted-foreground);
+  --vis-axis-tick-label-font-size: 11px;
+}

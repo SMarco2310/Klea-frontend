@@ -102,9 +102,11 @@ const transactionCategories = {
         <div v-else class="flex-grow h-56">
           <AreaChart
             :data="revenueTrend"
-            :categories="{ amount: { name: 'Revenue', color: '#7fb894' } }"
+            :categories="{ amount: { name: 'Revenue', color: '#34d399' } }"
             :x-formatter="(tick: number) => revenueTrend[tick]?.date || ''"
             :hide-legend="true"
+            :y-grid-line="true"
+            :x-grid-line="false"
             :height="224"
           />
         </div>
@@ -121,6 +123,10 @@ const transactionCategories = {
             x-axis="date"
             :categories="{ amount: { name: 'Subscriptions', color: '#38bdf8' } }"
             :hide-legend="true"
+            :radius="6"
+            :y-grid-line="true"
+            :x-grid-line="false"
+            :x-formatter="(tick: number) => subscriptionTrend[tick]?.date || ''"
             :height="224"
           />
         </div>
