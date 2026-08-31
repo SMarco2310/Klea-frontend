@@ -1,10 +1,11 @@
 <!-- app/pages/apps/[slug]/subscriptions.vue -->
 <script setup lang="ts">
 definePageMeta({ layout: 'dashboard', middleware: 'auth' })
-import { ReceiptIcon } from '@lucide/vue'
+import { ReceiptIcon, MailIcon, LayersIcon, ActivityIcon, BanknoteIcon, CalendarIcon } from '@lucide/vue'
 import { formatCurrency, formatDate } from '~/utils/format'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
 import DataTable from '~/components/dashboard/DataTable.vue'
+import IdentityCell from '~/components/dashboard/IdentityCell.vue'
 import AppHeader from '~/components/dashboard/AppHeader.vue'
 
 const { currentApp } = useApps()
@@ -16,11 +17,11 @@ watchEffect(() => {
 })
 
 const columns = [
-  { key: 'email', label: 'Subscriber Email' },
-  { key: 'plan', label: 'Plan' },
-  { key: 'status', label: 'Status' },
-  { key: 'amount', label: 'Amount' },
-  { key: 'starts_at', label: 'Started' },
+  { key: 'email', label: 'Subscriber', icon: MailIcon, searchable: 'subscriber.email' },
+  { key: 'plan', label: 'Plan', icon: LayersIcon, searchable: 'plan.name' },
+  { key: 'status', label: 'Status', icon: ActivityIcon },
+  { key: 'amount', label: 'Amount', icon: BanknoteIcon },
+  { key: 'starts_at', label: 'Started', icon: CalendarIcon },
 ]
 
 const STATUS_STYLES: Record<string, string> = {
@@ -43,9 +44,9 @@ const STATUS_STYLES: Record<string, string> = {
       />
     </div>
     <div v-else class="overflow-x-auto rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] p-4 min-h-[calc(100vh-16rem)]">
-      <DataTable :columns="columns" :rows="subscriptions">
+      <DataTable :columns="columns" :rows="subscriptions" search-placeholder="Search subscriber or plan">
         <template #cell-email="{ row }">
-          <span class="font-medium text-[var(--foreground)]">{{ row.subscriber?.email ?? '—' }}</span>
+          <IdentityCell :value="row.subscriber?.email" :sub="row.subscriber?.external_id" />
         </template>
         <template #cell-plan="{ row }">
           <span class="text-[var(--muted-foreground)] font-mono text-xs px-2 py-0.5 rounded bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)]">

@@ -1,10 +1,11 @@
 <!-- app/pages/apps/[slug]/subscribers.vue -->
 <script setup lang="ts">
 definePageMeta({ layout: 'dashboard', middleware: 'auth' })
-import { UsersIcon } from '@lucide/vue'
+import { UsersIcon, MailIcon, PhoneIcon, LayersIcon, CalendarIcon } from '@lucide/vue'
 import { formatDate } from '~/utils/format'
 import EmptyState from '~/components/dashboard/EmptyState.vue'
 import DataTable from '~/components/dashboard/DataTable.vue'
+import IdentityCell from '~/components/dashboard/IdentityCell.vue'
 import AppHeader from '~/components/dashboard/AppHeader.vue'
 
 const { currentApp } = useApps()
@@ -16,10 +17,10 @@ watchEffect(() => {
 })
 
 const columns = [
-  { key: 'email', label: 'Email' },
-  { key: 'phone_number', label: 'Phone' },
-  { key: 'environment', label: 'Environment' },
-  { key: 'created_at', label: 'Joined' },
+  { key: 'email', label: 'Email', icon: MailIcon, searchable: true },
+  { key: 'phone_number', label: 'Phone', icon: PhoneIcon, searchable: true },
+  { key: 'environment', label: 'Environment', icon: LayersIcon },
+  { key: 'created_at', label: 'Joined', icon: CalendarIcon },
 ]
 </script>
 
@@ -36,7 +37,10 @@ const columns = [
       />
     </div>
     <div v-else class="overflow-x-auto rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] p-4 min-h-[calc(100vh-16rem)]">
-      <DataTable :columns="columns" :rows="subscribers">
+      <DataTable :columns="columns" :rows="subscribers" search-placeholder="Search email or phone">
+        <template #cell-email="{ row }">
+          <IdentityCell :value="row.email as string" :sub="row.external_id as string" />
+        </template>
         <template #cell-environment="{ row }">
           <span
             class="inline-block px-2 py-0.5 rounded text-xs font-medium capitalize"
