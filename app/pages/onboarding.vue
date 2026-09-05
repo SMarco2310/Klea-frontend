@@ -50,8 +50,10 @@ async function handleSubmit() {
       </NuxtLink>
     </div>
 
-    <h1 class="font-heading text-2xl font-semibold mb-2 text-white">Welcome to <span class="notranslate">Klea</span></h1>
-    <p class="text-slate-400 text-sm mb-10">Let's set up your workspace to get started.</p>
+    <i18n-t keypath="onboarding.welcome" tag="h1" class="font-heading text-2xl font-semibold mb-2 text-white">
+      <template #brand><span class="notranslate">Klea</span></template>
+    </i18n-t>
+    <p class="text-slate-400 text-sm mb-10">{{ $t('onboarding.intro') }}</p>
 
     <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2 mb-4">
       {{ errorMessage }}
@@ -59,13 +61,13 @@ async function handleSubmit() {
 
     <form class="space-y-4" @submit.prevent="handleSubmit">
       <div class="space-y-2">
-        <Label for="tenantName" class="text-slate-300">Workspace Name</Label>
-        <Input id="tenantName" v-model="tenantName" type="text" placeholder="e.g. Acme Corp" required 
+        <Label for="tenantName" class="text-slate-300">{{ $t('onboarding.nameLabel') }}</Label>
+        <Input id="tenantName" v-model="tenantName" type="text" :placeholder="$t('onboarding.namePlaceholder')" required 
                class="h-11 bg-[#1a1f26] border-[#27313f] rounded-lg text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-[var(--color-accent)]" />
       </div>
       
       <div class="space-y-2">
-        <Label for="slug" class="text-slate-300">Workspace URL</Label>
+        <Label for="slug" class="text-slate-300">{{ $t('onboarding.urlLabel') }}</Label>
         <div class="flex items-center h-11 bg-[#1a1f26] border border-[#27313f] rounded-lg focus-within:ring-1 focus-within:ring-[var(--color-accent)] focus-within:border-[var(--color-accent)] overflow-hidden transition-shadow">
           <span class="text-slate-500 pl-3 pr-2 select-none text-sm font-medium">klea.io/</span>
           <Input id="slug" v-model="slug" @input="onSlugInput" type="text" placeholder="acme-corp" required 
@@ -76,7 +78,7 @@ async function handleSubmit() {
       <div class="py-2"></div>
 
       <Button type="submit" class="w-full cursor-pointer h-11 rounded-lg bg-white text-black hover:bg-slate-200 font-medium" :disabled="isSubmitting">
-        {{ isSubmitting ? 'Creating workspace...' : 'Create workspace' }}
+        {{ isSubmitting ? $t('onboarding.creating') : $t('onboarding.create') }}
       </Button>
     </form>
   </div>

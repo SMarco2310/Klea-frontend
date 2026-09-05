@@ -827,5 +827,39 @@
       "failedStatus": "Échec",
       "unknownEvent": "inconnu"
     }
+  },
+  "onboarding": {
+    "welcome": "Bienvenue sur {brand}",
+    "intro": "Configurons votre espace de travail pour commencer.",
+    "nameLabel": "Nom de l'espace de travail",
+    "namePlaceholder": "ex. Acme Corp",
+    "urlLabel": "URL de l'espace de travail",
+    "creating": "Création de l'espace…",
+    "create": "Créer l'espace de travail",
+    "noWorkspaceTitle": "Aucun espace de travail",
+    "noWorkspaceDescription": "Vous n'appartenez encore à aucun espace de travail. Créez-en un pour commencer.",
+    "createWorkspaceCta": "Créer un espace de travail"
+  },
+  "auth": {
+    "backToLogin": "Retour à la connexion",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "forgot": {
+      "title": "Mot de passe oublié",
+      "intro": "Saisissez votre e-mail et nous vous enverrons un lien de réinitialisation",
+      "emailPlaceholder": "Saisissez votre e-mail",
+      "sending": "Envoi…",
+      "submit": "Envoyer le lien de réinitialisation",
+      "sentTitle": "Vérifiez votre boîte mail",
+      "sentBody": "Si un compte existe pour {email}, nous avons envoyé un lien pour réinitialiser votre mot de passe."
+    },
+    "reset": {
+      "title": "Réinitialiser le mot de passe",
+      "intro": "Choisissez un nouveau mot de passe pour {email}",
+      "newPasswordPlaceholder": "Nouveau mot de passe",
+      "confirmPlaceholder": "Confirmez le nouveau mot de passe",
+      "resetting": "Réinitialisation…",
+      "submit": "Réinitialiser le mot de passe"
+    }
   }
 }

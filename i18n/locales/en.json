@@ -827,5 +827,39 @@
       "failedStatus": "Failed",
       "unknownEvent": "unknown"
     }
+  },
+  "onboarding": {
+    "welcome": "Welcome to {brand}",
+    "intro": "Let's set up your workspace to get started.",
+    "nameLabel": "Workspace Name",
+    "namePlaceholder": "e.g. Acme Corp",
+    "urlLabel": "Workspace URL",
+    "creating": "Creating workspace...",
+    "create": "Create workspace",
+    "noWorkspaceTitle": "No Workspace Found",
+    "noWorkspaceDescription": "You don't belong to any workspaces yet. You can create a new one to get started.",
+    "createWorkspaceCta": "Create Workspace"
+  },
+  "auth": {
+    "backToLogin": "Back to log in",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "forgot": {
+      "title": "Forgot password",
+      "intro": "Enter your email and we'll send you a reset link",
+      "emailPlaceholder": "Enter Email",
+      "sending": "Sending...",
+      "submit": "Send reset link",
+      "sentTitle": "Check your email",
+      "sentBody": "If an account exists for {email}, we've sent a link to reset your password."
+    },
+    "reset": {
+      "title": "Reset password",
+      "intro": "Choose a new password for {email}",
+      "newPasswordPlaceholder": "New password",
+      "confirmPlaceholder": "Confirm new password",
+      "resetting": "Resetting...",
+      "submit": "Reset password"
+    }
   }
 }

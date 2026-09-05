@@ -13,10 +13,10 @@ if (workspace.value.slug) {
 <template>
   <div class="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
     <div v-if="!workspace.slug" class="text-center p-6 bg-[var(--color-surface)] border border-[var(--color-border-dark)] rounded-xl shadow-xl max-w-sm mx-auto">
-      <h2 class="font-heading text-xl font-semibold mb-2">No Workspace Found</h2>
-      <p class="text-muted-foreground text-sm mb-6">You don't belong to any workspaces yet. You can create a new one to get started.</p>
+      <h2 class="font-heading text-xl font-semibold mb-2">{{ $t('onboarding.noWorkspaceTitle') }}</h2>
+      <p class="text-muted-foreground text-sm mb-6">{{ $t('onboarding.noWorkspaceDescription') }}</p>
       <NuxtLink to="/onboarding">
-        <Button class="w-full cursor-pointer bg-[var(--color-accent)] text-white hover:opacity-90">Create Workspace</Button>
+        <Button class="w-full cursor-pointer bg-[var(--color-accent)] text-white hover:opacity-90">{{ $t('onboarding.createWorkspaceCta') }}</Button>
       </NuxtLink>
     </div>
     <div v-else class="animate-pulse flex items-center gap-2 text-slate-500">
