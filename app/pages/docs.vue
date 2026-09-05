@@ -2,7 +2,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { RocketIcon, KeyRoundIcon, FlaskConicalIcon, ListIcon, TerminalIcon, WebhookIcon, ListChecksIcon, SearchIcon, MoonIcon, SunIcon, ExternalLinkIcon, MonitorIcon, LanguagesIcon } from '@lucide/vue'
+import { RocketIcon, KeyRoundIcon, FlaskConicalIcon, ListIcon, TerminalIcon, WebhookIcon, ListChecksIcon, SearchIcon, MoonIcon, SunIcon, ExternalLinkIcon, MonitorIcon, LanguagesIcon, ShieldCheckIcon, CreditCardIcon, MapIcon, AlertTriangleIcon } from '@lucide/vue'
 import DocsCodeBlock from '~/components/Docs/CodeBlock.vue'
 import DocsLanguageTabs from '~/components/Docs/LanguageTabs.vue'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '~/components/ui/dropdown-menu'
@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 const config = useRuntimeConfig()
 const apiBase = config.public.apiBaseUrl
 
+const router = useRouter()
 const searchQuery = ref('')
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const { colorMode } = useTheme()
@@ -19,6 +20,38 @@ function changeLanguage(code: string) {
   setLocale(code)
 }
 
+// Where "back" should go depends on how the reader arrived. Someone who came
+// from the dashboard expects to return there, not to the marketing site. The
+// referring route is captured once on mount (it's gone after any in-page
+// navigation) and remembered for the session so a refresh doesn't lose it.
+const DOCS_ORIGIN_KEY = 'klea_docs_origin'
+const backTarget = ref('/')
+
+const resolveBackTarget = () => {
+  const previous = router.options.history.state?.back
+  const remembered = sessionStorage.getItem(DOCS_ORIGIN_KEY)
+
+  // A dashboard path always looks like /<workspace>/<section>; the landing
+  // page, auth pages and docs itself never do.
+  const cameFromApp = typeof previous === 'string'
+    && /^\/[^/]+\/(dashboard|apps|earnings|team|settings)/.test(previous)
+
+  if (cameFromApp) {
+    sessionStorage.setItem(DOCS_ORIGIN_KEY, previous as string)
+    backTarget.value = previous as string
+    return
+  }
+
+  // Direct visit or refresh: fall back to whatever we recorded earlier.
+  if (remembered && !previous) {
+    backTarget.value = remembered
+    return
+  }
+
+  if (previous) sessionStorage.removeItem(DOCS_ORIGIN_KEY)
+  backTarget.value = '/'
+}
+
 const sections = [
   { id: 'quickstart', icon: RocketIcon, label: 'Quickstart' },
   { id: 'authentication', icon: KeyRoundIcon, label: 'Authentication' },
@@ -26,6 +59,11 @@ const sections = [
   { id: 'list-plans', icon: ListIcon, label: 'List plans' },
   { id: 'create-subscription', icon: TerminalIcon, label: 'Create a subscription' },
   { id: 'webhooks', icon: WebhookIcon, label: 'Webhooks' },
+  { id: 'entitlements', icon: ShieldCheckIcon, label: 'Storing entitlements' },
+  { id: 'enforcing-access', icon: ShieldCheckIcon, label: 'Enforcing access' },
+  { id: 'payment-flow', icon: CreditCardIcon, label: 'Payment flow & UX' },
+  { id: 'integration-checklist', icon: MapIcon, label: 'Integration checklist' },
+  { id: 'pitfalls', icon: AlertTriangleIcon, label: 'Common pitfalls' },
   { id: 'errors', icon: ListChecksIcon, label: 'Errors' },
 ]
 
@@ -43,6 +81,7 @@ function handleKeydown(e: KeyboardEvent) {
 }
 
 onMounted(() => {
+  resolveBackTarget()
   window.addEventListener('keydown', handleKeydown)
 })
 
@@ -107,6 +146,7 @@ const listPlansResponse = `{
       "name": "Pro",
       "price": "1000.00",
       "currency": "FCFA",
+      "billing_period": "monthly",
       "duration_days": 30,
       "grace_period_days": 3,
       "yearly_discount_percent": 15,
@@ -291,6 +331,106 @@ boolean valid = MessageDigest.isEqual(expected.getBytes(), signatureHeader.getBy
   },
 }
 
+const keyFormatSample = `# Test mode
+pk_test_<your_public_id>.sk_test_<your_secret>
+
+# Live mode
+pk_live_<your_public_id>.sk_live_<your_secret>`
+
+const entitlementsTableSample = `CREATE TABLE customer_entitlements (
+  id                BIGINT PRIMARY KEY AUTO_INCREMENT,
+  customer_id       VARCHAR(255) NOT NULL UNIQUE,  -- what you sent as external_id
+  klea_plan_id      BIGINT NULL,
+  plan_name         VARCHAR(255) NULL,             -- denormalised, for display
+  status            VARCHAR(32) NOT NULL,          -- pending|active|failed|expired
+  features          JSON NULL,                     -- snapshot from the webhook
+  expires_at        TIMESTAMP NULL,                -- YOU compute this
+  last_transaction_id BIGINT NULL,                 -- guards against replays
+  updated_at        TIMESTAMP NULL
+);`
+
+const featureGateSample = `// One place decides what a customer may do.
+class FeatureGate
+{
+    /** Numeric quota, or null when unlimited. */
+    public function limit(string $customerId, string $code): ?int
+    {
+        $ent = $this->activeEntitlement($customerId);
+
+        // No subscription (or expired) -> your own free tier.
+        if (! $ent) {
+            return config("entitlements.free.{$code}");
+        }
+
+        $feature = collect($ent->features)->firstWhere('code', $code);
+
+        // null here means UNLIMITED, so return it as-is.
+        return $feature ? $feature['limit'] : config("entitlements.free.{$code}");
+    }
+
+    private function activeEntitlement(string $customerId)
+    {
+        $ent = CustomerEntitlement::where('customer_id', $customerId)->first();
+
+        // Expiry is what ends access — a failed renewal alone never does.
+        return $ent && $ent->status === 'active' && $ent->expires_at?->isFuture()
+            ? $ent
+            : null;
+    }
+}
+
+// At the call site, skip the check entirely when the limit is null.
+$limit = $gate->limit($customerId, 'max_projects');
+
+if ($limit !== null && $currentCount >= $limit) {
+    return response()->json([
+        'upgrade_required' => true,
+        'feature' => 'max_projects',
+    ], 422);
+}`
+
+const upgradeRequiredSample = `{
+  "success": false,
+  "upgrade_required": true,
+  "feature": "max_projects",
+  "message": "You've reached the project limit for your plan."
+}`
+
+const gatewaysResponseSample = `GET /api/public/gateways
+
+{
+  "data": [
+    {
+      "id": 1,
+      "reference": "016eb63c-f29d-4384-92e4-b1bd37ef69f8",
+      "libelle": "FloozTG-Ecom",
+      "psp": { "libelle": "FLOOZ", "logo_url": "https://.../Flooz.png" },
+      "methode": "PUSH_USSD"
+    }
+  ],
+  "success": true
+}
+
+// Then, optionally, on POST /public/subscribe:
+{ "plan_id": 2, "external_id": "org_123", "gateway_id": 1 }`
+
+const pollingSample = `// No redirect comes back from the payment page, so watch your own
+// entitlement endpoint and stop once the webhook has activated it.
+const result = await subscribe(planId, phoneNumber, gatewayId)
+window.open(result.payment_url, '_blank')
+
+const timer = setInterval(async () => {
+  const entitlement = await getEntitlement(customerId)
+
+  if (entitlement.status === 'active') {
+    clearInterval(timer)
+    showSuccess()
+  }
+}, 5000)
+
+// Always clear the interval when the component unmounts, or it keeps
+// firing requests after the user has navigated away.`
+
 const validationErrorSample = `{
   "success": false,
   "message": "The plan id field is required. (and 2 more errors)",
@@ -306,7 +446,7 @@ const validationErrorSample = `{
   <div class="h-screen flex flex-col">
     <header class="shrink-0 border-b border-[var(--color-border-dark)] bg-[var(--color-surface)]">
       <div class="max-w-5xl mx-auto px-6 py-4 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-10 items-center">
-        <NuxtLink to="/" class="notranslate font-heading font-bold text-xl tracking-tight text-[var(--foreground)] flex items-center cursor-pointer select-none">
+        <NuxtLink :to="backTarget" class="notranslate font-heading font-bold text-xl tracking-tight text-[var(--foreground)] flex items-center cursor-pointer select-none">
           <span>Klea</span>
           <span class="text-[var(--color-accent)] font-extrabold text-2xl leading-none">.</span>
         </NuxtLink>
@@ -368,7 +508,9 @@ const validationErrorSample = `{
                 :key="l.code"
                 class="cursor-pointer"
                 @click="changeLanguage(l.code)"
-              >{{ l.name }}</DropdownMenuItem>
+              >
+                {{ l.name }} ({{ l.code.toUpperCase() }})
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -430,6 +572,16 @@ const validationErrorSample = `{
           the format <code class="bg-[var(--color-surface)] px-1 rounded">{public_id}.{secret}</code> — the two halves generated together when you create the key, joined by a period.
           Get a key from your application's <strong class="text-[var(--foreground)]">API Keys</strong> tab. The secret is shown exactly once at creation time and can't be
           retrieved again — if you lose it, revoke the key and generate a new one.
+        </p>
+        <p class="text-[var(--muted-foreground)] mb-4">
+          Both halves carry an environment prefix, so you can tell at a glance which mode a key belongs to —
+          in a <code class="bg-[var(--color-surface)] px-1 rounded">.env</code> file, a log line, or a support
+          request — without looking it up:
+        </p>
+        <DocsCodeBlock :code="keyFormatSample" lang="bash" />
+        <p class="text-[var(--muted-foreground)] text-sm mb-4">
+          Send the token exactly as issued, prefixes included — they are part of the credential, not decoration.
+          The environment is taken from the key itself, so a test key can only ever create test data.
         </p>
         <DocsCodeBlock
           code="Authorization: Bearer {public_id}.{secret}"
@@ -540,6 +692,190 @@ const validationErrorSample = `{
           There is no automatic retry today if your endpoint is unreachable or errors — treat delivery as
           best-effort and reconcile against <code class="bg-[var(--color-surface)] px-1 rounded">GET /api/transactions</code> from your dashboard-authenticated session if you need certainty.
         </p>
+      </section>
+
+      <section id="entitlements">
+        <h2 class="font-heading text-2xl font-semibold mb-4">Storing entitlements</h2>
+        <p class="text-[var(--muted-foreground)] mb-4">
+          Klea has no "is this customer subscribed?" endpoint, and you should not call the API on every
+          request anyway. Instead, keep a small table in your own database that the webhook writes to and
+          the rest of your app reads from. One row per customer (the entity you sent as
+          <code class="bg-[var(--color-surface)] px-1 rounded">external_id</code>).
+        </p>
+        <DocsCodeBlock lang="sql" :code="entitlementsTableSample" />
+        <p class="text-[var(--muted-foreground)] text-sm mt-3 mb-2">Three details that are easy to get wrong:</p>
+        <ul class="list-disc list-inside space-y-2 text-[var(--muted-foreground)] text-sm">
+          <li>
+            <strong class="text-[var(--foreground)]">Compute the expiry yourself.</strong> The webhook has no
+            expiry field. Check <code class="bg-[var(--color-surface)] px-1 rounded">billing_period</code> on the
+            plan: for <code class="bg-[var(--color-surface)] px-1 rounded">one_time</code> there is no expiry (the
+            customer keeps access forever); for every other period, take
+            <code class="bg-[var(--color-surface)] px-1 rounded">duration_days</code> (a plain integer number of
+            days — it is <code class="bg-[var(--color-surface)] px-1 rounded">null</code> only for
+            <code class="bg-[var(--color-surface)] px-1 rounded">one_time</code>) and add it to "now" when the
+            payment succeeds.
+          </li>
+          <li>
+            <strong class="text-[var(--foreground)]">Store the feature snapshot verbatim.</strong> Persist the
+            <code class="bg-[var(--color-surface)] px-1 rounded">features</code> array from the webhook as JSON.
+            Reading limits from a live API call on every request is slow and breaks when Klea is unreachable.
+          </li>
+          <li>
+            <strong class="text-[var(--foreground)]">A failed renewal must not revoke access.</strong> If a
+            payment fails while the customer still has a valid paid period, leave the active row alone. Only
+            expiry ends access.
+          </li>
+        </ul>
+      </section>
+
+      <section id="enforcing-access">
+        <h2 class="font-heading text-2xl font-semibold mb-4">Enforcing access</h2>
+        <p class="text-[var(--muted-foreground)] mb-4">
+          Put every check behind one function so there is a single place that decides what a customer may do.
+          Read from your local table, never from the API.
+        </p>
+        <DocsCodeBlock lang="php" :code="featureGateSample" />
+        <p class="text-[var(--muted-foreground)] text-sm mt-4 mb-2">
+          Two conventions worth adopting, because they remove whole classes of bug:
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-[var(--muted-foreground)] text-sm">
+          <li>
+            <strong class="text-[var(--foreground)]">Treat <code class="bg-[var(--color-surface)] px-1 rounded">null</code>
+            as unlimited, never as zero.</strong> A plan with an unlimited quota stores
+            <code class="bg-[var(--color-surface)] px-1 rounded">limit: null</code>. Reading that as
+            <code class="bg-[var(--color-surface)] px-1 rounded">0</code> blocks your best-paying customers.
+          </li>
+          <li>
+            <strong class="text-[var(--foreground)]">Define a free tier in config.</strong> Customers with no
+            subscription should fall back to it, so a missing row is a normal state rather than an error.
+          </li>
+        </ul>
+        <p class="text-[var(--muted-foreground)] text-sm mt-4">
+          Return a distinguishable response when a limit is hit, so the frontend can prompt an upgrade instead of
+          showing a generic failure:
+        </p>
+        <DocsCodeBlock lang="json" :code="upgradeRequiredSample" />
+      </section>
+
+      <section id="payment-flow">
+        <h2 class="font-heading text-2xl font-semibold mb-4">Payment flow &amp; UX</h2>
+        <p class="text-[var(--muted-foreground)] mb-4">
+          <code class="bg-[var(--color-surface)] px-1 rounded">POST /public/subscribe</code> returns a
+          <code class="bg-[var(--color-surface)] px-1 rounded">payment_url</code> — a hosted page where the
+          customer completes payment. Card details are entered there and never touch your servers, which keeps
+          you out of PCI-DSS scope. Do not build your own card form; there is no field to send one.
+        </p>
+        <p class="text-[var(--muted-foreground)] text-sm mb-2">
+          Optionally let the customer pick a channel first. <code class="bg-[var(--color-surface)] px-1 rounded">GET /public/gateways</code>
+          returns the live list with logos; pass the chosen
+          <code class="bg-[var(--color-surface)] px-1 rounded">id</code> as
+          <code class="bg-[var(--color-surface)] px-1 rounded">gateway_id</code> and the hosted page opens on it.
+          Omit it and the customer chooses there instead.
+        </p>
+        <DocsCodeBlock lang="json" :code="gatewaysResponseSample" />
+        <p class="text-[var(--muted-foreground)] text-sm mt-4 mb-2">
+          Set a <strong class="text-[var(--foreground)]">Return URL</strong> on your application (Settings →
+          Return URL) and we send the customer's browser back there after they pay. But
+          <strong class="text-[var(--foreground)]">arriving there does not prove the payment succeeded</strong>
+          — a customer can land on it by cancelling or pressing back. The webhook is the only trustworthy
+          signal. So send them somewhere that polls your own entitlement endpoint until it flips to active:
+        </p>
+        <DocsCodeBlock lang="javascript" :code="pollingSample" />
+        <p class="text-[var(--muted-foreground)] text-sm mt-3">
+          Mobile-money channels debit a wallet, so collect a phone number for those. Card channels need none —
+          asking for one there just adds friction.
+        </p>
+      </section>
+
+      <section id="integration-checklist">
+        <h2 class="font-heading text-2xl font-semibold mb-4">Integration checklist</h2>
+        <p class="text-[var(--muted-foreground)] mb-4">
+          A complete integration, in dependency order. Steps 1–4 are dashboard setup; the rest is code.
+        </p>
+        <ol class="list-decimal list-inside space-y-2 text-[var(--muted-foreground)] text-sm">
+          <li>Create an <strong class="text-[var(--foreground)]">Application</strong> for the app you're integrating.</li>
+          <li>Create <strong class="text-[var(--foreground)]">Features</strong>, and write the
+            <code class="bg-[var(--color-surface)] px-1 rounded">code</code> values down — they are the contract
+            your app reads, so they must match exactly.</li>
+          <li>Create <strong class="text-[var(--foreground)]">Plans</strong> and attach features with their limits.
+            Leave a limit empty for "unlimited". Make sure each plan is <strong class="text-[var(--foreground)]">active</strong>,
+            or it won't appear in <code class="bg-[var(--color-surface)] px-1 rounded">GET /public/plans</code>.</li>
+          <li>Generate an <strong class="text-[var(--foreground)]">API key</strong> (shown once) and set the
+            <strong class="text-[var(--foreground)]">webhook URL</strong> — saving it generates the signing secret.
+            Copy both into your app's environment; never into frontend code.</li>
+          <li>Create your entitlements table and the webhook receiver. Verify the signature before trusting anything.</li>
+          <li>Build the pricing page from <code class="bg-[var(--color-surface)] px-1 rounded">GET /public/plans</code>
+            rather than hardcoding prices.</li>
+          <li>Add a checkout page that calls <code class="bg-[var(--color-surface)] px-1 rounded">/public/subscribe</code>,
+            opens the payment URL, and polls for activation.</li>
+          <li>Route every limit check through your feature gate.</li>
+          <li>Test the full path with a real payment in test mode before going live.</li>
+        </ol>
+      </section>
+
+      <section id="pitfalls">
+        <h2 class="font-heading text-2xl font-semibold mb-4">Common pitfalls</h2>
+        <p class="text-[var(--muted-foreground)] mb-4">
+          Each of these has cost a real integration time. They're listed roughly in the order you'll hit them.
+        </p>
+        <div class="space-y-4">
+          <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
+            <p class="font-medium text-[var(--foreground)] mb-1">Plans exist but the API returns none</p>
+            <p class="text-[var(--muted-foreground)] text-sm">
+              <code class="bg-[var(--color-surface)] px-1 rounded">GET /public/plans</code> only returns
+              <strong class="text-[var(--foreground)]">active</strong> plans. A plan left as a draft is invisible
+              to your app with no error to explain why.
+            </p>
+          </div>
+          <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
+            <p class="font-medium text-[var(--foreground)] mb-1">The signature covers the transaction id, not the body</p>
+            <p class="text-[var(--muted-foreground)] text-sm">
+              Most webhook APIs sign the whole payload. This one signs
+              <code class="bg-[var(--color-surface)] px-1 rounded">transaction.id</code> only. Verifying against the
+              JSON body will reject every delivery. Compare with
+              <code class="bg-[var(--color-surface)] px-1 rounded">hash_equals</code>, not
+              <code class="bg-[var(--color-surface)] px-1 rounded">{{ '===' }}</code>.
+            </p>
+          </div>
+          <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
+            <p class="font-medium text-[var(--foreground)] mb-1">An unset webhook secret fails open</p>
+            <p class="text-[var(--muted-foreground)] text-sm">
+              If your secret is empty, an HMAC computed with an empty key is one anybody can reproduce — so any
+              forged request would be accepted. Reject webhooks outright when the secret is missing, rather than
+              computing a signature with a blank one.
+            </p>
+          </div>
+          <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
+            <p class="font-medium text-[var(--foreground)] mb-1">Starting a new payment revokes the current plan</p>
+            <p class="text-[var(--muted-foreground)] text-sm">
+              If you set the entitlement to <em>pending</em> when checkout starts, a customer who abandons payment
+              loses the plan they already paid for. Only downgrade when there is nothing active to protect.
+            </p>
+          </div>
+          <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
+            <p class="font-medium text-[var(--foreground)] mb-1">Webhooks are not retried</p>
+            <p class="text-[var(--muted-foreground)] text-sm">
+              If your endpoint is down when a payment settles, that notification is gone. Show pending payments as
+              "awaiting confirmation" rather than failed, and reconcile from your dashboard if needed.
+            </p>
+          </div>
+          <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
+            <p class="font-medium text-[var(--foreground)] mb-1">Caching a typed object breaks on the second call</p>
+            <p class="text-[var(--muted-foreground)] text-sm">
+              Caching a framework collection in a serializing store (database, Redis, file) hands back an
+              incomplete object on a cache hit. The first request works and every later one fails. Cache plain
+              arrays and re-wrap them after reading.
+            </p>
+          </div>
+          <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
+            <p class="font-medium text-[var(--foreground)] mb-1">Boolean features rendered as numbers</p>
+            <p class="text-[var(--muted-foreground)] text-sm">
+              An on/off feature may carry <code class="bg-[var(--color-surface)] px-1 rounded">limit: 1</code>,
+              which renders as "Advanced analytics: 1" if you print limits blindly. Only show a number for quota
+              features.
+            </p>
+          </div>
+        </div>
       </section>
 
       <section id="errors">
