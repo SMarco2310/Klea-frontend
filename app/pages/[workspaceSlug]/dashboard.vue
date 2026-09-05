@@ -57,33 +57,37 @@ const createOpen = ref(false)
         <LayersIcon class="w-6 h-6 text-[var(--color-accent)]" />
       </div>
       <div>
-        <h1 class="font-heading text-3xl font-bold tracking-tight">Welcome back, {{ user?.name ?? 'there' }}</h1>
+        <h1 class="font-heading text-3xl font-bold tracking-tight">
+          {{ $t('dashboard.welcomeBack', { name: user?.name ?? $t('dashboard.thereFallback') }) }}
+        </h1>
         <p class="text-[var(--muted-foreground)] mt-1">
-          You're working in <span class="font-medium text-[var(--foreground)]">{{ workspace.name }}</span>
-          · {{ mode === 'live' ? 'Live' : 'Test' }} mode
+          <i18n-t keypath="dashboard.workingIn" tag="span">
+            <template #workspace><span class="font-medium text-[var(--foreground)]">{{ workspace.name }}</span></template>
+            <template #modeSuffix>{{ $t('common.modeSuffix', { mode: mode === 'live' ? $t('nav.liveMode') : $t('nav.testMode') }) }}</template>
+          </i18n-t>
         </p>
       </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-      <StatCard label="Applications" :value="apps.length" :icon="LayersIcon" sublabel="Total registered apps" />
-      <StatCard label="Subscribers" :value="totalSubscribers" :icon="UsersIcon" :sublabel="`In ${mode} environment`" />
-      <StatCard label="API Keys" :value="totalApiKeys" :icon="KeyIcon" sublabel="Issued keys" />
+      <StatCard :label="$t('dashboard.statApplications')" :value="apps.length" :icon="LayersIcon" :sublabel="$t('dashboard.statApplicationsSublabel')" />
+      <StatCard :label="$t('dashboard.statSubscribers')" :value="totalSubscribers" :icon="UsersIcon" :sublabel="$t('dashboard.inEnvironment', { mode })" />
+      <StatCard :label="$t('dashboard.statApiKeys')" :value="totalApiKeys" :icon="KeyIcon" :sublabel="$t('dashboard.statApiKeysSublabel')" />
     </div>
 
     <div class="flex items-center justify-between mb-4">
-      <h2 class="font-heading text-lg font-semibold">Your apps</h2>
+      <h2 class="font-heading text-lg font-semibold">{{ $t('dashboard.yourApps') }}</h2>
       <Button id="tour-create-app" class="cursor-pointer gap-1" @click="createOpen = true">
-        <PlusIcon class="w-4 h-4" /> New app
+        <PlusIcon class="w-4 h-4" /> {{ $t('dashboard.newApp') }}
       </Button>
     </div>
 
     <div v-if="apps.length === 0" id="tour-first-app-card">
       <EmptyState
         :icon="LayersIcon"
-        title="No apps yet"
-        description="Create your first app to start issuing licenses."
-        cta-label="New app"
+        :title="$t('dashboard.noAppsTitle')"
+        :description="$t('dashboard.noAppsDescription')"
+        :cta-label="$t('dashboard.newApp')"
         @cta="createOpen = true"
       />
     </div>
@@ -98,12 +102,12 @@ const createOpen = ref(false)
           <span class="w-8 h-8 rounded bg-[#e8e7e7] dark:bg-[#a9a9a9] flex items-center justify-center text-xs font-semibold">
             {{ app.name[0] }}
           </span>
-          <Badge v-if="app.status === 'active'" class="bg-[var(--color-accent)]/20 text-[var(--color-accent)]">Active</Badge>
+          <Badge v-if="app.status === 'active'" class="bg-[var(--color-accent)]/20 text-[var(--color-accent)]">{{ $t('dashboard.active') }}</Badge>
         </div>
         <h3 class="font-heading font-semibold">{{ app.name }}</h3>
         <p class="text-sm text-slate-400">{{ app.slug }}</p>
         <div class="border-t border-[var(--color-border-dark)] mt-4 pt-3 text-xs text-slate-500">
-          {{ app.webhook_url ? 'Webhook configured' : 'No webhook' }}
+          {{ app.webhook_url ? $t('dashboard.webhookConfigured') : $t('dashboard.noWebhook') }}
         </div>
       </NuxtLink>
     </div>

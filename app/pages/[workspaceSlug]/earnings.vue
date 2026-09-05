@@ -18,6 +18,7 @@ const { mode } = useEnvMode()
 const { currency: walletCurrency, withdrawable, balance: walletBalance, entries: walletEntries, fetchWallet } = useWallet()
 const { user } = useAppAuth()
 const { requests: payoutRequests, fetchPayoutRequests, createPayoutRequest } = usePayouts()
+const { t } = useI18n()
 
 // Same pivot-role lookup team.vue uses for "your role" — the server-side
 // PayoutRequestPolicy is the real gate; this only decides whether to show
@@ -51,10 +52,12 @@ const isSubmitting = ref(false)
 const submitError = ref('')
 
 const destinationLabel = computed(() =>
-  destinationType.value === 'mobile_money' ? 'Phone number' : 'Account reference'
+  destinationType.value === 'mobile_money'
+    ? t('earnings.withdraw_dialog.phoneNumberLabel')
+    : t('earnings.withdraw_dialog.accountReferenceLabel')
 )
 const destinationPlaceholder = computed(() =>
-  destinationType.value === 'mobile_money' ? '+228 90 00 00 00' : 'IBAN or bank account reference'
+  destinationType.value === 'mobile_money' ? '+228 90 00 00 00' : t('earnings.withdraw_dialog.accountReferencePlaceholder')
 )
 
 function resetForm() {
@@ -111,13 +114,13 @@ function formatCents(cents: number): string {
 // + PayoutService), these just spare the developer an obvious round trip.
 const validationError = computed(() => {
   const trimmedAmount = amount.value.trim()
-  if (!trimmedAmount) return 'Enter an amount.'
-  if (!/^\d+(\.\d{1,2})?$/.test(trimmedAmount)) return 'Amount must be a number with at most two decimals.'
-  if (Number(trimmedAmount) <= 0) return 'Amount must be greater than zero.'
+  if (!trimmedAmount) return t('earnings.withdraw_dialog.errors.enterAmount')
+  if (!/^\d+(\.\d{1,2})?$/.test(trimmedAmount)) return t('earnings.withdraw_dialog.errors.invalidAmount')
+  if (Number(trimmedAmount) <= 0) return t('earnings.withdraw_dialog.errors.notPositive')
   if (Number(trimmedAmount) > Number(walletBalance.value)) {
-    return `Amount cannot exceed your available balance of ${walletBalance.value}.`
+    return t('earnings.withdraw_dialog.errors.exceedsBalance', { balance: walletBalance.value })
   }
-  if (!destination.value.trim()) return 'Enter a destination.'
+  if (!destination.value.trim()) return t('earnings.withdraw_dialog.errors.enterDestination')
   return null
 })
 
@@ -139,7 +142,7 @@ async function handleSubmit() {
     // reflects the source of truth rather than assuming nothing changed.
     await fetchWallet()
     closeDialog()
-    toast.success('Withdrawal requested. It is pending review — your balance is unchanged until it is approved.')
+    toast.success(t('earnings.withdraw_dialog.successToast'))
   } catch (e) {
     // 422s here carry the real reason in `message` (including the available
     // balance on an over-balance refusal) — surfaced as-is, never replaced
@@ -150,30 +153,37 @@ async function handleSubmit() {
   }
 }
 
-const statusLabels: Record<string, string> = {
-  pending: 'Pending — awaiting review',
-  approved: 'Approved — balance debited, payment on the way',
-  paid: 'Paid',
-  rejected: 'Rejected',
-}
+// Plain (non-computed) string maps do not re-evaluate on locale switch, so
+// these are computed even though their shape never changes.
+const statusLabels = computed<Record<string, string>>(() => ({
+  pending: t('earnings.status.pending'),
+  approved: t('earnings.status.approved'),
+  paid: t('earnings.status.paid'),
+  rejected: t('earnings.status.rejected'),
+}))
+
+const destinationTypeLabels = computed<Record<string, string>>(() => ({
+  mobile_money: t('earnings.destinationType.mobile_money'),
+  bank_account: t('earnings.destinationType.bank_account'),
+}))
 </script>
 
 <template>
   <div>
     <div class="flex items-center justify-between mb-6">
-      <h1 class="font-heading text-2xl font-semibold">Earnings</h1>
-      <span class="text-sm text-slate-400">{{ mode === 'live' ? 'Live' : 'Test' }} mode</span>
+      <h1 class="font-heading text-2xl font-semibold">{{ $t('earnings.title') }}</h1>
+      <span class="text-sm text-slate-400">{{ $t('common.modeSuffix', { mode: mode === 'live' ? $t('nav.liveMode') : $t('nav.testMode') }) }}</span>
     </div>
 
     <div class="p-6 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] mb-6">
       <div class="flex items-start justify-between gap-4">
         <div>
           <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-400 mb-2">
-            <WalletIcon class="w-4 h-4" /> Total balance
+            <WalletIcon class="w-4 h-4" /> {{ $t('earnings.totalBalance') }}
           </div>
           <div class="text-4xl font-heading font-bold">{{ formatCurrency(totalBalance, walletCurrency) }}</div>
           <div class="text-xs mt-1" :class="withdrawable ? 'text-[var(--color-accent)]' : 'text-yellow-400'">
-            {{ withdrawable ? 'Withdrawable' : 'Test balance — not withdrawable' }}
+            {{ withdrawable ? $t('earnings.withdrawable') : $t('earnings.notWithdrawable') }}
           </div>
         </div>
         <Button
@@ -182,28 +192,28 @@ const statusLabels: Record<string, string> = {
           :disabled="balanceIsZero"
           @click="openDialog"
         >
-          <ArrowUpFromLineIcon class="w-4 h-4" /> Withdraw
+          <ArrowUpFromLineIcon class="w-4 h-4" /> {{ $t('earnings.withdraw') }}
         </Button>
       </div>
 
       <div class="grid grid-cols-3 gap-6 mt-6 pt-6 border-t border-[var(--color-border-dark)]">
         <div>
-          <div class="text-xs uppercase tracking-wide text-slate-400 mb-1">Gross volume</div>
+          <div class="text-xs uppercase tracking-wide text-slate-400 mb-1">{{ $t('earnings.grossVolume') }}</div>
           <div class="text-xl font-semibold">{{ formatCurrency(grossVolume) }}</div>
         </div>
         <div>
-          <div class="text-xs uppercase tracking-wide text-slate-400 mb-1">Refunded</div>
+          <div class="text-xs uppercase tracking-wide text-slate-400 mb-1">{{ $t('earnings.refunded') }}</div>
           <div class="text-xl font-semibold">{{ formatCurrency(refunded) }}</div>
         </div>
         <div>
-          <div class="text-xs uppercase tracking-wide text-slate-400 mb-1">Avg. transaction</div>
+          <div class="text-xs uppercase tracking-wide text-slate-400 mb-1">{{ $t('earnings.avgTransaction') }}</div>
           <div class="text-xl font-semibold">{{ avgTransaction === null ? '—' : formatCurrency(avgTransaction) }}</div>
         </div>
       </div>
     </div>
 
     <div v-if="walletEntries.length" class="mt-8">
-      <h2 class="font-heading text-lg font-semibold mb-3">Wallet activity</h2>
+      <h2 class="font-heading text-lg font-semibold mb-3">{{ $t('earnings.walletActivity') }}</h2>
       <div class="rounded-xl border border-[var(--color-border-dark)] divide-y divide-[var(--color-border-dark)]">
         <div v-for="entry in walletEntries" :key="entry.id" class="flex items-center justify-between px-4 py-3">
           <div>
@@ -221,23 +231,23 @@ const statusLabels: Record<string, string> = {
     </div>
 
     <div v-if="canRequestPayout" class="mt-8">
-      <h2 class="font-heading text-lg font-semibold mb-3">Withdrawal requests</h2>
+      <h2 class="font-heading text-lg font-semibold mb-3">{{ $t('earnings.withdrawalRequests') }}</h2>
       <EmptyState
         v-if="payoutRequests.length === 0"
         :icon="ArrowUpFromLineIcon"
-        title="No withdrawal requests yet"
-        description="Requests you submit will appear here. A pending request does not reserve or reduce your balance."
+        :title="$t('earnings.noRequestsTitle')"
+        :description="$t('earnings.noRequestsDescription')"
       />
       <div v-else class="overflow-x-auto rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)]">
         <table class="w-full text-left text-sm whitespace-nowrap">
           <thead class="border-b border-[var(--color-border-dark)] bg-[var(--color-surface-muted)]">
             <tr>
-              <th class="px-4 py-3 font-medium text-slate-300">Date</th>
-              <th class="px-4 py-3 font-medium text-slate-300">Requested</th>
-              <th class="px-4 py-3 font-medium text-slate-300">Fee</th>
-              <th class="px-4 py-3 font-medium text-slate-300">Net</th>
-              <th class="px-4 py-3 font-medium text-slate-300">Destination</th>
-              <th class="px-4 py-3 font-medium text-slate-300">Status</th>
+              <th class="px-4 py-3 font-medium text-slate-300">{{ $t('earnings.table.date') }}</th>
+              <th class="px-4 py-3 font-medium text-slate-300">{{ $t('earnings.table.requested') }}</th>
+              <th class="px-4 py-3 font-medium text-slate-300">{{ $t('earnings.table.fee') }}</th>
+              <th class="px-4 py-3 font-medium text-slate-300">{{ $t('earnings.table.net') }}</th>
+              <th class="px-4 py-3 font-medium text-slate-300">{{ $t('earnings.table.destination') }}</th>
+              <th class="px-4 py-3 font-medium text-slate-300">{{ $t('earnings.table.status') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-[var(--color-border-dark)]">
@@ -250,7 +260,7 @@ const statusLabels: Record<string, string> = {
               <td class="px-4 py-3 font-mono font-medium">{{ row.amount_net }}</td>
               <td class="px-4 py-3 text-slate-300">
                 <div>{{ row.destination }}</div>
-                <div class="text-xs text-slate-500 capitalize">{{ row.destination_type.replace('_', ' ') }}</div>
+                <div class="text-xs text-slate-500 capitalize">{{ destinationTypeLabels[row.destination_type] ?? row.destination_type.replace('_', ' ') }}</div>
               </td>
               <td class="px-4 py-3">
                 <span
@@ -276,28 +286,28 @@ const statusLabels: Record<string, string> = {
          moved no money, so folding it into "Paid" would overstate conversions
          and hiding it would undercount the customer base. -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 mt-8">
-      <StatCard label="Transactions" :value="transactionCount" :icon="CreditCardIcon" />
-      <StatCard label="Paid" :value="paidCount" :icon="BanknoteIcon" />
-      <StatCard label="Free signups" :value="freeSignupCount" :icon="UsersIcon" />
-      <StatCard label="Apps" :value="appCount" :icon="Layers2Icon" />
+      <StatCard :label="$t('earnings.statTransactions')" :value="transactionCount" :icon="CreditCardIcon" />
+      <StatCard :label="$t('earnings.statPaid')" :value="paidCount" :icon="BanknoteIcon" />
+      <StatCard :label="$t('earnings.statFreeSignups')" :value="freeSignupCount" :icon="UsersIcon" />
+      <StatCard :label="$t('earnings.statApps')" :value="appCount" :icon="Layers2Icon" />
     </div>
 
-    <h2 class="font-heading text-lg font-semibold mb-4">Recent transactions</h2>
+    <h2 class="font-heading text-lg font-semibold mb-4">{{ $t('earnings.recentTransactions') }}</h2>
     <EmptyState
       v-if="transactionCount === 0"
       :icon="CreditCardIcon"
-      title="No transactions yet"
-      description="When end users pay through your apps, earnings will appear here."
+      :title="$t('earnings.noTransactionsTitle')"
+      :description="$t('earnings.noTransactionsDescription')"
     />
     <div v-else class="overflow-x-auto rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] p-0">
       <table class="w-full text-left text-sm whitespace-nowrap">
         <thead class="border-b border-[var(--color-border-dark)] bg-[var(--color-surface-muted)]">
           <tr>
-            <th class="px-4 py-3 font-medium text-slate-300">ID / Date</th>
-            <th class="px-4 py-3 font-medium text-slate-300">Amount</th>
-            <th class="px-4 py-3 font-medium text-slate-300">Method</th>
-            <th class="px-4 py-3 font-medium text-slate-300">Phone</th>
-            <th class="px-4 py-3 font-medium text-slate-300">Status</th>
+            <th class="px-4 py-3 font-medium text-slate-300">{{ $t('earnings.txTable.idDate') }}</th>
+            <th class="px-4 py-3 font-medium text-slate-300">{{ $t('earnings.txTable.amount') }}</th>
+            <th class="px-4 py-3 font-medium text-slate-300">{{ $t('earnings.txTable.method') }}</th>
+            <th class="px-4 py-3 font-medium text-slate-300">{{ $t('earnings.txTable.phone') }}</th>
+            <th class="px-4 py-3 font-medium text-slate-300">{{ $t('earnings.txTable.status') }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-[var(--color-border-dark)]">
@@ -329,22 +339,21 @@ const statusLabels: Record<string, string> = {
     <Dialog v-model:open="dialogOpen">
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Request a withdrawal</DialogTitle>
+          <DialogTitle>{{ $t('earnings.withdraw_dialog.title') }}</DialogTitle>
           <DialogDescription>
-            This submits a request for review — it does not move money yet. Your balance changes only once an
-            operator approves it.
+            {{ $t('earnings.withdraw_dialog.description') }}
           </DialogDescription>
         </DialogHeader>
         <div class="space-y-4 py-2">
           <div class="space-y-2">
-            <Label>Method</Label>
+            <Label>{{ $t('earnings.withdraw_dialog.method') }}</Label>
             <Select v-model="destinationType">
               <SelectTrigger>
-                <SelectValue placeholder="Select a method" />
+                <SelectValue :placeholder="$t('earnings.withdraw_dialog.selectMethodPlaceholder')" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="mobile_money">Mobile money</SelectItem>
-                <SelectItem value="bank_account">Bank account</SelectItem>
+                <SelectItem value="mobile_money">{{ $t('earnings.destinationType.mobile_money') }}</SelectItem>
+                <SelectItem value="bank_account">{{ $t('earnings.destinationType.bank_account') }}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -354,23 +363,23 @@ const statusLabels: Record<string, string> = {
           </div>
           <div class="space-y-2">
             <div class="flex items-center justify-between">
-              <Label for="payout-amount">Amount</Label>
-              <span class="text-xs text-slate-400">Available: {{ walletBalance }} {{ walletCurrency }}</span>
+              <Label for="payout-amount">{{ $t('earnings.withdraw_dialog.amount') }}</Label>
+              <span class="text-xs text-slate-400">{{ $t('earnings.withdraw_dialog.available', { balance: walletBalance, currency: walletCurrency }) }}</span>
             </div>
             <Input id="payout-amount" v-model="amount" placeholder="0.00" inputmode="decimal" />
           </div>
           <div v-if="feePreview" class="text-xs text-slate-400 bg-[var(--color-surface-muted)] rounded-md px-3 py-2">
-            Estimate — Fee {{ FEE_RATE * 100 }}%: {{ feePreview.feeAmount }} → You receive: {{ feePreview.netAmount }}
-            <span class="block text-slate-500 mt-0.5">The final figures are set when the request is submitted.</span>
+            {{ $t('earnings.withdraw_dialog.feeEstimate', { rate: FEE_RATE * 100, fee: feePreview.feeAmount, net: feePreview.netAmount }) }}
+            <span class="block text-slate-500 mt-0.5">{{ $t('earnings.withdraw_dialog.feeFinalNote') }}</span>
           </div>
           <p v-if="submitError" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2">
             {{ submitError }}
           </p>
         </div>
         <div class="flex justify-end gap-2">
-          <Button variant="ghost" class="cursor-pointer" :disabled="isSubmitting" @click="closeDialog">Cancel</Button>
+          <Button variant="ghost" class="cursor-pointer" :disabled="isSubmitting" @click="closeDialog">{{ $t('common.cancel') }}</Button>
           <Button class="cursor-pointer" :disabled="isSubmitting" @click="handleSubmit">
-            {{ isSubmitting ? 'Submitting...' : 'Request withdrawal' }}
+            {{ isSubmitting ? $t('earnings.withdraw_dialog.submitting') : $t('earnings.withdraw_dialog.requestWithdrawal') }}
           </Button>
         </div>
       </DialogContent>

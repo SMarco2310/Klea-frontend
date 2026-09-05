@@ -73,56 +73,56 @@ const STATUS_STYLES: Record<string, string> = {
 <template>
   <div>
     <div class="flex items-center justify-between mb-8">
-      <h1 class="font-heading text-2xl font-semibold">Settings</h1>
-      <Button variant="outline" class="cursor-pointer font-medium" @click="startTour">Take a tour</Button>
+      <h1 class="font-heading text-2xl font-semibold">{{ $t('settings.title') }}</h1>
+      <Button variant="outline" class="cursor-pointer font-medium" @click="startTour">{{ $t('settings.takeTour') }}</Button>
     </div>
 
-    <p v-if="pending" class="text-sm text-slate-400 mb-4">Loading workspace...</p>
+    <p v-if="pending" class="text-sm text-slate-400 mb-4">{{ $t('settings.loadingWorkspace') }}</p>
 
     <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 items-start">
       <SettingsIdentityCard
         :initial="workspace.name?.[0]?.toUpperCase() || '?'"
-        :title="workspace.name || 'Workspace'"
+        :title="workspace.name || $t('nav.workspaceFallback')"
         :subtitle="workspace.slug ? `/${workspace.slug}` : undefined"
       >
         <div class="flex items-center justify-between text-sm">
-          <span class="text-slate-400">Status</span>
+          <span class="text-slate-400">{{ $t('settings.statusLabel') }}</span>
           <span class="text-xs font-medium px-2 py-0.5 rounded-full capitalize" :class="STATUS_STYLES[workspace.status]">
             {{ workspace.status }}
           </span>
         </div>
         <div class="flex items-center justify-between text-sm">
-          <span class="text-slate-400">Apps</span>
+          <span class="text-slate-400">{{ $t('nav.apps') }}</span>
           <span class="font-medium">{{ apps.length }}</span>
         </div>
         <div class="flex items-center justify-between text-sm">
-          <span class="text-slate-400">Currency</span>
+          <span class="text-slate-400">{{ $t('settings.currencyLabel') }}</span>
           <span class="font-medium">{{ workspace.currency }}</span>
         </div>
       </SettingsIdentityCard>
 
       <div class="space-y-5">
-        <SettingsSection :icon="Building2Icon" title="Workspace" description="Public name and URL of your workspace.">
+        <SettingsSection :icon="Building2Icon" :title="$t('settings.workspaceSection.title')" :description="$t('settings.workspaceSection.description')">
           <div class="space-y-2">
-            <Label for="ws-name">Workspace name</Label>
+            <Label for="ws-name">{{ $t('settings.workspaceNameLabel') }}</Label>
             <Input id="ws-name" v-model="name" />
           </div>
           <div class="space-y-2">
-            <Label for="ws-slug">Slug</Label>
+            <Label for="ws-slug">{{ $t('settings.slugLabel') }}</Label>
             <Input id="ws-slug" v-model="slug" />
           </div>
           <div class="space-y-2">
-            <Label for="ws-currency">Default Currency</Label>
+            <Label for="ws-currency">{{ $t('settings.defaultCurrencyLabel') }}</Label>
             <Select v-model="currency">
               <SelectTrigger id="ws-currency">
-                <SelectValue placeholder="Select a currency" />
+                <SelectValue :placeholder="$t('settings.selectCurrencyPlaceholder')" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="XOF">FCFA (XOF)</SelectItem>
-                <SelectItem value="USD">US Dollar (USD)</SelectItem>
-                <SelectItem value="EUR">Euro (EUR)</SelectItem>
-                <SelectItem value="NGN">Naira (NGN)</SelectItem>
-                <SelectItem value="GBP">British Pound (GBP)</SelectItem>
+                <SelectItem value="XOF">{{ $t('settings.currency.xof') }}</SelectItem>
+                <SelectItem value="USD">{{ $t('settings.currency.usd') }}</SelectItem>
+                <SelectItem value="EUR">{{ $t('settings.currency.eur') }}</SelectItem>
+                <SelectItem value="NGN">{{ $t('settings.currency.ngn') }}</SelectItem>
+                <SelectItem value="GBP">{{ $t('settings.currency.gbp') }}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -133,57 +133,59 @@ const STATUS_STYLES: Record<string, string> = {
         </p>
 
         <Button class="cursor-pointer gap-2" :disabled="isSaving" @click="handleSave">
-          <SaveIcon class="w-4 h-4" /> {{ isSaving ? 'Saving...' : saved ? 'Saved' : 'Save changes' }}
+          <SaveIcon class="w-4 h-4" /> {{ isSaving ? $t('settings.saving') : saved ? $t('settings.saved') : $t('settings.saveChanges') }}
         </Button>
 
         <div v-if="isOwner" class="pt-10 mt-10 border-t border-[var(--color-border-dark)]">
-          <SettingsSection 
-            :icon="Building2Icon" 
-            title="Danger Zone" 
-            description="Irreversibly delete this workspace and all of its data. This action cannot be undone."
+          <SettingsSection
+            :icon="Building2Icon"
+            :title="$t('settings.dangerZone.title')"
+            :description="$t('settings.dangerZone.description')"
           >
             <div class="p-4 rounded-xl border border-red-500/30 bg-red-500/10 space-y-4">
-              <h3 class="text-sm font-medium text-red-400">Delete Workspace</h3>
+              <h3 class="text-sm font-medium text-red-400">{{ $t('settings.deleteWorkspace') }}</h3>
               <p class="text-xs text-slate-400">
-                Once you delete a workspace, there is no going back. Please be certain.
+                {{ $t('settings.deleteWorkspaceWarning') }}
               </p>
-              
+
               <div v-if="showDeleteConfirm" class="space-y-3 pt-3 border-t border-red-500/20">
                 <Label for="delete-confirm" class="text-xs text-slate-300">
-                  Type <span class="font-bold text-red-400">{{ workspace.name }}</span> to confirm
+                  <i18n-t keypath="settings.typeToConfirm" tag="span">
+                    <template #name><span class="font-bold text-red-400">{{ workspace.name }}</span></template>
+                  </i18n-t>
                 </Label>
-                <Input 
-                  id="delete-confirm" 
-                  v-model="deleteConfirmText" 
-                  class="border-red-500/30 focus-visible:ring-red-500/50" 
+                <Input
+                  id="delete-confirm"
+                  v-model="deleteConfirmText"
+                  class="border-red-500/30 focus-visible:ring-red-500/50"
                   :placeholder="workspace.name"
                 />
                 <div class="flex items-center gap-3">
-                  <Button 
-                    variant="destructive" 
+                  <Button
+                    variant="destructive"
                     class="cursor-pointer"
                     :disabled="deleteConfirmText !== workspace.name || isDeleting"
                     @click="handleDelete"
                   >
-                    {{ isDeleting ? 'Deleting...' : 'Yes, delete this workspace' }}
+                    {{ isDeleting ? $t('settings.deleting') : $t('settings.confirmDeleteButton') }}
                   </Button>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     class="cursor-pointer"
                     @click="showDeleteConfirm = false; deleteConfirmText = ''"
                   >
-                    Cancel
+                    {{ $t('common.cancel') }}
                   </Button>
                 </div>
               </div>
-              
-              <Button 
-                v-else 
-                variant="destructive" 
-                class="cursor-pointer" 
+
+              <Button
+                v-else
+                variant="destructive"
+                class="cursor-pointer"
                 @click="showDeleteConfirm = true"
               >
-                Delete Workspace
+                {{ $t('settings.deleteWorkspace') }}
               </Button>
             </div>
           </SettingsSection>

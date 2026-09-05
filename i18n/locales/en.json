@@ -10,7 +10,9 @@
     "save": "Save",
     "done": "Done",
     "settings": "Settings",
-    "docs": "Docs"
+    "docs": "Docs",
+    "modeSuffix": "{mode} mode",
+    "emailAddress": "Email address"
   },
   "nav": {
     "generalSection": "General",
@@ -333,5 +335,191 @@
       "login": "Login",
       "signup": "Signup"
     }
+  },
+  "dashboard": {
+    "welcomeBack": "Welcome back, {name}",
+    "thereFallback": "there",
+    "workingIn": "You're working in {workspace} · {modeSuffix}",
+    "statApplications": "Applications",
+    "statApplicationsSublabel": "Total registered apps",
+    "statSubscribers": "Subscribers",
+    "inEnvironment": "In {mode} environment",
+    "statApiKeys": "API Keys",
+    "statApiKeysSublabel": "Issued keys",
+    "yourApps": "Your apps",
+    "newApp": "New app",
+    "noAppsTitle": "No apps yet",
+    "noAppsDescription": "Create your first app to start issuing licenses.",
+    "active": "Active",
+    "webhookConfigured": "Webhook configured",
+    "noWebhook": "No webhook"
+  },
+  "earnings": {
+    "title": "Earnings",
+    "totalBalance": "Total balance",
+    "withdrawable": "Withdrawable",
+    "notWithdrawable": "Test balance — not withdrawable",
+    "withdraw": "Withdraw",
+    "grossVolume": "Gross volume",
+    "refunded": "Refunded",
+    "avgTransaction": "Avg. transaction",
+    "walletActivity": "Wallet activity",
+    "withdrawalRequests": "Withdrawal requests",
+    "noRequestsTitle": "No withdrawal requests yet",
+    "noRequestsDescription": "Requests you submit will appear here. A pending request does not reserve or reduce your balance.",
+    "table": {
+      "date": "Date",
+      "requested": "Requested",
+      "fee": "Fee",
+      "net": "Net",
+      "destination": "Destination",
+      "status": "Status"
+    },
+    "status": {
+      "pending": "Pending — awaiting review",
+      "approved": "Approved — balance debited, payment on the way",
+      "paid": "Paid",
+      "rejected": "Rejected"
+    },
+    "destinationType": {
+      "mobile_money": "Mobile money",
+      "bank_account": "Bank account"
+    },
+    "statTransactions": "Transactions",
+    "statPaid": "Paid",
+    "statFreeSignups": "Free signups",
+    "statApps": "Apps",
+    "recentTransactions": "Recent transactions",
+    "noTransactionsTitle": "No transactions yet",
+    "noTransactionsDescription": "When end users pay through your apps, earnings will appear here.",
+    "txTable": {
+      "idDate": "ID / Date",
+      "amount": "Amount",
+      "method": "Method",
+      "phone": "Phone",
+      "status": "Status"
+    },
+    "withdraw_dialog": {
+      "title": "Request a withdrawal",
+      "description": "This submits a request for review — it does not move money yet. Your balance changes only once an operator approves it.",
+      "method": "Method",
+      "selectMethodPlaceholder": "Select a method",
+      "phoneNumberLabel": "Phone number",
+      "accountReferenceLabel": "Account reference",
+      "accountReferencePlaceholder": "IBAN or bank account reference",
+      "amount": "Amount",
+      "available": "Available: {balance} {currency}",
+      "feeEstimate": "Estimate — Fee {rate}%: {fee} → You receive: {net}",
+      "feeFinalNote": "The final figures are set when the request is submitted.",
+      "submitting": "Submitting...",
+      "requestWithdrawal": "Request withdrawal",
+      "errors": {
+        "enterAmount": "Enter an amount.",
+        "invalidAmount": "Amount must be a number with at most two decimals.",
+        "notPositive": "Amount must be greater than zero.",
+        "exceedsBalance": "Amount cannot exceed your available balance of {balance}.",
+        "enterDestination": "Enter a destination."
+      },
+      "successToast": "Withdrawal requested. It is pending review — your balance is unchanged until it is approved."
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "accountFallback": "Your account",
+    "verified": "Verified",
+    "unverified": "Unverified",
+    "nameSection": {
+      "title": "Name",
+      "description": "How your name appears across Klea."
+    },
+    "fullNameLabel": "Full name",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "saveName": "Save name",
+    "emailSection": {
+      "title": "Email",
+      "description": "Used to sign in and receive account notifications."
+    },
+    "emailNotVerifiedHint": "This email isn't verified yet.",
+    "saveEmail": "Save email",
+    "passwordSection": {
+      "title": "Password",
+      "description": "Change your password."
+    },
+    "newPasswordLabel": "New password",
+    "confirmNewPasswordLabel": "Confirm new password",
+    "savePassword": "Save password"
+  },
+  "settings": {
+    "title": "Settings",
+    "takeTour": "Take a tour",
+    "loadingWorkspace": "Loading workspace...",
+    "statusLabel": "Status",
+    "currencyLabel": "Currency",
+    "workspaceSection": {
+      "title": "Workspace",
+      "description": "Public name and URL of your workspace."
+    },
+    "workspaceNameLabel": "Workspace name",
+    "slugLabel": "Slug",
+    "defaultCurrencyLabel": "Default Currency",
+    "selectCurrencyPlaceholder": "Select a currency",
+    "currency": {
+      "xof": "FCFA (XOF)",
+      "usd": "US Dollar (USD)",
+      "eur": "Euro (EUR)",
+      "ngn": "Naira (NGN)",
+      "gbp": "British Pound (GBP)"
+    },
+    "saving": "Saving...",
+    "saved": "Saved",
+    "saveChanges": "Save changes",
+    "dangerZone": {
+      "title": "Danger Zone",
+      "description": "Irreversibly delete this workspace and all of its data. This action cannot be undone."
+    },
+    "deleteWorkspace": "Delete Workspace",
+    "deleteWorkspaceWarning": "Once you delete a workspace, there is no going back. Please be certain.",
+    "typeToConfirm": "Type {name} to confirm",
+    "confirmDeleteButton": "Yes, delete this workspace",
+    "deleting": "Deleting..."
+  },
+  "team": {
+    "title": "Team",
+    "subtitle": "Manage your workspace members and their roles.",
+    "inviteMember": "Invite member",
+    "yourRoleLabel": "Your role",
+    "pendingInvitesLabel": "Pending invites",
+    "membersSection": {
+      "title": "Members",
+      "description": "People with access to this workspace."
+    },
+    "youSuffix": "(you)",
+    "pendingInvitationsSection": {
+      "title": "Pending invitations",
+      "description": "Invites waiting to be accepted."
+    },
+    "loadingInvitations": "Loading invitations...",
+    "noInvitationsTitle": "No pending invitations",
+    "noInvitationsDescription": "Invite a teammate to give them access to this workspace.",
+    "invitedAs": "Invited as {role} · expires {date}",
+    "revokeInviteAria": "Revoke invite to {email}",
+    "roleAdmin": "Admin",
+    "roleMember": "Member",
+    "revokeDialog": {
+      "title": "Revoke invitation",
+      "description": "They won't be able to accept this invite anymore."
+    },
+    "revoking": "Revoking...",
+    "revokeInviteButton": "Revoke invite",
+    "inviteDialog": {
+      "title": "Invite a team member",
+      "description": "They will receive an email invitation to join your workspace."
+    },
+    "invitationSentSuccess": "Invitation sent successfully!",
+    "roleLabel": "Role",
+    "selectRolePlaceholder": "Select a role",
+    "sending": "Sending...",
+    "sendInvite": "Send invite"
   }
 }

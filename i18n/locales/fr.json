@@ -10,7 +10,9 @@
     "save": "Enregistrer",
     "done": "Terminé",
     "settings": "Paramètres",
-    "docs": "Documentation"
+    "docs": "Documentation",
+    "modeSuffix": "mode {mode}",
+    "emailAddress": "Adresse e-mail"
   },
   "nav": {
     "generalSection": "Général",
@@ -333,5 +335,191 @@
       "login": "Connexion",
       "signup": "Inscription"
     }
+  },
+  "dashboard": {
+    "welcomeBack": "Bon retour, {name}",
+    "thereFallback": "cher utilisateur",
+    "workingIn": "Vous travaillez dans {workspace} · {modeSuffix}",
+    "statApplications": "Applications",
+    "statApplicationsSublabel": "Total des applications enregistrées",
+    "statSubscribers": "Abonnés",
+    "inEnvironment": "En environnement {mode}",
+    "statApiKeys": "Clés API",
+    "statApiKeysSublabel": "Clés émises",
+    "yourApps": "Vos applications",
+    "newApp": "Nouvelle application",
+    "noAppsTitle": "Aucune application pour l'instant",
+    "noAppsDescription": "Créez votre première application pour commencer à émettre des licences.",
+    "active": "Active",
+    "webhookConfigured": "Webhook configuré",
+    "noWebhook": "Aucun webhook"
+  },
+  "earnings": {
+    "title": "Revenus",
+    "totalBalance": "Solde total",
+    "withdrawable": "Retirable",
+    "notWithdrawable": "Solde de test — non retirable",
+    "withdraw": "Retirer",
+    "grossVolume": "Volume brut",
+    "refunded": "Remboursé",
+    "avgTransaction": "Transaction moy.",
+    "walletActivity": "Activité du portefeuille",
+    "withdrawalRequests": "Demandes de retrait",
+    "noRequestsTitle": "Aucune demande de retrait pour l'instant",
+    "noRequestsDescription": "Les demandes que vous soumettez apparaîtront ici. Une demande en attente ne réserve ni ne réduit votre solde.",
+    "table": {
+      "date": "Date",
+      "requested": "Demandé",
+      "fee": "Frais",
+      "net": "Net",
+      "destination": "Destination",
+      "status": "Statut"
+    },
+    "status": {
+      "pending": "En attente — en cours d'examen",
+      "approved": "Approuvé — solde débité, paiement en cours",
+      "paid": "Payé",
+      "rejected": "Rejeté"
+    },
+    "destinationType": {
+      "mobile_money": "Mobile money",
+      "bank_account": "Compte bancaire"
+    },
+    "statTransactions": "Transactions",
+    "statPaid": "Payées",
+    "statFreeSignups": "Inscriptions gratuites",
+    "statApps": "Applications",
+    "recentTransactions": "Transactions récentes",
+    "noTransactionsTitle": "Aucune transaction pour l'instant",
+    "noTransactionsDescription": "Lorsque des utilisateurs finaux paieront via vos applications, les revenus apparaîtront ici.",
+    "txTable": {
+      "idDate": "ID / Date",
+      "amount": "Montant",
+      "method": "Méthode",
+      "phone": "Téléphone",
+      "status": "Statut"
+    },
+    "withdraw_dialog": {
+      "title": "Demander un retrait",
+      "description": "Ceci soumet une demande pour examen — l'argent n'est pas encore transféré. Votre solde ne change qu'une fois la demande approuvée par un opérateur.",
+      "method": "Méthode",
+      "selectMethodPlaceholder": "Sélectionner une méthode",
+      "phoneNumberLabel": "Numéro de téléphone",
+      "accountReferenceLabel": "Référence du compte",
+      "accountReferencePlaceholder": "IBAN ou référence de compte bancaire",
+      "amount": "Montant",
+      "available": "Disponible : {balance} {currency}",
+      "feeEstimate": "Estimation — Frais de {rate} % : {fee} → Vous recevrez : {net}",
+      "feeFinalNote": "Les montants définitifs sont fixés au moment de la soumission de la demande.",
+      "submitting": "Envoi en cours...",
+      "requestWithdrawal": "Demander le retrait",
+      "errors": {
+        "enterAmount": "Saisissez un montant.",
+        "invalidAmount": "Le montant doit être un nombre avec au plus deux décimales.",
+        "notPositive": "Le montant doit être supérieur à zéro.",
+        "exceedsBalance": "Le montant ne peut pas dépasser votre solde disponible de {balance}.",
+        "enterDestination": "Saisissez une destination."
+      },
+      "successToast": "Retrait demandé. Il est en cours d'examen — votre solde reste inchangé tant qu'il n'est pas approuvé."
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "accountFallback": "Votre compte",
+    "verified": "Vérifié",
+    "unverified": "Non vérifié",
+    "nameSection": {
+      "title": "Nom",
+      "description": "Comment votre nom apparaît sur Klea."
+    },
+    "fullNameLabel": "Nom complet",
+    "saving": "Enregistrement...",
+    "saved": "Enregistré",
+    "saveName": "Enregistrer le nom",
+    "emailSection": {
+      "title": "E-mail",
+      "description": "Utilisé pour vous connecter et recevoir les notifications de compte."
+    },
+    "emailNotVerifiedHint": "Cette adresse e-mail n'est pas encore vérifiée.",
+    "saveEmail": "Enregistrer l'e-mail",
+    "passwordSection": {
+      "title": "Mot de passe",
+      "description": "Modifiez votre mot de passe."
+    },
+    "newPasswordLabel": "Nouveau mot de passe",
+    "confirmNewPasswordLabel": "Confirmer le nouveau mot de passe",
+    "savePassword": "Enregistrer le mot de passe"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "takeTour": "Faire une visite guidée",
+    "loadingWorkspace": "Chargement de l'espace de travail...",
+    "statusLabel": "Statut",
+    "currencyLabel": "Devise",
+    "workspaceSection": {
+      "title": "Espace de travail",
+      "description": "Nom public et URL de votre espace de travail."
+    },
+    "workspaceNameLabel": "Nom de l'espace de travail",
+    "slugLabel": "Slug",
+    "defaultCurrencyLabel": "Devise par défaut",
+    "selectCurrencyPlaceholder": "Sélectionner une devise",
+    "currency": {
+      "xof": "FCFA (XOF)",
+      "usd": "Dollar américain (USD)",
+      "eur": "Euro (EUR)",
+      "ngn": "Naira (NGN)",
+      "gbp": "Livre sterling (GBP)"
+    },
+    "saving": "Enregistrement...",
+    "saved": "Enregistré",
+    "saveChanges": "Enregistrer les modifications",
+    "dangerZone": {
+      "title": "Zone de danger",
+      "description": "Supprimez irréversiblement cet espace de travail et toutes ses données. Cette action est irréversible."
+    },
+    "deleteWorkspace": "Supprimer l'espace de travail",
+    "deleteWorkspaceWarning": "Une fois l'espace de travail supprimé, il n'y a pas de retour en arrière possible. Soyez certain de vous.",
+    "typeToConfirm": "Tapez {name} pour confirmer",
+    "confirmDeleteButton": "Oui, supprimer cet espace de travail",
+    "deleting": "Suppression..."
+  },
+  "team": {
+    "title": "Équipe",
+    "subtitle": "Gérez les membres de votre espace de travail et leurs rôles.",
+    "inviteMember": "Inviter un membre",
+    "yourRoleLabel": "Votre rôle",
+    "pendingInvitesLabel": "Invitations en attente",
+    "membersSection": {
+      "title": "Membres",
+      "description": "Personnes ayant accès à cet espace de travail."
+    },
+    "youSuffix": "(vous)",
+    "pendingInvitationsSection": {
+      "title": "Invitations en attente",
+      "description": "Invitations en attente d'acceptation."
+    },
+    "loadingInvitations": "Chargement des invitations...",
+    "noInvitationsTitle": "Aucune invitation en attente",
+    "noInvitationsDescription": "Invitez un collègue pour lui donner accès à cet espace de travail.",
+    "invitedAs": "Invité en tant que {role} · expire le {date}",
+    "revokeInviteAria": "Révoquer l'invitation de {email}",
+    "roleAdmin": "Admin",
+    "roleMember": "Membre",
+    "revokeDialog": {
+      "title": "Révoquer l'invitation",
+      "description": "Cette personne ne pourra plus accepter cette invitation."
+    },
+    "revoking": "Révocation...",
+    "revokeInviteButton": "Révoquer l'invitation",
+    "inviteDialog": {
+      "title": "Inviter un membre de l'équipe",
+      "description": "Cette personne recevra une invitation par e-mail pour rejoindre votre espace de travail."
+    },
+    "invitationSentSuccess": "Invitation envoyée avec succès !",
+    "roleLabel": "Rôle",
+    "selectRolePlaceholder": "Sélectionner un rôle",
+    "sending": "Envoi en cours...",
+    "sendInvite": "Envoyer l'invitation"
   }
 }
