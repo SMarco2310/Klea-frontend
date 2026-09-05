@@ -17,6 +17,7 @@ const isNew = computed(() => route.params.id === 'new')
 const featureId = computed(() => isNew.value ? null : Number(route.params.id))
 
 const { features, pending, fetchFeatures, createFeature, updateFeature } = useFeatures(appId.value)
+const { t } = useI18n()
 
 const name = ref('')
 const key = ref('')
@@ -66,14 +67,14 @@ async function handleSave() {
         code: cleanKey,
         description: description.value.trim(),
       })
-      toast.success('Feature updated successfully')
+      toast.success(t('features.toasts.updated'))
     } else {
       await createFeature({
         name: featureName,
         code: cleanKey,
         description: description.value.trim(),
       })
-      toast.success('Feature created successfully')
+      toast.success(t('features.toasts.created'))
     }
     navigateTo(`/${route.params.workspaceSlug}/apps/${route.params.slug}/features`)
   } catch (e) {
@@ -146,11 +147,11 @@ else:
 
 <template>
   <div class="max-w-[1000px] mx-auto w-full pb-12">
-    <AppHeader :title="isNew ? 'New feature' : 'Edit feature'">
+    <AppHeader :title="isNew ? $t('features.newFeature') : $t('features.editFeatureTitle')">
       <template #actions>
         <NuxtLink :to="`/${route.params.workspaceSlug}/apps/${route.params.slug}/features`">
           <Button variant="ghost" class="gap-1 cursor-pointer">
-            <ArrowLeftIcon class="w-4 h-4" /> Back to features
+            <ArrowLeftIcon class="w-4 h-4" /> {{ $t('features.backToFeatures') }}
           </Button>
         </NuxtLink>
       </template>
@@ -160,23 +161,23 @@ else:
       <!-- Left side: Form -->
       <div class="bg-[var(--color-surface)] border border-[var(--color-border-dark)] rounded-xl p-6 shadow-sm">
         <div v-if="pending && !isNew && !isInitialized" class="py-12 text-center text-[var(--muted-foreground)]">
-          Loading feature details...
+          {{ $t('features.loadingDetails') }}
         </div>
         <div v-else class="space-y-6">
           <div class="space-y-2">
-            <Label for="feature-name">Feature Name</Label>
-            <Input id="feature-name" v-model="name" placeholder="Multiple Device Login" />
+            <Label for="feature-name">{{ $t('features.form.nameLabel') }}</Label>
+            <Input id="feature-name" v-model="name" :placeholder="$t('features.form.namePlaceholder')" />
           </div>
-          
+
           <div class="space-y-2">
-            <Label for="feature-key">Code / Key</Label>
+            <Label for="feature-key">{{ $t('features.form.codeLabel') }}</Label>
             <Input id="feature-key" v-model="key" placeholder="auth_multiple" class="font-mono" />
-            <p class="text-xs text-[var(--muted-foreground)]">snake_case, auto-formatted on save. Used to check access via API.</p>
+            <p class="text-xs text-[var(--muted-foreground)]">{{ $t('features.form.codeHelper') }}</p>
           </div>
-          
+
           <div class="space-y-2">
-            <Label for="feature-desc">Description</Label>
-            <Input id="feature-desc" v-model="description" placeholder="What this feature means for the user" />
+            <Label for="feature-desc">{{ $t('features.form.descriptionLabel') }}</Label>
+            <Input id="feature-desc" v-model="description" :placeholder="$t('features.form.descriptionPlaceholder')" />
           </div>
 
           <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2">
@@ -185,10 +186,10 @@ else:
 
           <div class="pt-4 mt-6 border-t border-[var(--color-border-dark)] flex items-center justify-between">
             <Button class="cursor-pointer px-8" :disabled="!key.trim() || isSaving" @click="handleSave">
-              {{ isSaving ? 'Saving...' : (isNew ? 'Create feature' : 'Save changes') }}
+              {{ isSaving ? $t('features.form.saving') : (isNew ? $t('features.form.createSubmit') : $t('features.form.saveChanges')) }}
             </Button>
             <NuxtLink :to="`/${route.params.workspaceSlug}/apps/${route.params.slug}/features`">
-              <Button variant="ghost" class="cursor-pointer">Cancel</Button>
+              <Button variant="ghost" class="cursor-pointer">{{ $t('common.cancel') }}</Button>
             </NuxtLink>
           </div>
         </div>
@@ -198,13 +199,13 @@ else:
       <div class="bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] rounded-xl overflow-hidden shadow-sm sticky top-6">
         <div class="px-4 py-3 border-b border-[var(--color-border-dark)] flex items-center gap-2 bg-[var(--color-surface)]">
           <CodeIcon class="w-4 h-4 text-[var(--color-accent)]" />
-          <h3 class="text-sm font-medium text-[var(--foreground)]">Integration example</h3>
+          <h3 class="text-sm font-medium text-[var(--foreground)]">{{ $t('features.integration.title') }}</h3>
         </div>
         <div class="p-4 space-y-4">
-          <p class="text-sm text-[var(--muted-foreground)]">
-            Use the <code class="px-1.5 py-0.5 rounded bg-[var(--color-bg)] font-mono text-xs text-[var(--foreground)]">{{ slugifyKey(key) || 'feature_code' }}</code> key in your application code to selectively allow access based on the user's active plan.
-          </p>
-          
+          <i18n-t keypath="features.integration.description" tag="p" class="text-sm text-[var(--muted-foreground)]">
+            <template #code><code class="px-1.5 py-0.5 rounded bg-[var(--color-bg)] font-mono text-xs text-[var(--foreground)]">{{ slugifyKey(key) || 'feature_code' }}</code></template>
+          </i18n-t>
+
           <div class="overflow-hidden rounded-lg border border-[var(--color-border-dark)]">
             <DocsLanguageTabs :samples="codeSamples" />
           </div>

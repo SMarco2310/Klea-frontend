@@ -16,6 +16,7 @@ const { currentApp } = useApps()
 const appId = computed(() => currentApp.value?.id ?? 0)
 const { plans, pending, fetchPlans, deletePlan, reorderPlans, updatePlan } = usePlans(appId)
 const { features, fetchFeatures } = useFeatures(appId)
+const { t } = useI18n()
 
 watchEffect(() => {
   if (appId.value) {
@@ -92,7 +93,7 @@ async function confirmDelete() {
   isDeleting.value = true
   try {
     await deletePlan(pendingDeleteId.value)
-    toast.success('Plan deleted successfully')
+    toast.success(t('plans.toasts.deleted'))
     pendingDeleteId.value = null
   } catch (e) {
     errorMessage.value = extractApiErrorMessage(e)
@@ -105,7 +106,7 @@ async function togglePublish(plan: Plan) {
   const newStatus = !plan.is_active
   try {
     await updatePlan(plan.id, { is_active: newStatus })
-    toast.success(newStatus ? 'Plan published successfully' : 'Plan moved to draft')
+    toast.success(newStatus ? t('plans.toasts.published') : t('plans.toasts.movedToDraft'))
   } catch (e) {
     errorMessage.value = extractApiErrorMessage(e)
   }
@@ -114,10 +115,10 @@ async function togglePublish(plan: Plan) {
 
 <template>
   <div>
-    <AppHeader title="Plans">
+    <AppHeader :title="$t('plans.title')">
       <template #subtitle>
         <div class="flex items-center gap-3">
-          <span class="text-sm text-[var(--muted-foreground)]">{{ plans.length }} plan{{ plans.length === 1 ? '' : 's' }}</span>
+          <span class="text-sm text-[var(--muted-foreground)]">{{ plans.length === 1 ? $t('plans.subtitleOne', { count: plans.length }) : $t('plans.subtitleOther', { count: plans.length }) }}</span>
 
           <!-- View mode switcher -->
           <div class="inline-flex p-1 rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] text-xs">
@@ -127,7 +128,7 @@ async function togglePublish(plan: Plan) {
               @click="viewMode = 'list'"
             >
               <LayoutListIcon class="w-3.5 h-3.5" />
-              <span>List</span>
+              <span>{{ $t('plans.viewMode.list') }}</span>
             </button>
             <button
               class="flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-colors cursor-pointer"
@@ -135,14 +136,14 @@ async function togglePublish(plan: Plan) {
               @click="viewMode = 'preview'"
             >
               <EyeIcon class="w-3.5 h-3.5" />
-              <span>Preview</span>
+              <span>{{ $t('plans.viewMode.preview') }}</span>
             </button>
           </div>
         </div>
       </template>
       <template #actions>
         <Button class="cursor-pointer gap-1" @click="openCreatePage">
-          <PlusIcon class="w-4 h-4" /> New plan
+          <PlusIcon class="w-4 h-4" /> {{ $t('plans.newPlan') }}
         </Button>
       </template>
     </AppHeader>
@@ -150,8 +151,8 @@ async function togglePublish(plan: Plan) {
     <div class="mb-5 p-3.5 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-start gap-3">
       <InfoIcon class="w-5 h-5 mt-0.5 text-sky-400 shrink-0" />
       <div>
-        <h4 class="text-sm font-medium text-sky-500 dark:text-sky-300 mb-0.5">Currency Configuration</h4>
-        <p class="text-xs text-sky-600 dark:text-sky-400/80 leading-relaxed">Ensure all active plans use the same currency. Mixing different currencies for a single application can cause checkout issues.</p>
+        <h4 class="text-sm font-medium text-sky-500 dark:text-sky-300 mb-0.5">{{ $t('plans.currencyInfo.title') }}</h4>
+        <p class="text-xs text-sky-600 dark:text-sky-400/80 leading-relaxed">{{ $t('plans.currencyInfo.description') }}</p>
       </div>
     </div>
 
@@ -166,14 +167,14 @@ async function togglePublish(plan: Plan) {
 
     <!-- List View -->
     <template v-else>
-      <p v-if="pending" class="text-sm text-[var(--muted-foreground)]">Loading plans...</p>
+      <p v-if="pending" class="text-sm text-[var(--muted-foreground)]">{{ $t('plans.loading') }}</p>
 
       <EmptyState
         v-else-if="plans.length === 0"
         :icon="LayersIcon"
-        title="No plans yet"
-        description="Create a plan to start billing subscribers."
-        cta-label="New plan"
+        :title="$t('plans.emptyTitle')"
+        :description="$t('plans.emptyDescription')"
+        :cta-label="$t('plans.newPlan')"
         @cta="openCreatePage"
       />
 
@@ -202,17 +203,17 @@ async function togglePublish(plan: Plan) {
                 <div class="flex items-center gap-2">
                   <span class="font-medium text-lg text-[var(--foreground)]">{{ plan.name }}</span>
                   <span v-if="!plan.is_active" class="px-2 py-0.5 rounded text-[11px] font-medium bg-[var(--color-surface-muted)] text-[var(--muted-foreground)] border border-[var(--color-border-dark)]">
-                    Draft
+                    {{ $t('plans.status.draft') }}
                   </span>
                   <span v-else class="px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                    Published
+                    {{ $t('plans.status.published') }}
                   </span>
                   <span v-if="(plan.yearly_discount_percent ?? 0) > 0" class="px-2 py-0.5 rounded text-[11px] font-medium bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/30">
-                    {{ plan.yearly_discount_percent }}% annual discount
+                    {{ $t('plans.annualDiscount', { percent: plan.yearly_discount_percent }) }}
                   </span>
                 </div>
                 <div class="text-sm text-[var(--muted-foreground)]">
-                  {{ formatCurrency(plan.price, plan.currency || 'NGN') }} &middot; {{ formatBillingPeriod(plan.billing_period, plan.duration_days) }}
+                  {{ formatCurrency(plan.price, plan.currency || 'NGN') }} &middot; {{ formatBillingPeriod(plan.billing_period, plan.duration_days, t) }}
                 </div>
               </div>
             </div>
@@ -224,7 +225,7 @@ async function togglePublish(plan: Plan) {
                 class="h-7 text-xs font-medium cursor-pointer"
                 @click.stop="togglePublish(plan)"
               >
-                Publish
+                {{ $t('plans.publishButton') }}
               </Button>
               <Button
                 v-else
@@ -233,18 +234,18 @@ async function togglePublish(plan: Plan) {
                 class="h-7 text-xs font-medium text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer"
                 @click.stop="togglePublish(plan)"
               >
-                Unpublish
+                {{ $t('plans.unpublishButton') }}
               </Button>
               <button
                 class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer transition-colors"
-                :aria-label="`Edit ${plan.name}`"
+                :aria-label="$t('plans.editAria', { name: plan.name })"
                 @click.stop="openEditPage(plan.id)"
               >
                 <PencilIcon class="w-4 h-4" />
               </button>
               <button
                 class="text-[var(--muted-foreground)] hover:text-red-500 cursor-pointer transition-colors"
-                :aria-label="`Delete ${plan.name}`"
+                :aria-label="$t('plans.deleteAria', { name: plan.name })"
                 @click.stop="promptDelete(plan.id)"
               >
                 <Trash2Icon class="w-4 h-4" />
@@ -254,9 +255,9 @@ async function togglePublish(plan: Plan) {
 
           <!-- Features list on plan card -->
           <div class="pt-2 border-t border-[var(--color-border-dark)]">
-            <div class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-2">Included Features</div>
+            <div class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-2">{{ $t('plans.includedFeaturesTitle') }}</div>
             <div v-if="!plan.features || plan.features.length === 0" class="text-xs text-[var(--muted-foreground)] italic">
-              No features included in this plan
+              {{ $t('plans.noFeaturesIncluded') }}
             </div>
             <div v-else class="flex flex-wrap gap-2">
               <span
@@ -277,19 +278,19 @@ async function togglePublish(plan: Plan) {
     <Dialog :open="!!pendingDeleteId" @update:open="pendingDeleteId = null">
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete plan</DialogTitle>
+          <DialogTitle>{{ $t('plans.deleteDialog.title') }}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this plan? This action cannot be undone.
+            {{ $t('plans.deleteDialog.description') }}
           </DialogDescription>
         </DialogHeader>
         <div class="flex justify-end gap-2 mt-4">
-          <Button variant="ghost" class="cursor-pointer" :disabled="isDeleting" @click="pendingDeleteId = null">Cancel</Button>
+          <Button variant="ghost" class="cursor-pointer" :disabled="isDeleting" @click="pendingDeleteId = null">{{ $t('common.cancel') }}</Button>
           <Button
             variant="destructive"
             class="cursor-pointer"
             :disabled="isDeleting"
             @click="confirmDelete"
-          >{{ isDeleting ? 'Deleting...' : 'Delete' }}</Button>
+          >{{ isDeleting ? $t('plans.deleteDialog.deleting') : $t('plans.deleteDialog.confirm') }}</Button>
         </div>
       </DialogContent>
     </Dialog>

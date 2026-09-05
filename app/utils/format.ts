@@ -24,12 +24,24 @@ export function formatDate(iso: string): string {
   })
 }
 
-const BILLING_PERIOD_LABELS: Record<BillingPeriod, string> = {
-  one_time: 'One-time',
-  monthly: 'Monthly',
-  quarterly: 'Quarterly',
-  yearly: 'Yearly',
-  custom: 'Custom',
+// Maps each billing_period enum value (never translated — it's the API
+// value) to the i18n key suffix that carries its display label. The label
+// text itself lives in plans.billingPeriod.displayLabels.* so it can be
+// translated; this map is just plumbing between the two.
+const BILLING_PERIOD_KEYS: Record<BillingPeriod, string> = {
+  one_time: 'oneTime',
+  monthly: 'monthly',
+  quarterly: 'quarterly',
+  yearly: 'yearly',
+  custom: 'custom',
+}
+
+type Translator = (key: string, params?: Record<string, unknown>) => string
+
+function dayCountLabel(t: Translator, durationDays: number): string {
+  return durationDays === 1
+    ? t('plans.billingPeriod.displayLabels.dayCount', { count: durationDays })
+    : t('plans.billingPeriod.displayLabels.dayCountPlural', { count: durationDays })
 }
 
 /**
@@ -37,18 +49,23 @@ const BILLING_PERIOD_LABELS: Record<BillingPeriod, string> = {
  * "N days" rendering for custom periods (or legacy plans that only carry
  * a duration_days value), and is null-safe: one-time plans have
  * duration_days === null.
+ *
+ * Utils can't call useI18n() at module scope, so the caller's own
+ * translator (from useI18n() in its <script setup>) is passed in instead.
  */
-export function formatBillingPeriod(billingPeriod: BillingPeriod | null | undefined, durationDays: number | null | undefined): string {
+export function formatBillingPeriod(billingPeriod: BillingPeriod | null | undefined, durationDays: number | null | undefined, t: Translator): string {
   if (billingPeriod === 'custom') {
-    return typeof durationDays === 'number' ? `${durationDays} day${durationDays === 1 ? '' : 's'}` : 'Custom'
+    return typeof durationDays === 'number'
+      ? dayCountLabel(t, durationDays)
+      : t('plans.billingPeriod.displayLabels.custom')
   }
-  if (billingPeriod && BILLING_PERIOD_LABELS[billingPeriod]) {
-    return BILLING_PERIOD_LABELS[billingPeriod]
+  if (billingPeriod && BILLING_PERIOD_KEYS[billingPeriod]) {
+    return t(`plans.billingPeriod.displayLabels.${BILLING_PERIOD_KEYS[billingPeriod]}`)
   }
   // Fallback for plans without a billing_period (shouldn't happen post-migration,
   // but keeps display safe if the field is ever missing).
   if (typeof durationDays === 'number') {
-    return `${durationDays} day${durationDays === 1 ? '' : 's'}`
+    return dayCountLabel(t, durationDays)
   }
-  return 'One-time'
+  return t('plans.billingPeriod.displayLabels.oneTime')
 }

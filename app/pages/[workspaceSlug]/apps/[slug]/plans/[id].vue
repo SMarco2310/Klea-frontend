@@ -19,6 +19,7 @@ const planId = computed(() => isNew.value ? null : Number(route.params.id))
 
 const { plans, pending, fetchPlans, createPlan, updatePlan, attachFeature, detachFeature } = usePlans(appId)
 const { features, fetchFeatures } = useFeatures(appId)
+const { t } = useI18n()
 
 const CURRENCIES = [
   { code: 'TND', label: 'TND (DT)' },
@@ -32,13 +33,16 @@ const CURRENCIES = [
   { code: 'XAF', label: 'XAF (FCFA)' },
 ]
 
-const BILLING_PERIODS: { value: BillingPeriod; label: string }[] = [
-  { value: 'one_time', label: 'One-time — pay once, keep forever' },
-  { value: 'monthly', label: 'Monthly' },
-  { value: 'quarterly', label: 'Quarterly' },
-  { value: 'yearly', label: 'Yearly' },
-  { value: 'custom', label: 'Custom' },
-]
+// The `value` sent to the API is the raw billing_period enum and is never
+// translated — only `label` (computed, so it re-evaluates on locale switch)
+// is display text.
+const BILLING_PERIODS = computed<{ value: BillingPeriod; label: string }[]>(() => [
+  { value: 'one_time', label: t('plans.billingPeriod.optionLabels.oneTime') },
+  { value: 'monthly', label: t('plans.billingPeriod.optionLabels.monthly') },
+  { value: 'quarterly', label: t('plans.billingPeriod.optionLabels.quarterly') },
+  { value: 'yearly', label: t('plans.billingPeriod.optionLabels.yearly') },
+  { value: 'custom', label: t('plans.billingPeriod.optionLabels.custom') },
+])
 
 const name = ref('')
 const price = ref(0)
@@ -101,7 +105,7 @@ function isFeatureSelected(featureId: number) {
 async function handleSave(publish: boolean) {
   if (!name.value.trim()) return
   if (billingPeriodVal.value === 'custom' && (!customDurationDays.value || customDurationDays.value < 1)) {
-    errorMessage.value = 'Enter a number of days for a custom billing period.'
+    errorMessage.value = t('plans.form.errors.customDurationRequired')
     return
   }
 
@@ -124,7 +128,7 @@ async function handleSave(publish: boolean) {
         yearly_discount_percent: yearlyDiscountVal.value,
         is_active: publish,
       })
-      toast.success(publish ? 'Plan published successfully' : 'Plan saved as draft')
+      toast.success(publish ? t('plans.toasts.published') : t('plans.toasts.savedAsDraft'))
     } else {
       savedPlan = await createPlan({
         name: name.value.trim(),
@@ -134,7 +138,7 @@ async function handleSave(publish: boolean) {
         yearly_discount_percent: yearlyDiscountVal.value,
         is_active: publish,
       })
-      toast.success(publish ? 'Plan published successfully' : 'Plan saved as draft')
+      toast.success(publish ? t('plans.toasts.published') : t('plans.toasts.savedAsDraft'))
     }
 
     // Sync feature attachments
@@ -168,11 +172,11 @@ async function handleSave(publish: boolean) {
 
 <template>
   <div class="max-w-4xl mx-auto w-full pb-12">
-    <AppHeader :title="isNew ? 'New plan' : 'Edit plan'">
+    <AppHeader :title="isNew ? $t('plans.newPlan') : $t('plans.editPlanTitle')">
       <template #actions>
         <NuxtLink :to="`/${route.params.workspaceSlug}/apps/${route.params.slug}/plans`">
           <Button variant="ghost" class="gap-1 cursor-pointer">
-            <ArrowLeftIcon class="w-4 h-4" /> Back to plans
+            <ArrowLeftIcon class="w-4 h-4" /> {{ $t('plans.backToPlans') }}
           </Button>
         </NuxtLink>
       </template>
@@ -180,29 +184,29 @@ async function handleSave(publish: boolean) {
 
     <div class="bg-[var(--color-surface)] border border-[var(--color-border-dark)] rounded-xl p-6 mt-4 shadow-sm">
       <div v-if="pending && !isNew && !isInitialized" class="py-12 text-center text-[var(--muted-foreground)]">
-        Loading plan details...
+        {{ $t('plans.loadingDetails') }}
       </div>
       <div v-else class="space-y-6">
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-2">
-            <Label for="plan-name">Plan Name</Label>
-            <Input id="plan-name" v-model="name" placeholder="Pro" />
+            <Label for="plan-name">{{ $t('plans.form.nameLabel') }}</Label>
+            <Input id="plan-name" v-model="name" :placeholder="$t('plans.form.namePlaceholder')" />
           </div>
 
           <div class="space-y-2">
-            <Label for="plan-discount">Yearly Discount (%)</Label>
+            <Label for="plan-discount">{{ $t('plans.form.yearlyDiscountLabel') }}</Label>
             <Input id="plan-discount" v-model.number="yearlyDiscountVal" type="number" min="0" max="100" placeholder="20" />
           </div>
         </div>
 
         <div class="grid grid-cols-3 gap-4">
           <div class="space-y-2">
-            <Label for="plan-price">Price</Label>
+            <Label for="plan-price">{{ $t('plans.form.priceLabel') }}</Label>
             <Input id="plan-price" v-model.number="price" type="number" min="0" />
           </div>
 
           <div class="space-y-2">
-            <Label for="plan-currency">Currency</Label>
+            <Label for="plan-currency">{{ $t('plans.form.currencyLabel') }}</Label>
             <Select v-model="currencyVal">
               <SelectTrigger id="plan-currency">
                 <SelectValue placeholder="NGN" />
@@ -216,10 +220,10 @@ async function handleSave(publish: boolean) {
           </div>
 
           <div class="space-y-2">
-            <Label for="plan-billing">Billing</Label>
+            <Label for="plan-billing">{{ $t('plans.form.billingLabel') }}</Label>
             <Select v-model="billingPeriodVal">
               <SelectTrigger id="plan-billing">
-                <SelectValue placeholder="Select billing period" />
+                <SelectValue :placeholder="$t('plans.form.billingPlaceholder')" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem v-for="p in BILLING_PERIODS" :key="p.value" :value="p.value">
@@ -232,7 +236,7 @@ async function handleSave(publish: boolean) {
 
         <div v-if="billingPeriodVal === 'custom'" class="grid grid-cols-3 gap-4">
           <div class="space-y-2">
-            <Label for="plan-duration-days">Duration (days)</Label>
+            <Label for="plan-duration-days">{{ $t('plans.form.durationDaysLabel') }}</Label>
             <Input id="plan-duration-days" v-model.number="customDurationDays" type="number" min="1" placeholder="30" />
           </div>
         </div>
@@ -240,14 +244,14 @@ async function handleSave(publish: boolean) {
         <!-- Feature Selection Section -->
         <div class="space-y-3 pt-4 border-t border-[var(--color-border-dark)]">
           <div>
-            <Label class="text-sm font-medium">Select Features</Label>
-            <p class="text-xs text-[var(--muted-foreground)]">Choose which features are included in this plan</p>
+            <Label class="text-sm font-medium">{{ $t('plans.form.selectFeaturesLabel') }}</Label>
+            <p class="text-xs text-[var(--muted-foreground)]">{{ $t('plans.form.selectFeaturesDescription') }}</p>
           </div>
 
           <div v-if="features.length === 0" class="p-6 rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] text-center">
-            <p class="text-sm text-[var(--muted-foreground)]">No features created yet.</p>
+            <p class="text-sm text-[var(--muted-foreground)]">{{ $t('plans.form.noFeaturesCreated') }}</p>
             <NuxtLink :to="`/${$route.params.workspaceSlug}/apps/${currentApp?.slug}/features/new`" class="text-sm text-teal-600 dark:text-teal-400 hover:underline mt-2 inline-block font-medium">
-              Create features first
+              {{ $t('plans.form.createFeaturesFirstLink') }}
             </NuxtLink>
           </div>
 
@@ -287,16 +291,16 @@ async function handleSave(publish: boolean) {
 
                 <!-- Limit Input (Only show if selected) -->
                 <div v-if="isFeatureSelected(feature.id)" class="mt-3 pt-3 border-t border-[var(--color-border-dark)]" @click.stop>
-                  <Label :for="`limit-${feature.id}`" class="text-xs text-[var(--muted-foreground)] mb-1.5 block">Usage Limit (optional)</Label>
+                  <Label :for="`limit-${feature.id}`" class="text-xs text-[var(--muted-foreground)] mb-1.5 block">{{ $t('plans.form.usageLimitLabel') }}</Label>
                   <Input
                     :id="`limit-${feature.id}`"
                     v-model.number="featureLimits[feature.id]"
                     type="number"
                     min="0"
-                    placeholder="Unlimited"
+                    :placeholder="$t('plans.form.unlimitedPlaceholder')"
                     class="h-8 text-sm w-full max-w-[200px] bg-[var(--color-surface)]"
                   />
-                  <p class="text-[10px] text-[var(--muted-foreground)] mt-1.5">Leave blank for unlimited access.</p>
+                  <p class="text-[10px] text-[var(--muted-foreground)] mt-1.5">{{ $t('plans.form.unlimitedHelper') }}</p>
                 </div>
               </div>
             </div>
@@ -310,14 +314,14 @@ async function handleSave(publish: boolean) {
         <div class="pt-4 mt-6 border-t border-[var(--color-border-dark)] flex items-center justify-between">
           <div class="flex items-center gap-3">
             <Button class="cursor-pointer" :disabled="!name.trim() || isSaving" @click="handleSave(true)">
-              {{ isSaving ? 'Publishing...' : (isNew ? 'Publish Plan' : 'Publish Changes') }}
+              {{ isSaving ? $t('plans.form.publishing') : (isNew ? $t('plans.form.publishPlanButton') : $t('plans.form.publishChangesButton')) }}
             </Button>
             <Button variant="outline" class="cursor-pointer" :disabled="!name.trim() || isSaving" @click="handleSave(false)">
-              {{ isSaving ? 'Saving...' : 'Save as Draft' }}
+              {{ isSaving ? $t('plans.form.savingDraft') : $t('plans.form.saveAsDraft') }}
             </Button>
           </div>
           <NuxtLink :to="`/${route.params.workspaceSlug}/apps/${route.params.slug}/plans`">
-            <Button variant="ghost" class="cursor-pointer">Cancel</Button>
+            <Button variant="ghost" class="cursor-pointer">{{ $t('common.cancel') }}</Button>
           </NuxtLink>
         </div>
       </div>

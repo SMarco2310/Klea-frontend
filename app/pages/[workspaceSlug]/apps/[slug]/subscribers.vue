@@ -11,33 +11,42 @@ import AppHeader from '~/components/dashboard/AppHeader.vue'
 const { currentApp } = useApps()
 const appId = computed(() => currentApp.value?.id ?? 0)
 const { subscribers, pending, fetchSubscribers } = useSubscribers(appId.value)
+const { t } = useI18n()
 
 watchEffect(() => {
   if (appId.value) fetchSubscribers()
 })
 
-const columns = [
-  { key: 'email', label: 'Email', icon: MailIcon, searchable: true },
-  { key: 'phone_number', label: 'Phone', icon: PhoneIcon, searchable: true },
-  { key: 'environment', label: 'Environment', icon: LayersIcon },
-  { key: 'created_at', label: 'Joined', icon: CalendarIcon },
-]
+// Computed so labels re-evaluate on locale switch — a plain array literal
+// would not.
+const columns = computed(() => [
+  { key: 'email', label: t('subscribers.columns.email'), icon: MailIcon, searchable: true },
+  { key: 'phone_number', label: t('subscribers.columns.phone'), icon: PhoneIcon, searchable: true },
+  { key: 'environment', label: t('subscribers.columns.environment'), icon: LayersIcon },
+  { key: 'created_at', label: t('subscribers.columns.joined'), icon: CalendarIcon },
+])
+
+const subtitle = computed(() =>
+  subscribers.value.length === 1
+    ? t('subscribers.subtitleOne', { count: subscribers.value.length })
+    : t('subscribers.subtitleOther', { count: subscribers.value.length })
+)
 </script>
 
 <template>
   <div>
-    <AppHeader title="Subscribers" :subtitle="`${subscribers.length} subscriber${subscribers.length === 1 ? '' : 's'}`" />
-    <p v-if="pending" class="text-sm text-slate-400 mb-4">Loading subscribers...</p>
+    <AppHeader :title="$t('nav.subscribers')" :subtitle="subtitle" />
+    <p v-if="pending" class="text-sm text-slate-400 mb-4">{{ $t('subscribers.loading') }}</p>
     <div v-else-if="subscribers.length === 0" class="flex flex-col items-center justify-center">
       <EmptyState
         :icon="UsersIcon"
-        title="No subscribers yet"
-        description="When end users subscribe through your app, they'll appear here with their contact details."
+        :title="$t('subscribers.emptyTitle')"
+        :description="$t('subscribers.emptyDescription')"
         class="w-full"
       />
     </div>
     <div v-else class="overflow-x-auto rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] p-4 min-h-[calc(100vh-16rem)]">
-      <DataTable :columns="columns" :rows="subscribers" search-placeholder="Search email or phone">
+      <DataTable :columns="columns" :rows="subscribers" :search-placeholder="$t('subscribers.searchPlaceholder')">
         <template #cell-email="{ row }">
           <IdentityCell :value="row.email as string" :sub="row.external_id as string" />
         </template>

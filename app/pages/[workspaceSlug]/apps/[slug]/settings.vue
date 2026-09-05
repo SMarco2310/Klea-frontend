@@ -12,6 +12,7 @@ import type { App } from '~/composables/useApps'
 
 const { currentApp, updateApp, deleteApp } = useApps()
 const route = useRoute()
+const { t } = useI18n()
 
 const appName = ref(currentApp.value?.name ?? '')
 const webhookUrl = ref(currentApp.value?.webhook_url ?? '')
@@ -43,7 +44,7 @@ async function copySecret() {
   if (!webhookSecret.value) return
   await navigator.clipboard.writeText(webhookSecret.value)
   copiedSecret.value = true
-  toast.success('Signing secret copied to clipboard')
+  toast.success(t('apps.settings.toasts.secretCopied'))
   setTimeout(() => { copiedSecret.value = false }, 2000)
 }
 
@@ -55,7 +56,7 @@ async function confirmRegenerate() {
     await updateApp(currentApp.value.id, { webhook_secret: generateSecret() })
     secretVisible.value = true
     regenerateOpen.value = false
-    toast.success('Signing secret regenerated — update it in your app')
+    toast.success(t('apps.settings.toasts.secretRegenerated'))
   } catch (e) {
     errorMessage.value = extractApiErrorMessage(e)
   } finally {
@@ -107,9 +108,9 @@ async function saveSettings() {
 
     if (mintedSecret) {
       secretVisible.value = true
-      toast.success('Settings saved — signing secret generated')
+      toast.success(t('apps.settings.toasts.savedWithSecret'))
     } else {
-      toast.success('Settings saved successfully')
+      toast.success(t('apps.settings.toasts.saved'))
     }
   } catch (e) {
     errorMessage.value = extractApiErrorMessage(e)
@@ -125,7 +126,7 @@ async function confirmDelete() {
   try {
     const deletedName = currentApp.value.name
     await deleteApp(currentApp.value.id)
-    toast.success(`${deletedName} deleted successfully`)
+    toast.success(t('apps.settings.toasts.appDeleted', { name: deletedName }))
     await navigateTo(`/${route.params.workspaceSlug}/dashboard`)
   } catch (e) {
     deleteError.value = extractApiErrorMessage(e)
@@ -136,51 +137,50 @@ async function confirmDelete() {
 
 <template>
   <div v-if="currentApp">
-    <AppHeader title="App settings" subtitle="Manage your application settings and configurations" />
+    <AppHeader :title="$t('apps.settings.title')" :subtitle="$t('apps.settings.subtitle')" />
     
     <div class="max-w-3xl pb-12 space-y-6 mt-4">
       <!-- General Settings Card -->
       <div class="bg-[var(--color-surface)] border border-[var(--color-border-dark)] rounded-xl shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-[var(--color-border-dark)]">
-           <h3 class="font-semibold text-[var(--foreground)]">General Configuration</h3>
+           <h3 class="font-semibold text-[var(--foreground)]">{{ $t('apps.settings.generalConfig') }}</h3>
         </div>
         <div class="p-6 space-y-6">
           <div class="space-y-2 max-w-md">
-            <Label for="app-name">App Name</Label>
-            <Input id="app-name" v-model="appName" placeholder="Your amazing app" />
+            <Label for="app-name">{{ $t('apps.settings.appNameLabel') }}</Label>
+            <Input id="app-name" v-model="appName" :placeholder="$t('apps.settings.appNamePlaceholder')" />
           </div>
 
           <div class="pt-6 border-t border-[var(--color-border-dark)] max-w-xl">
             <div class="flex items-center gap-2 mb-1">
               <WebhookIcon class="w-4 h-4 text-[var(--muted-foreground)]" />
-              <h3 class="font-medium text-sm text-[var(--foreground)]">Webhook endpoint</h3>
+              <h3 class="font-medium text-sm text-[var(--foreground)]">{{ $t('apps.settings.webhookSectionTitle') }}</h3>
             </div>
-            <p class="text-xs text-[var(--muted-foreground)] mb-3">We'll POST subscription events to this URL.</p>
+            <p class="text-xs text-[var(--muted-foreground)] mb-3">{{ $t('apps.settings.webhookSectionDescription') }}</p>
             <div class="space-y-2">
-              <Label for="webhook-url">Endpoint URL</Label>
-              <Input id="webhook-url" v-model="webhookUrl" placeholder="https://yourapp.com/webhooks/klea" class="font-mono text-sm" />
+              <Label for="webhook-url">{{ $t('apps.settings.endpointUrlLabel') }}</Label>
+              <Input id="webhook-url" v-model="webhookUrl" :placeholder="$t('apps.settings.endpointUrlPlaceholder')" class="font-mono text-sm" />
             </div>
 
             <!-- Different from the webhook above: this is where the customer's
                  BROWSER returns after paying, not where we POST the result. -->
             <div class="space-y-2 mt-4">
-              <Label for="redirect-url">Return URL</Label>
-              <Input id="redirect-url" v-model="redirectUrl" placeholder="https://yourapp.com/payment/done" class="font-mono text-sm" />
+              <Label for="redirect-url">{{ $t('apps.settings.returnUrlLabel') }}</Label>
+              <Input id="redirect-url" v-model="redirectUrl" :placeholder="$t('apps.settings.returnUrlPlaceholder')" class="font-mono text-sm" />
               <p class="text-xs text-[var(--muted-foreground)]">
-                Where we send your customer's browser after they pay. Arriving here does not
-                confirm payment — wait for the webhook above before granting access.
+                {{ $t('apps.settings.returnUrlHelper') }}
               </p>
             </div>
 
             <div class="space-y-2 mt-4">
-              <Label>Signing secret</Label>
+              <Label>{{ $t('apps.settings.signingSecretLabel') }}</Label>
 
               <div v-if="webhookSecret" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)]">
                 <code class="text-xs font-mono flex-1 truncate">{{ secretVisible ? webhookSecret : maskedSecret }}</code>
                 <button
                   type="button"
                   class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer shrink-0"
-                  :aria-label="secretVisible ? 'Hide secret' : 'Show secret'"
+                  :aria-label="secretVisible ? $t('apps.settings.hideSecretAria') : $t('apps.settings.showSecretAria')"
                   @click="secretVisible = !secretVisible"
                 >
                   <component :is="secretVisible ? EyeOffIcon : EyeIcon" class="w-3.5 h-3.5" />
@@ -188,7 +188,7 @@ async function confirmDelete() {
                 <button
                   type="button"
                   class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer shrink-0"
-                  aria-label="Copy signing secret"
+                  :aria-label="$t('apps.settings.copySecretAria')"
                   @click="copySecret"
                 >
                   <component :is="copiedSecret ? CheckIcon : CopyIcon" class="w-3.5 h-3.5" />
@@ -196,7 +196,7 @@ async function confirmDelete() {
                 <button
                   type="button"
                   class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer shrink-0"
-                  aria-label="Regenerate signing secret"
+                  :aria-label="$t('apps.settings.regenerateSecretAria')"
                   @click="regenerateOpen = true"
                 >
                   <RefreshCwIcon class="w-3.5 h-3.5" />
@@ -204,11 +204,11 @@ async function confirmDelete() {
               </div>
 
               <p v-else class="text-xs text-[var(--muted-foreground)]">
-                Generated automatically once you save an endpoint URL.
+                {{ $t('apps.settings.secretAutoGenerated') }}
               </p>
 
               <p class="text-xs text-[var(--muted-foreground)]">
-                Sign deliveries with this secret to verify they came from Klea. Copy it into your app's environment.
+                {{ $t('apps.settings.secretUsageHint') }}
               </p>
             </div>
           </div>
@@ -219,7 +219,7 @@ async function confirmDelete() {
         </div>
         <div class="px-6 py-4 bg-[var(--color-surface-muted)] border-t border-[var(--color-border-dark)] flex justify-end">
           <Button class="cursor-pointer" :disabled="isSaving" @click="saveSettings">
-            {{ isSaving ? 'Saving...' : 'Save changes' }}
+            {{ isSaving ? $t('apps.settings.saving') : $t('apps.settings.saveChanges') }}
           </Button>
         </div>
       </div>
@@ -228,17 +228,17 @@ async function confirmDelete() {
       <div class="bg-red-500/5 border border-red-500/20 rounded-xl shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-red-500/20 flex items-center gap-2">
            <TrashIcon class="w-4 h-4 text-red-500" />
-           <h3 class="font-semibold text-red-500">Danger Zone</h3>
+           <h3 class="font-semibold text-red-500">{{ $t('apps.settings.dangerZoneTitle') }}</h3>
         </div>
         <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h4 class="font-medium text-[var(--foreground)] mb-1">Delete Application</h4>
+            <h4 class="font-medium text-[var(--foreground)] mb-1">{{ $t('apps.settings.deleteAppTitle') }}</h4>
             <p class="text-sm text-[var(--muted-foreground)]">
-              Permanently remove this app and all of its data. This cannot be undone.
+              {{ $t('apps.settings.deleteAppDescription') }}
             </p>
           </div>
           <Button variant="destructive" class="cursor-pointer gap-1.5 shrink-0" @click="deleteOpen = true">
-            Delete {{ currentApp.name }}
+            {{ $t('apps.settings.deleteButton', { name: currentApp.name }) }}
           </Button>
         </div>
       </div>
@@ -247,17 +247,16 @@ async function confirmDelete() {
     <Dialog v-model:open="regenerateOpen">
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Regenerate signing secret?</DialogTitle>
+          <DialogTitle>{{ $t('apps.settings.regenerateDialog.title') }}</DialogTitle>
           <DialogDescription>
-            The current secret stops working immediately. Any app verifying deliveries with it will
-            reject every webhook until you update it with the new value.
+            {{ $t('apps.settings.regenerateDialog.description') }}
           </DialogDescription>
         </DialogHeader>
 
         <div class="flex justify-end gap-2 mt-4">
-          <Button variant="ghost" class="cursor-pointer" :disabled="isRegenerating" @click="regenerateOpen = false">Cancel</Button>
+          <Button variant="ghost" class="cursor-pointer" :disabled="isRegenerating" @click="regenerateOpen = false">{{ $t('common.cancel') }}</Button>
           <Button variant="destructive" class="cursor-pointer" :disabled="isRegenerating" @click="confirmRegenerate">
-            {{ isRegenerating ? 'Regenerating...' : 'Regenerate secret' }}
+            {{ isRegenerating ? $t('apps.settings.regenerateDialog.regenerating') : $t('apps.settings.regenerateDialog.confirm') }}
           </Button>
         </div>
       </DialogContent>
@@ -266,19 +265,21 @@ async function confirmDelete() {
     <Dialog v-model:open="deleteOpen">
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete {{ currentApp.name }}?</DialogTitle>
+          <DialogTitle>{{ $t('apps.settings.deleteDialog.title', { name: currentApp.name }) }}</DialogTitle>
           <DialogDescription>
-            This permanently deletes the app, its plans, features, subscribers, and API keys. This can't be undone.
+            {{ $t('apps.settings.deleteDialog.description') }}
           </DialogDescription>
         </DialogHeader>
 
         <div class="py-2 space-y-2">
           <Label for="confirm-delete" class="text-sm font-normal text-[var(--muted-foreground)]">
-            To confirm, type <strong class="text-[var(--foreground)] font-semibold select-all">{{ currentApp.name }}</strong> below
+            <i18n-t keypath="apps.settings.deleteDialog.confirmPrompt" tag="span">
+              <template #name><strong class="text-[var(--foreground)] font-semibold select-all">{{ currentApp.name }}</strong></template>
+            </i18n-t>
           </Label>
-          <Input 
-            id="confirm-delete" 
-            v-model="deleteConfirmText" 
+          <Input
+            id="confirm-delete"
+            v-model="deleteConfirmText"
             :placeholder="currentApp.name"
           />
         </div>
@@ -287,14 +288,14 @@ async function confirmDelete() {
           {{ deleteError }}
         </p>
         <div class="flex justify-end gap-2 mt-4">
-          <Button variant="ghost" class="cursor-pointer" :disabled="isDeleting" @click="deleteOpen = false">Cancel</Button>
-          <Button 
-            variant="destructive" 
-            class="cursor-pointer" 
-            :disabled="isDeleting || deleteConfirmText !== currentApp.name" 
+          <Button variant="ghost" class="cursor-pointer" :disabled="isDeleting" @click="deleteOpen = false">{{ $t('common.cancel') }}</Button>
+          <Button
+            variant="destructive"
+            class="cursor-pointer"
+            :disabled="isDeleting || deleteConfirmText !== currentApp.name"
             @click="confirmDelete"
           >
-            {{ isDeleting ? 'Deleting...' : 'Delete app' }}
+            {{ isDeleting ? $t('apps.settings.deleteDialog.deleting') : $t('apps.settings.deleteDialog.confirm') }}
           </Button>
         </div>
       </DialogContent>

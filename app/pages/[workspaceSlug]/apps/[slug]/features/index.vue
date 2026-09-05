@@ -11,6 +11,7 @@ import { toast } from 'vue-sonner'
 const { currentApp } = useApps()
 const appId = computed(() => currentApp.value?.id ?? 0)
 const { features, pending, fetchFeatures, deleteFeature } = useFeatures(appId.value)
+const { t } = useI18n()
 
 watchEffect(() => {
   if (appId.value) fetchFeatures()
@@ -18,6 +19,12 @@ watchEffect(() => {
 
 const errorMessage = ref('')
 const route = useRoute()
+
+const subtitle = computed(() =>
+  features.value.length === 1
+    ? t('features.subtitleOne', { count: features.value.length })
+    : t('features.subtitleOther', { count: features.value.length })
+)
 
 function openCreatePage() {
   navigateTo(`/${route.params.workspaceSlug}/apps/${route.params.slug}/features/new`)
@@ -39,7 +46,7 @@ async function confirmDelete() {
   isDeleting.value = true
   try {
     await deleteFeature(pendingDeleteId.value)
-    toast.success('Feature deleted successfully')
+    toast.success(t('features.toasts.deleted'))
     pendingDeleteId.value = null
   } catch (e) {
     errorMessage.value = extractApiErrorMessage(e)
@@ -51,10 +58,10 @@ async function confirmDelete() {
 
 <template>
   <div>
-    <AppHeader title="Features" :subtitle="`${features.length} feature${features.length === 1 ? '' : 's'}`">
+    <AppHeader :title="$t('nav.features')" :subtitle="subtitle">
       <template #actions>
         <Button class="cursor-pointer gap-1" @click="openCreatePage">
-          <PlusIcon class="w-4 h-4" /> New feature
+          <PlusIcon class="w-4 h-4" /> {{ $t('features.newFeature') }}
         </Button>
       </template>
     </AppHeader>
@@ -63,14 +70,14 @@ async function confirmDelete() {
       {{ errorMessage }}
     </p>
 
-    <p v-if="pending" class="text-sm text-[var(--muted-foreground)]">Loading features...</p>
+    <p v-if="pending" class="text-sm text-[var(--muted-foreground)]">{{ $t('features.loading') }}</p>
 
     <EmptyState
       v-else-if="features.length === 0"
       :icon="PuzzleIcon"
-      title="No features yet"
-      description="Define a feature flag to gate functionality per plan."
-      cta-label="New feature"
+      :title="$t('features.emptyTitle')"
+      :description="$t('features.emptyDescription')"
+      :cta-label="$t('features.newFeature')"
       @cta="openCreatePage"
     />
 
@@ -92,14 +99,14 @@ async function confirmDelete() {
         <div class="flex items-center gap-3 pt-1">
           <button
             class="text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer transition-colors"
-            :aria-label="`Edit ${feature.name || feature.code}`"
+            :aria-label="$t('features.editAria', { name: feature.name || feature.code })"
             @click="openEditPage(feature.id)"
           >
             <PencilIcon class="w-4 h-4" />
           </button>
           <button
             class="text-[var(--muted-foreground)] hover:text-red-500 cursor-pointer transition-colors"
-            :aria-label="`Delete ${feature.name || feature.code}`"
+            :aria-label="$t('features.deleteAria', { name: feature.name || feature.code })"
             @click="promptDelete(feature.id)"
           >
             <Trash2Icon class="w-4 h-4" />
@@ -111,19 +118,19 @@ async function confirmDelete() {
     <Dialog :open="!!pendingDeleteId" @update:open="pendingDeleteId = null">
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete feature</DialogTitle>
+          <DialogTitle>{{ $t('features.deleteDialog.title') }}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this feature? This action cannot be undone.
+            {{ $t('features.deleteDialog.description') }}
           </DialogDescription>
         </DialogHeader>
         <div class="flex justify-end gap-2 mt-4">
-          <Button variant="ghost" class="cursor-pointer" :disabled="isDeleting" @click="pendingDeleteId = null">Cancel</Button>
+          <Button variant="ghost" class="cursor-pointer" :disabled="isDeleting" @click="pendingDeleteId = null">{{ $t('common.cancel') }}</Button>
           <Button
             variant="destructive"
             class="cursor-pointer"
             :disabled="isDeleting"
             @click="confirmDelete"
-          >{{ isDeleting ? 'Deleting...' : 'Delete' }}</Button>
+          >{{ isDeleting ? $t('features.deleteDialog.deleting') : $t('features.deleteDialog.confirm') }}</Button>
         </div>
       </DialogContent>
     </Dialog>

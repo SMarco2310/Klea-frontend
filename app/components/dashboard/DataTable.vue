@@ -5,6 +5,8 @@ import { SearchIcon } from '@lucide/vue'
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '~/components/ui/table'
 import { Input } from '~/components/ui/input'
 
+const { t } = useI18n()
+
 const props = defineProps<{
   /** `icon` and `searchable` are optional — existing callers work unchanged. */
   /**
@@ -72,7 +74,7 @@ const visibleRows = computed(() => {
     <!-- Distinct from the page's own empty state: the list has rows, the filter
          just matched none of them. Telling the two apart matters. -->
     <p v-if="query && visibleRows.length === 0" class="text-sm text-[var(--muted-foreground)] text-center py-8">
-      No results for “{{ query }}”.
+      {{ t('common.noResultsFor', { query }) }}
     </p>
   </div>
 </template>

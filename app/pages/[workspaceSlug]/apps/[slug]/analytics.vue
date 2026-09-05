@@ -12,6 +12,7 @@ const { currentApp } = useApps()
 const appId = computed(() => currentApp.value?.id ?? 0)
 const timeRange = ref(30)
 const { continueTourInAppIfFlagged } = useTour()
+const { t } = useI18n()
 
 onMounted(() => {
   continueTourInAppIfFlagged()
@@ -56,16 +57,23 @@ const transactionStatusCounts = computed(() => {
   return [active, pendingCount]
 })
 
-const transactionCategories = {
-  Succeeded: { name: 'Succeeded', color: '#10b981' },
-  Pending: { name: 'Pending', color: '#64748b' }
-}
+const transactionCategories = computed(() => ({
+  Succeeded: { name: t('analytics.transactionStatus.succeeded'), color: '#10b981' },
+  Pending: { name: t('analytics.transactionStatus.pending'), color: '#64748b' }
+}))
+
+// Plain (non-computed) string maps do not re-evaluate on locale switch.
+const subscriptionStatusLabels = computed<Record<string, string>>(() => ({
+  active: t('subscriptions.status.active'),
+  expired: t('subscriptions.status.expired'),
+  cancelled: t('subscriptions.status.cancelled'),
+}))
 </script>
 
 <template>
   <div class="flex flex-col min-h-[calc(100vh-14rem)]">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <AppHeader title="Analytics" subtitle="Overview of your app's performance" />
+      <AppHeader :title="$t('nav.analytics')" :subtitle="$t('analytics.subtitle')" />
       <div class="flex bg-[var(--color-surface)] border border-[var(--color-border-dark)] rounded-lg p-1 shrink-0">
         <button
           v-for="range in [7, 30, 90]"
@@ -74,20 +82,20 @@ const transactionCategories = {
           :class="timeRange === range ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)] shadow-sm' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-hover)]'"
           @click="timeRange = range"
         >
-          Last {{ range }} days
+          {{ $t('analytics.lastNDays', { days: range }) }}
         </button>
       </div>
     </div>
 
-    <p v-if="pending" class="text-sm text-slate-400 mb-4 mt-4">Loading analytics...</p>
+    <p v-if="pending" class="text-sm text-slate-400 mb-4 mt-4">{{ $t('analytics.loading') }}</p>
     <div v-else class="mb-4 mt-4" />
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 shrink-0">
-      <StatCard label="Active subs" :value="activeSubs" :icon="UsersIcon" :trend="subscriptionTrend" :delta="subscriptionsDelta" />
-      <StatCard label="Revenue" :value="revenue > 0 ? `+${formatCurrency(revenue)}` : formatCurrency(revenue)" :icon="BanknoteIcon" :trend="revenueTrend" :delta="revenueDelta" :valueClass="revenue > 0 ? 'text-emerald-400' : ''" />
-      <StatCard label="Transactions" :value="transactions" :icon="ActivityIcon" />
+      <StatCard :label="$t('analytics.stats.activeSubs')" :value="activeSubs" :icon="UsersIcon" :trend="subscriptionTrend" :delta="subscriptionsDelta" />
+      <StatCard :label="$t('analytics.stats.revenue')" :value="revenue > 0 ? `+${formatCurrency(revenue)}` : formatCurrency(revenue)" :icon="BanknoteIcon" :trend="revenueTrend" :delta="revenueDelta" :valueClass="revenue > 0 ? 'text-emerald-400' : ''" />
+      <StatCard :label="$t('analytics.stats.transactions')" :value="transactions" :icon="ActivityIcon" />
       <StatCard
-        label="Success rate"
+        :label="$t('analytics.stats.successRate')"
         :value="successRate === null ? null : `${successRate}%`"
         :icon="TrendingUpIcon"
       />
@@ -95,14 +103,14 @@ const transactionCategories = {
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
       <div class="p-6 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] h-full min-h-[320px] flex flex-col">
-        <h3 class="text-sm font-medium text-slate-300 mb-4">Revenue over time</h3>
+        <h3 class="text-sm font-medium text-slate-300 mb-4">{{ $t('analytics.charts.revenueOverTime') }}</h3>
         <div v-if="revenueTrend.length === 0" class="flex-grow flex items-center justify-center">
-          <p class="text-sm text-slate-500">No revenue data yet</p>
+          <p class="text-sm text-slate-500">{{ $t('analytics.charts.noRevenueData') }}</p>
         </div>
         <div v-else class="flex-grow h-56">
           <AreaChart
             :data="revenueTrend"
-            :categories="{ amount: { name: 'Revenue', color: '#34d399' } }"
+            :categories="{ amount: { name: $t('analytics.stats.revenue'), color: '#34d399' } }"
             :x-formatter="(tick: number) => revenueTrend[tick]?.date || ''"
             :hide-legend="true"
             :y-grid-line="true"
@@ -112,16 +120,16 @@ const transactionCategories = {
         </div>
       </div>
       <div class="p-6 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] h-full min-h-[320px] flex flex-col">
-        <h3 class="text-sm font-medium text-slate-300 mb-4">Subscriptions</h3>
+        <h3 class="text-sm font-medium text-slate-300 mb-4">{{ $t('nav.subscriptions') }}</h3>
         <div v-if="subscriptionTrend.length === 0" class="flex-grow flex items-center justify-center">
-          <p class="text-sm text-slate-500">No data</p>
+          <p class="text-sm text-slate-500">{{ $t('analytics.charts.noData') }}</p>
         </div>
         <div v-else class="flex-grow h-56">
           <BarChart
             :data="subscriptionTrend"
             :y-axis="['amount']"
             x-axis="date"
-            :categories="{ amount: { name: 'Subscriptions', color: '#38bdf8' } }"
+            :categories="{ amount: { name: $t('nav.subscriptions'), color: '#38bdf8' } }"
             :hide-legend="true"
             :radius="6"
             :y-grid-line="true"
@@ -132,38 +140,38 @@ const transactionCategories = {
         </div>
       </div>
       <div class="p-6 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] h-full min-h-[320px] flex flex-col">
-        <h3 class="text-sm font-medium text-slate-300 mb-4">Plan distribution</h3>
+        <h3 class="text-sm font-medium text-slate-300 mb-4">{{ $t('analytics.charts.planDistribution') }}</h3>
         <div v-if="planCounts.length === 0" class="flex-grow flex items-center justify-center min-h-[200px]">
-          <p class="text-sm text-slate-500">No active subscriptions yet</p>
+          <p class="text-sm text-slate-500">{{ $t('analytics.charts.noActiveSubscriptions') }}</p>
         </div>
         <DonutBreakdown
           v-else
           :values="planCounts"
           :categories="planCategories"
-          total-label="subscriptions"
+          :total-label="$t('analytics.charts.subscriptionsUnit')"
         />
       </div>
       <div class="p-6 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] h-full min-h-[320px] flex flex-col">
-        <h3 class="text-sm font-medium text-slate-300 mb-4">Transaction status</h3>
+        <h3 class="text-sm font-medium text-slate-300 mb-4">{{ $t('analytics.charts.transactionStatus') }}</h3>
         <div v-if="transactionStatusCounts.length === 0" class="flex-grow flex items-center justify-center min-h-[200px]">
-          <p class="text-sm text-slate-500">No transactions yet</p>
+          <p class="text-sm text-slate-500">{{ $t('analytics.charts.noTransactionsYet') }}</p>
         </div>
         <DonutBreakdown
           v-else
           :values="transactionStatusCounts"
           :categories="transactionCategories"
-          total-label="transactions"
+          :total-label="$t('analytics.charts.transactionsUnit')"
         />
       </div>
     </div>
 
     <div class="rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-dark)] p-5">
-      <h3 class="text-sm font-medium text-slate-300 mb-4">Recent subscriptions</h3>
+      <h3 class="text-sm font-medium text-slate-300 mb-4">{{ $t('analytics.recentSubscriptions.title') }}</h3>
       <EmptyState
         v-if="recentSubscriptions.length === 0"
         :icon="ReceiptIcon"
-        title="No subscriptions yet"
-        description="New subscriptions will show up here as soon as someone subscribes through your app."
+        :title="$t('analytics.recentSubscriptions.emptyTitle')"
+        :description="$t('analytics.recentSubscriptions.emptyDescription')"
       />
       <div v-else class="divide-y divide-[var(--color-border-dark)]">
         <div
@@ -187,7 +195,7 @@ const transactionCategories = {
                 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                 : 'bg-slate-800 text-slate-400 border border-slate-700'
             "
-          >{{ sub.status }}</span>
+          >{{ subscriptionStatusLabels[sub.status as string] ?? sub.status }}</span>
         </div>
       </div>
     </div>

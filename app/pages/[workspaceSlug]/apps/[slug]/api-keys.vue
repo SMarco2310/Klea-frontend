@@ -14,6 +14,7 @@ const { currentApp } = useApps()
 const { mode } = useEnvMode()
 const appId = computed(() => currentApp.value?.id ?? 0)
 const { apiKeys, pending, fetchApiKeys, createApiKey, revokeApiKey } = useApiKeys(appId.value)
+const { t } = useI18n()
 
 watchEffect(() => {
   if (appId.value) fetchApiKeys()
@@ -86,28 +87,35 @@ async function confirmRevoke(id: number) {
 }
 
 function lastUsedLabel(key: { last_used_at: string | null }) {
-  return key.last_used_at ? `Last used ${formatDate(key.last_used_at)}` : 'Never used'
+  return key.last_used_at ? t('apiKeys.lastUsed', { date: formatDate(key.last_used_at) }) : t('apiKeys.neverUsed')
 }
+
+const subtitle = computed(() => {
+  const modeLabel = mode.value === 'live' ? t('nav.liveMode') : t('nav.testMode')
+  return apiKeys.value.length === 1
+    ? t('apiKeys.subtitleOne', { count: apiKeys.value.length, mode: modeLabel })
+    : t('apiKeys.subtitleOther', { count: apiKeys.value.length, mode: modeLabel })
+})
 </script>
 
 <template>
   <div>
-    <AppHeader title="API keys" :subtitle="`${apiKeys.length} key${apiKeys.length === 1 ? '' : 's'} · authenticating in ${mode} mode`">
+    <AppHeader :title="$t('apiKeys.title')" :subtitle="subtitle">
       <template #actions>
         <Button class="cursor-pointer gap-1" @click="createOpen = true">
-          <PlusIcon class="w-4 h-4" /> New key
+          <PlusIcon class="w-4 h-4" /> {{ $t('apiKeys.newKey') }}
         </Button>
       </template>
     </AppHeader>
 
-    <p v-if="pending" class="text-sm text-slate-400 mb-4">Loading API keys...</p>
+    <p v-if="pending" class="text-sm text-slate-400 mb-4">{{ $t('apiKeys.loading') }}</p>
 
     <EmptyState
       v-else-if="apiKeys.length === 0"
       :icon="KeyIcon"
-      title="No API keys yet"
-      description="Generate a key to start authenticating requests."
-      cta-label="New key"
+      :title="$t('apiKeys.emptyTitle')"
+      :description="$t('apiKeys.emptyDescription')"
+      :cta-label="$t('apiKeys.newKey')"
       @cta="createOpen = true"
     />
 
@@ -136,7 +144,7 @@ function lastUsedLabel(key: { last_used_at: string | null }) {
           <span class="text-xs text-slate-500 hidden sm:block">{{ lastUsedLabel(key) }}</span>
           <button
             class="text-slate-500 hover:text-red-400 cursor-pointer transition-colors duration-150"
-            :aria-label="`Revoke ${key.name}`"
+            :aria-label="$t('apiKeys.revokeAria', { name: key.name })"
             @click="pendingRevokeId = key.id"
           >
             <Trash2Icon class="w-4 h-4" />
@@ -148,22 +156,22 @@ function lastUsedLabel(key: { last_used_at: string | null }) {
     <Dialog :open="!!pendingRevokeId" @update:open="pendingRevokeId = null">
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Revoke key</DialogTitle>
+          <DialogTitle>{{ $t('apiKeys.revokeDialog.title') }}</DialogTitle>
           <DialogDescription>
-            Any request using this key will stop working immediately. This can't be undone.
+            {{ $t('apiKeys.revokeDialog.description') }}
           </DialogDescription>
         </DialogHeader>
         <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2">
           {{ errorMessage }}
         </p>
         <div class="flex justify-end gap-2">
-          <Button variant="ghost" class="cursor-pointer" :disabled="isRevoking" @click="pendingRevokeId = null">Cancel</Button>
+          <Button variant="ghost" class="cursor-pointer" :disabled="isRevoking" @click="pendingRevokeId = null">{{ $t('common.cancel') }}</Button>
           <Button
             variant="destructive"
             class="cursor-pointer"
             :disabled="isRevoking"
             @click="pendingRevokeId && confirmRevoke(pendingRevokeId)"
-          >{{ isRevoking ? 'Revoking...' : 'Revoke key' }}</Button>
+          >{{ isRevoking ? $t('apiKeys.revokeDialog.revoking') : $t('apiKeys.revokeDialog.title') }}</Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -172,55 +180,55 @@ function lastUsedLabel(key: { last_used_at: string | null }) {
       <DialogContent>
         <template v-if="!revealedSecretKey">
           <DialogHeader>
-            <DialogTitle>New API key</DialogTitle>
-            <DialogDescription>Give this key a name so you can identify it later.</DialogDescription>
+            <DialogTitle>{{ $t('apiKeys.createDialog.title') }}</DialogTitle>
+            <DialogDescription>{{ $t('apiKeys.createDialog.description') }}</DialogDescription>
           </DialogHeader>
           <div class="space-y-4 py-2">
             <div class="space-y-2">
-              <Label for="key-name">Key name</Label>
-              <Input id="key-name" v-model="name" placeholder="Production server" />
+              <Label for="key-name">{{ $t('apiKeys.createDialog.nameLabel') }}</Label>
+              <Input id="key-name" v-model="name" :placeholder="$t('apiKeys.createDialog.namePlaceholder')" />
             </div>
             <p v-if="errorMessage" class="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2">
               {{ errorMessage }}
             </p>
           </div>
           <div class="flex justify-end gap-2">
-            <Button variant="ghost" class="cursor-pointer" :disabled="isCreating" @click="closeDialog">Cancel</Button>
+            <Button variant="ghost" class="cursor-pointer" :disabled="isCreating" @click="closeDialog">{{ $t('common.cancel') }}</Button>
             <Button class="cursor-pointer" :disabled="!name.trim() || isCreating" @click="handleCreate">
-              {{ isCreating ? 'Creating...' : 'Create key' }}
+              {{ isCreating ? $t('apiKeys.createDialog.creating') : $t('apiKeys.createDialog.submit') }}
             </Button>
           </div>
         </template>
         <template v-else>
           <DialogHeader>
-            <DialogTitle>Key created</DialogTitle>
-            <DialogDescription>Copy these now — the secret won't be shown again.</DialogDescription>
+            <DialogTitle>{{ $t('apiKeys.createdDialog.title') }}</DialogTitle>
+            <DialogDescription>{{ $t('apiKeys.createdDialog.description') }}</DialogDescription>
           </DialogHeader>
           <div class="py-2 space-y-3">
             <div class="space-y-1.5">
-              <Label>Publishable key</Label>
+              <Label>{{ $t('apiKeys.createdDialog.publishableKeyLabel') }}</Label>
               <div class="flex items-center gap-2 p-3 rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)]">
                 <code class="text-sm font-mono flex-1 break-all select-all">{{ revealedPublishableKey }}</code>
-                <button class="text-slate-400 hover:text-white cursor-pointer shrink-0" aria-label="Copy publishable key" @click="copyPublishableKey">
+                <button class="text-slate-400 hover:text-white cursor-pointer shrink-0" :aria-label="$t('apiKeys.createdDialog.copyPublishableAria')" @click="copyPublishableKey">
                   <component :is="copiedPublishable ? CheckIcon : CopyIcon" class="w-4 h-4" />
                 </button>
               </div>
             </div>
             <div class="space-y-1.5">
-              <Label>Secret key</Label>
+              <Label>{{ $t('apiKeys.createdDialog.secretKeyLabel') }}</Label>
               <div class="flex items-center gap-2 p-3 rounded-lg bg-[var(--color-surface-muted)] border border-amber-400/30">
                 <code class="text-sm font-mono flex-1 break-all select-all">{{ revealedSecretKey }}</code>
-                <button class="text-slate-400 hover:text-white cursor-pointer shrink-0" aria-label="Copy secret key" @click="copySecretKey">
+                <button class="text-slate-400 hover:text-white cursor-pointer shrink-0" :aria-label="$t('apiKeys.createdDialog.copySecretAria')" @click="copySecretKey">
                   <component :is="copiedSecret ? CheckIcon : CopyIcon" class="w-4 h-4" />
                 </button>
               </div>
               <p class="flex items-center gap-1.5 text-xs text-amber-400">
                 <ShieldAlertIcon class="w-3.5 h-3.5 shrink-0" />
-                This secret won't be shown again — copy it now.
+                {{ $t('apiKeys.createdDialog.warning') }}
               </p>
             </div>
             <p class="text-xs text-slate-500">
-              Requests authenticate with the two joined by a dot:
+              {{ $t('apiKeys.createdDialog.joinedHint') }}
               <!-- break-all like the two fields above: the joined form is ~70
                    chars with no spaces, so without it the line overflows the
                    dialog instead of wrapping. -->
@@ -228,7 +236,7 @@ function lastUsedLabel(key: { last_used_at: string | null }) {
             </p>
           </div>
           <div class="flex justify-end">
-            <Button class="cursor-pointer" @click="closeDialog">Done</Button>
+            <Button class="cursor-pointer" @click="closeDialog">{{ $t('common.done') }}</Button>
           </div>
         </template>
       </DialogContent>
