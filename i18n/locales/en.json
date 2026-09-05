@@ -53,6 +53,166 @@
     "testModeBanner": "Test mode — sandbox data and keys only. Switch to Live in the top bar to go real.",
     "liveModeBanner": "Live mode — real transactions are being processed."
   },
+  "docs": {
+    "nav": {
+      "contents": "Contents",
+      "searchPlaceholder": "Search docs...",
+      "noMatches": "No matching topics",
+      "fullApiReference": "Full API reference"
+    },
+    "page": {
+      "eyebrow": "Developer guide",
+      "title": "Integrate {brand} in minutes",
+      "intro": "{brand} handles subscriptions and payments for your app. Create an application, generate an API key, define a plan, and call one endpoint to start a subscriber's subscription."
+    },
+    "terms": {
+      "application": "Application",
+      "apiKey": "API key",
+      "apiKeyPlural": "API Keys",
+      "plan": "plan",
+      "plans": "Plans",
+      "features": "Features",
+      "webhookUrl": "webhook URL",
+      "returnUrl": "Return URL"
+    },
+    "common": {
+      "responseStatus": "Response — {status}"
+    },
+    "quickstart": {
+      "title": "Quickstart",
+      "step1": "{link} — this also creates your first workspace.",
+      "step1LinkText": "Create a {brand} account",
+      "step2": "From the dashboard, create an {application} for the app you're integrating.",
+      "step3": "Under that application, generate an {apiKey} — the secret is shown once, so store it now.",
+      "step4": "Define at least one {plan} (price, duration, features) under the application.",
+      "step5": "Call {listPlansLink} to show pricing, then {createSubscriptionLink} when a user picks one."
+    },
+    "authentication": {
+      "title": "Authentication",
+      "para1": "Every request to the public API is authenticated with an API key, sent as a bearer token in the format {idFormat} — the two halves generated together when you create the key, joined by a period. Get a key from your application's {apiKeysTab} tab. The secret is shown exactly once at creation time and can't be retrieved again — if you lose it, revoke the key and generate a new one.",
+      "para2": "Both halves carry an environment prefix, so you can tell at a glance which mode a key belongs to — in a {envFile} file, a log line, or a support request — without looking it up:",
+      "para3": "Send the token exactly as issued, prefixes included — they are part of the credential, not decoration. The environment is taken from the key itself, so a test key can only ever create test data."
+    },
+    "environments": {
+      "title": "Test vs Live",
+      "body": "Every API key and every subscriber/subscription record has an {envField} of either {testValue} or {liveValue}. Today this is a label for your own filtering and reporting — it is {notEnforced} as an isolated sandbox: a test-environment key can read and write live-environment data and vice versa, and no separate test database or mock payment flow exists. Treat the distinction as informational until stated otherwise, and don't rely on it for data isolation.",
+      "notEnforced": "not currently enforced"
+    },
+    "listPlans": {
+      "title": "List plans",
+      "intro": "{endpoint} — returns the active plans (with their features) for the application whose key you authenticated with."
+    },
+    "createSubscription": {
+      "title": "Create a subscription",
+      "intro": "{endpoint} — creates the subscriber if new, a pending subscription, a pending transaction, and returns a payment link.",
+      "responseNote": "Redirect your user to {paymentUrl} (or render {qrcodeUrl}) to complete payment. Either can be {nullVal} if the payment provider didn't return one — handle that case. The subscription is {pendingVal} until payment settles; that's what the webhook below tells you about.",
+      "fieldsTable": {
+        "field": "Field",
+        "type": "Type",
+        "required": "Required",
+        "notes": "Notes",
+        "yes": "yes",
+        "no": "no",
+        "notePlanId": "Must belong to your application.",
+        "noteExternalId": "Your own identifier for this user.",
+        "notePhoneNumber": "Used for the payment provider.",
+        "noteEnvironment": "Defaults to \"live\". See {section} above."
+      }
+    },
+    "webhooks": {
+      "title": "Webhooks",
+      "intro": "Set a {webhookUrlLabel} on your application (Settings tab) and {brand} {postMethod}s to it once a subscriber's payment settles. There is currently one event, {eventName}. If no webhook URL is configured, nothing is sent — no error is raised.",
+      "payloadLabel": "Payload",
+      "verify": "Every delivery includes an {sigHeader} header so you can verify it came from {brand}. {important} the signature is an HMAC-SHA256 of the transaction's numeric {idField} as a string — {notWord} a hash of the request body — using the {secretField} shown on your application's settings. This differs from most webhook signing schemes you may have implemented before, which usually hash the whole payload — get this right or verification will silently fail.",
+      "important": "Important:",
+      "notWord": "not",
+      "retryNote": "There is no automatic retry today if your endpoint is unreachable or errors — treat delivery as best-effort and reconcile against {transactionsEndpoint} from your dashboard-authenticated session if you need certainty."
+    },
+    "entitlements": {
+      "title": "Storing entitlements",
+      "intro": "Klea has no \"is this customer subscribed?\" endpoint, and you should not call the API on every request anyway. Instead, keep a small table in your own database that the webhook writes to and the rest of your app reads from. One row per customer (the entity you sent as {externalId}).",
+      "detailsIntro": "Three details that are easy to get wrong:",
+      "detail1Lead": "Compute the expiry yourself.",
+      "detail1": "{lead} The webhook has no expiry field. Check {billingPeriod} on the plan: for {oneTime} there is no expiry (the customer keeps access forever); for every other period, take {durationDays} (a plain integer number of days — it is {nullVal} only for {oneTime}) and add it to \"now\" when the payment succeeds.",
+      "detail2Lead": "Store the feature snapshot verbatim.",
+      "detail2": "{lead} Persist the {featuresField} array from the webhook as JSON. Reading limits from a live API call on every request is slow and breaks when Klea is unreachable.",
+      "detail3Lead": "A failed renewal must not revoke access.",
+      "detail3": "{lead} If a payment fails while the customer still has a valid paid period, leave the active row alone. Only expiry ends access."
+    },
+    "enforcingAccess": {
+      "title": "Enforcing access",
+      "intro": "Put every check behind one function so there is a single place that decides what a customer may do. Read from your local table, never from the API.",
+      "conventionsIntro": "Two conventions worth adopting, because they remove whole classes of bug:",
+      "rule1Lead": "Treat {nullVal} as unlimited, never as zero.",
+      "rule1": "{lead} A plan with an unlimited quota stores {limitNull}. Reading that as {zero} blocks your best-paying customers.",
+      "rule2Lead": "Define a free tier in config.",
+      "rule2": "{lead} Customers with no subscription should fall back to it, so a missing row is a normal state rather than an error.",
+      "upgradeIntro": "Return a distinguishable response when a limit is hit, so the frontend can prompt an upgrade instead of showing a generic failure:"
+    },
+    "paymentFlow": {
+      "title": "Payment flow & UX",
+      "intro": "{endpoint} returns a {paymentUrlField} — a hosted page where the customer completes payment. Card details are entered there and never touch your servers, which keeps you out of PCI-DSS scope. Do not build your own card form; there is no field to send one.",
+      "gatewaysIntro": "Optionally let the customer pick a channel first. {gatewaysEndpoint} returns the live list with logos; pass the chosen {idField} as {gatewayIdField} and the hosted page opens on it. Omit it and the customer chooses there instead.",
+      "returnUrl": "Set a {returnUrlLabel} on your application (Settings → Return URL) and we send the customer's browser back there after they pay. But {notProof} — a customer can land on it by cancelling or pressing back. The webhook is the only trustworthy signal. So send them somewhere that polls your own entitlement endpoint until it flips to active:",
+      "notProof": "arriving there does not prove the payment succeeded",
+      "channelsNote": "Mobile-money channels debit a wallet, so collect a phone number for those. Card channels need none — asking for one there just adds friction."
+    },
+    "integrationChecklist": {
+      "title": "Integration checklist",
+      "intro": "A complete integration, in dependency order. Steps 1–4 are dashboard setup; the rest is code.",
+      "step1": "Create an {application} for the app you're integrating.",
+      "step2": "Create {features}, and write the {codeField} values down — they are the contract your app reads, so they must match exactly.",
+      "step3": "Create {plans} and attach features with their limits. Leave a limit empty for \"unlimited\". Make sure each plan is {active}, or it won't appear in {plansEndpoint}.",
+      "step3Active": "active",
+      "step4": "Generate an {apiKey} (shown once) and set the {webhookUrl} — saving it generates the signing secret. Copy both into your app's environment; never into frontend code.",
+      "step5": "Create your entitlements table and the webhook receiver. Verify the signature before trusting anything.",
+      "step6": "Build the pricing page from {plansEndpoint} rather than hardcoding prices.",
+      "step7": "Add a checkout page that calls {subscribeEndpoint}, opens the payment URL, and polls for activation.",
+      "step8": "Route every limit check through your feature gate.",
+      "step9": "Test the full path with a real payment in test mode before going live."
+    },
+    "pitfalls": {
+      "title": "Common pitfalls",
+      "intro": "Each of these has cost a real integration time. They're listed roughly in the order you'll hit them.",
+      "item1": {
+        "title": "Plans exist but the API returns none",
+        "desc": "{plansEndpoint} only returns {active} plans. A plan left as a draft is invisible to your app with no error to explain why."
+      },
+      "item1Active": "active",
+      "item2": {
+        "title": "The signature covers the transaction id, not the body",
+        "desc": "Most webhook APIs sign the whole payload. This one signs {transactionId} only. Verifying against the JSON body will reject every delivery. Compare with {hashEquals}, not {tripleEquals}."
+      },
+      "item3": {
+        "title": "An unset webhook secret fails open",
+        "desc": "If your secret is empty, an HMAC computed with an empty key is one anybody can reproduce — so any forged request would be accepted. Reject webhooks outright when the secret is missing, rather than computing a signature with a blank one."
+      },
+      "item4": {
+        "title": "Starting a new payment revokes the current plan",
+        "desc": "If you set the entitlement to {pendingWord} when checkout starts, a customer who abandons payment loses the plan they already paid for. Only downgrade when there is nothing active to protect."
+      },
+      "item5": {
+        "title": "Webhooks are not retried",
+        "desc": "If your endpoint is down when a payment settles, that notification is gone. Show pending payments as \"awaiting confirmation\" rather than failed, and reconcile from your dashboard if needed."
+      },
+      "item6": {
+        "title": "Caching a typed object breaks on the second call",
+        "desc": "Caching a framework collection in a serializing store (database, Redis, file) hands back an incomplete object on a cache hit. The first request works and every later one fails. Cache plain arrays and re-wrap them after reading."
+      },
+      "item7": {
+        "title": "Boolean features rendered as numbers",
+        "desc": "An on/off feature may carry {limitOne}, which renders as \"Advanced analytics: 1\" if you print limits blindly. Only show a number for quota features."
+      }
+    },
+    "errors": {
+      "title": "Errors",
+      "intro": "Every error response has the shape {shape}. For field-validation failures (422), {errorField} is an object keyed by field name:",
+      "statusCodesLabel": "Common status codes",
+      "code401": "{code} — missing, malformed, or invalid/revoked API key",
+      "code422": "{code} — request validation failed, or {planId} doesn't belong to your application",
+      "code500": "{code} — something failed on our side (including payment-provider errors during subscribe)"
+    }
+  },
   "landing": {
     "nav": {
       "features": "Features",

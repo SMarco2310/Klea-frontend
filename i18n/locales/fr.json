@@ -53,6 +53,166 @@
     "testModeBanner": "Mode test — données et clés de test uniquement. Passez en mode En direct dans la barre supérieure pour utiliser des données réelles.",
     "liveModeBanner": "Mode en direct — des transactions réelles sont en cours de traitement."
   },
+  "docs": {
+    "nav": {
+      "contents": "Sommaire",
+      "searchPlaceholder": "Rechercher dans la documentation…",
+      "noMatches": "Aucun sujet ne correspond",
+      "fullApiReference": "Référence API complète"
+    },
+    "page": {
+      "eyebrow": "Guide développeur",
+      "title": "Intégrez {brand} en quelques minutes",
+      "intro": "{brand} gère les abonnements et les paiements de votre application. Créez une application, générez une clé API, définissez un forfait, puis appelez un seul endpoint pour démarrer l'abonnement d'un abonné."
+    },
+    "terms": {
+      "application": "Application",
+      "apiKey": "clé API",
+      "apiKeyPlural": "Clés API",
+      "plan": "forfait",
+      "plans": "Forfaits",
+      "features": "Fonctionnalités",
+      "webhookUrl": "URL de webhook",
+      "returnUrl": "URL de retour"
+    },
+    "common": {
+      "responseStatus": "Réponse — {status}"
+    },
+    "quickstart": {
+      "title": "Démarrage rapide",
+      "step1": "{link} — cela crée également votre premier espace de travail.",
+      "step1LinkText": "Créer un compte {brand}",
+      "step2": "Depuis le tableau de bord, créez une {application} pour l'app que vous intégrez.",
+      "step3": "Sous cette application, générez une {apiKey} — le secret n'est affiché qu'une seule fois, alors enregistrez-le maintenant.",
+      "step4": "Définissez au moins un {plan} (prix, durée, fonctionnalités) sous l'application.",
+      "step5": "Appelez {listPlansLink} pour afficher les tarifs, puis {createSubscriptionLink} lorsqu'un utilisateur en choisit un."
+    },
+    "authentication": {
+      "title": "Authentification",
+      "para1": "Chaque requête vers l'API publique est authentifiée par une clé API, envoyée comme jeton porteur au format {idFormat} — les deux moitiés sont générées ensemble à la création de la clé, reliées par un point. Récupérez une clé depuis l'onglet {apiKeysTab} de votre application. Le secret n'est affiché qu'une seule fois, à la création, et ne peut plus être récupéré ensuite — si vous le perdez, révoquez la clé et générez-en une nouvelle.",
+      "para2": "Les deux moitiés portent un préfixe d'environnement, ce qui permet de savoir en un coup d'œil à quel mode une clé appartient — dans un fichier {envFile}, une ligne de log ou une demande de support — sans avoir à le vérifier :",
+      "para3": "Envoyez le jeton exactement tel qu'il a été délivré, préfixes compris — ils font partie intégrante de l'identifiant, ce ne sont pas des décorations. L'environnement est déterminé par la clé elle-même : une clé de test ne peut donc jamais créer que des données de test."
+    },
+    "environments": {
+      "title": "Test vs Live",
+      "body": "Chaque clé API et chaque enregistrement d'abonné ou d'abonnement possède un {envField} valant soit {testValue}, soit {liveValue}. Pour l'instant, il s'agit uniquement d'une étiquette pour votre propre filtrage et vos rapports — elle {notEnforced} comme un bac à sable isolé : une clé en environnement test peut lire et écrire des données en environnement live et inversement, et il n'existe ni base de test séparée ni flux de paiement simulé. Considérez cette distinction comme informative jusqu'à nouvel ordre, et ne comptez pas dessus pour isoler vos données.",
+      "notEnforced": "n'est pas actuellement appliquée"
+    },
+    "listPlans": {
+      "title": "Lister les forfaits",
+      "intro": "{endpoint} — renvoie les forfaits actifs (avec leurs fonctionnalités) pour l'application dont vous avez utilisé la clé pour vous authentifier."
+    },
+    "createSubscription": {
+      "title": "Créer un abonnement",
+      "intro": "{endpoint} — crée l'abonné s'il est nouveau, un abonnement en attente, une transaction en attente, et renvoie un lien de paiement.",
+      "responseNote": "Redirigez votre utilisateur vers {paymentUrl} (ou affichez {qrcodeUrl}) pour finaliser le paiement. L'un ou l'autre peut valoir {nullVal} si le prestataire de paiement n'en a pas renvoyé — gérez ce cas. L'abonnement reste {pendingVal} tant que le paiement n'est pas finalisé ; c'est justement ce que le webhook ci-dessous vous indique.",
+      "fieldsTable": {
+        "field": "Champ",
+        "type": "Type",
+        "required": "Obligatoire",
+        "notes": "Remarques",
+        "yes": "oui",
+        "no": "non",
+        "notePlanId": "Doit appartenir à votre application.",
+        "noteExternalId": "Votre propre identifiant pour cet utilisateur.",
+        "notePhoneNumber": "Utilisé par le prestataire de paiement.",
+        "noteEnvironment": "Vaut \"live\" par défaut. Voir la section {section} ci-dessus."
+      }
+    },
+    "webhooks": {
+      "title": "Webhooks",
+      "intro": "Définissez une {webhookUrlLabel} sur votre application (onglet Paramètres) et {brand} y envoie une requête {postMethod} dès qu'un abonné règle son paiement. Il existe actuellement un seul événement, {eventName}. Si aucune URL de webhook n'est configurée, rien n'est envoyé — aucune erreur n'est levée.",
+      "payloadLabel": "Charge utile",
+      "verify": "Chaque envoi inclut un en-tête {sigHeader} qui permet de vérifier qu'il provient bien de {brand}. {important} la signature est un HMAC-SHA256 de l'identifiant numérique {idField} de la transaction, converti en chaîne — {notWord} un hachage du corps de la requête — en utilisant le {secretField} affiché dans les paramètres de votre application. Cela diffère de la plupart des schémas de signature de webhook que vous avez pu implémenter auparavant, qui hachent généralement l'ensemble de la charge utile — faites bien ceci correctement, sinon la vérification échouera silencieusement.",
+      "important": "Important :",
+      "notWord": "pas",
+      "retryNote": "Il n'existe aujourd'hui aucune nouvelle tentative automatique si votre endpoint est injoignable ou renvoie une erreur — considérez l'envoi comme du best-effort et recoupez avec {transactionsEndpoint} depuis votre session authentifiée sur le tableau de bord si vous avez besoin de certitude."
+    },
+    "entitlements": {
+      "title": "Stocker les droits d'accès",
+      "intro": "Klea ne propose pas d'endpoint « ce client est-il abonné ? », et de toute façon vous ne devriez pas appeler l'API à chaque requête. Conservez plutôt une petite table dans votre propre base de données, alimentée par le webhook et lue par le reste de votre application. Une ligne par client (l'entité que vous avez envoyée comme {externalId}).",
+      "detailsIntro": "Trois détails faciles à mal gérer :",
+      "detail1Lead": "Calculez vous-même la date d'expiration.",
+      "detail1": "{lead} Le webhook ne fournit aucun champ d'expiration. Vérifiez {billingPeriod} sur le forfait : pour {oneTime}, il n'y a pas d'expiration (le client garde l'accès pour toujours) ; pour toute autre période, prenez {durationDays} (un simple entier représentant un nombre de jours — il vaut {nullVal} uniquement pour {oneTime}) et ajoutez-le à « maintenant » lorsque le paiement réussit.",
+      "detail2Lead": "Enregistrez tel quel l'instantané des fonctionnalités.",
+      "detail2": "{lead} Persistez le tableau {featuresField} du webhook au format JSON. Lire les limites via un appel API en direct à chaque requête est lent et casse tout si Klea est injoignable.",
+      "detail3Lead": "Un renouvellement échoué ne doit jamais révoquer l'accès.",
+      "detail3": "{lead} Si un paiement échoue alors que le client a encore une période payée valide, laissez la ligne active telle quelle. Seule l'expiration met fin à l'accès."
+    },
+    "enforcingAccess": {
+      "title": "Contrôler l'accès",
+      "intro": "Faites passer chaque vérification par une seule fonction, afin qu'un seul endroit décide de ce qu'un client peut faire. Lisez depuis votre table locale, jamais depuis l'API.",
+      "conventionsIntro": "Deux conventions à adopter, car elles éliminent des catégories entières de bugs :",
+      "rule1Lead": "Traitez {nullVal} comme illimité, jamais comme zéro.",
+      "rule1": "{lead} Un forfait avec un quota illimité stocke {limitNull}. Le lire comme {zero} bloquerait vos meilleurs clients payants.",
+      "rule2Lead": "Définissez un palier gratuit dans la configuration.",
+      "rule2": "{lead} Les clients sans abonnement doivent y retomber par défaut, si bien qu'une ligne manquante est un état normal plutôt qu'une erreur.",
+      "upgradeIntro": "Renvoyez une réponse identifiable lorsqu'une limite est atteinte, afin que le frontend puisse proposer une mise à niveau plutôt qu'afficher un échec générique :"
+    },
+    "paymentFlow": {
+      "title": "Flux de paiement et UX",
+      "intro": "{endpoint} renvoie une {paymentUrlField} — une page hébergée où le client finalise son paiement. Les informations de carte y sont saisies et ne transitent jamais par vos serveurs, ce qui vous place hors du périmètre PCI-DSS. Ne créez pas votre propre formulaire de carte ; il n'existe aucun champ pour en envoyer un.",
+      "gatewaysIntro": "Vous pouvez laisser le client choisir un canal au préalable. {gatewaysEndpoint} renvoie la liste à jour avec les logos ; transmettez l'{idField} choisi comme {gatewayIdField} et la page hébergée s'ouvrira dessus. Omettez-le et le client choisira directement sur la page.",
+      "returnUrl": "Définissez une {returnUrlLabel} sur votre application (Paramètres → URL de retour) : nous y renvoyons le navigateur du client une fois le paiement effectué. Mais {notProof} — un client peut y atterrir en annulant ou en faisant retour arrière. Le webhook reste le seul signal fiable. Redirigez donc le client vers une page qui interroge votre propre endpoint de droits d'accès jusqu'à ce qu'il passe à actif :",
+      "notProof": "arriver sur cette page ne prouve pas que le paiement a réussi",
+      "channelsNote": "Les canaux mobile money débitent un portefeuille, pensez donc à collecter un numéro de téléphone pour ceux-ci. Les canaux carte n'en ont besoin d'aucun — en demander un ne ferait qu'ajouter de la friction."
+    },
+    "integrationChecklist": {
+      "title": "Checklist d'intégration",
+      "intro": "Une intégration complète, dans l'ordre des dépendances. Les étapes 1 à 4 se font dans le tableau de bord ; le reste est du code.",
+      "step1": "Créez une {application} pour l'app que vous intégrez.",
+      "step2": "Créez des {features}, et notez les valeurs de {codeField} — elles forment le contrat que votre app lit, elles doivent donc correspondre exactement.",
+      "step3": "Créez des {plans} et associez-leur des fonctionnalités avec leurs limites. Laissez une limite vide pour « illimité ». Assurez-vous que chaque forfait est {active}, sinon il n'apparaîtra pas dans {plansEndpoint}.",
+      "step3Active": "actif",
+      "step4": "Générez une {apiKey} (affichée une seule fois) et définissez l'{webhookUrl} — l'enregistrer génère le secret de signature. Copiez les deux dans l'environnement de votre app ; jamais dans le code frontend.",
+      "step5": "Créez votre table des droits d'accès et le récepteur de webhook. Vérifiez la signature avant de faire confiance à quoi que ce soit.",
+      "step6": "Construisez la page tarifaire à partir de {plansEndpoint} plutôt que de coder les prix en dur.",
+      "step7": "Ajoutez une page de paiement qui appelle {subscribeEndpoint}, ouvre l'URL de paiement, et interroge régulièrement l'activation.",
+      "step8": "Faites passer chaque vérification de limite par votre feature gate.",
+      "step9": "Testez le parcours complet avec un vrai paiement en mode test avant de passer en production."
+    },
+    "pitfalls": {
+      "title": "Pièges courants",
+      "intro": "Chacun de ces pièges a fait perdre du temps à une intégration réelle. Ils sont listés à peu près dans l'ordre où vous les rencontrerez.",
+      "item1": {
+        "title": "Des forfaits existent mais l'API n'en renvoie aucun",
+        "desc": "{plansEndpoint} ne renvoie que les forfaits {active}. Un forfait laissé en brouillon est invisible pour votre app, sans aucune erreur pour l'expliquer."
+      },
+      "item1Active": "actifs",
+      "item2": {
+        "title": "La signature couvre l'identifiant de transaction, pas le corps",
+        "desc": "La plupart des API à webhooks signent l'ensemble de la charge utile. Celle-ci ne signe que {transactionId}. Vérifier par rapport au corps JSON rejettera chaque envoi. Comparez avec {hashEquals}, pas {tripleEquals}."
+      },
+      "item3": {
+        "title": "Un secret de webhook non défini échoue en mode ouvert",
+        "desc": "Si votre secret est vide, un HMAC calculé avec une clé vide peut être reproduit par n'importe qui — toute requête forgée serait donc acceptée. Rejetez purement et simplement les webhooks quand le secret est manquant, plutôt que de calculer une signature avec un secret vide."
+      },
+      "item4": {
+        "title": "Démarrer un nouveau paiement révoque le forfait actuel",
+        "desc": "Si vous passez le droit d'accès à {pendingWord} dès le début du paiement, un client qui abandonne perd le forfait qu'il avait déjà payé. Ne rétrogradez que lorsqu'il n'y a rien d'actif à protéger."
+      },
+      "item5": {
+        "title": "Les webhooks ne sont pas réessayés",
+        "desc": "Si votre endpoint est hors service au moment où un paiement se finalise, cette notification est perdue. Affichez les paiements en attente comme « en attente de confirmation » plutôt que comme échoués, et recoupez depuis votre tableau de bord si nécessaire."
+      },
+      "item6": {
+        "title": "Mettre en cache un objet typé casse au deuxième appel",
+        "desc": "Mettre en cache une collection du framework dans un stockage sérialisant (base de données, Redis, fichier) renvoie un objet incomplet lors d'un hit de cache. La première requête fonctionne et toutes les suivantes échouent. Mettez en cache de simples tableaux et ré-encapsulez-les après lecture."
+      },
+      "item7": {
+        "title": "Fonctionnalités booléennes affichées comme des nombres",
+        "desc": "Une fonctionnalité on/off peut porter {limitOne}, ce qui s'affiche comme « Advanced analytics : 1 » si vous imprimez les limites sans réfléchir. N'affichez un nombre que pour les fonctionnalités à quota."
+      }
+    },
+    "errors": {
+      "title": "Erreurs",
+      "intro": "Chaque réponse d'erreur a la forme {shape}. Pour les échecs de validation de champs (422), {errorField} est un objet indexé par nom de champ :",
+      "statusCodesLabel": "Codes de statut courants",
+      "code401": "{code} — clé API manquante, mal formée, invalide ou révoquée",
+      "code422": "{code} — la validation de la requête a échoué, ou {planId} n'appartient pas à votre application",
+      "code500": "{code} — un problème est survenu de notre côté (y compris des erreurs du prestataire de paiement lors de l'abonnement)"
+    }
+  },
   "landing": {
     "nav": {
       "features": "Fonctionnalités",

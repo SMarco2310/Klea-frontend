@@ -15,6 +15,7 @@ const searchQuery = ref('')
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const { colorMode } = useTheme()
 const { availableLocales, setLocale } = useLocale()
+const { t } = useI18n()
 
 function changeLanguage(code: string) {
   setLocale(code)
@@ -52,25 +53,27 @@ const resolveBackTarget = () => {
   backTarget.value = '/'
 }
 
-const sections = [
-  { id: 'quickstart', icon: RocketIcon, label: 'Quickstart' },
-  { id: 'authentication', icon: KeyRoundIcon, label: 'Authentication' },
-  { id: 'environments', icon: FlaskConicalIcon, label: 'Test vs Live' },
-  { id: 'list-plans', icon: ListIcon, label: 'List plans' },
-  { id: 'create-subscription', icon: TerminalIcon, label: 'Create a subscription' },
-  { id: 'webhooks', icon: WebhookIcon, label: 'Webhooks' },
-  { id: 'entitlements', icon: ShieldCheckIcon, label: 'Storing entitlements' },
-  { id: 'enforcing-access', icon: ShieldCheckIcon, label: 'Enforcing access' },
-  { id: 'payment-flow', icon: CreditCardIcon, label: 'Payment flow & UX' },
-  { id: 'integration-checklist', icon: MapIcon, label: 'Integration checklist' },
-  { id: 'pitfalls', icon: AlertTriangleIcon, label: 'Common pitfalls' },
-  { id: 'errors', icon: ListChecksIcon, label: 'Errors' },
+const sectionDefs = [
+  { id: 'quickstart', icon: RocketIcon, key: 'docs.quickstart.title' },
+  { id: 'authentication', icon: KeyRoundIcon, key: 'docs.authentication.title' },
+  { id: 'environments', icon: FlaskConicalIcon, key: 'docs.environments.title' },
+  { id: 'list-plans', icon: ListIcon, key: 'docs.listPlans.title' },
+  { id: 'create-subscription', icon: TerminalIcon, key: 'docs.createSubscription.title' },
+  { id: 'webhooks', icon: WebhookIcon, key: 'docs.webhooks.title' },
+  { id: 'entitlements', icon: ShieldCheckIcon, key: 'docs.entitlements.title' },
+  { id: 'enforcing-access', icon: ShieldCheckIcon, key: 'docs.enforcingAccess.title' },
+  { id: 'payment-flow', icon: CreditCardIcon, key: 'docs.paymentFlow.title' },
+  { id: 'integration-checklist', icon: MapIcon, key: 'docs.integrationChecklist.title' },
+  { id: 'pitfalls', icon: AlertTriangleIcon, key: 'docs.pitfalls.title' },
+  { id: 'errors', icon: ListChecksIcon, key: 'docs.errors.title' },
 ]
 
+const sections = computed(() => sectionDefs.map((s) => ({ ...s, label: t(s.key) })))
+
 const filteredSections = computed(() => {
-  if (!searchQuery.value.trim()) return sections
+  if (!searchQuery.value.trim()) return sections.value
   const q = searchQuery.value.toLowerCase()
-  return sections.filter((s) => s.label.toLowerCase().includes(q) || s.id.toLowerCase().includes(q))
+  return sections.value.filter((s) => s.label.toLowerCase().includes(q) || s.id.toLowerCase().includes(q))
 })
 
 function handleKeydown(e: KeyboardEvent) {
@@ -459,7 +462,7 @@ const validationErrorSample = `{
                 ref="searchInputRef"
                 v-model="searchQuery"
                 type="text"
-                placeholder="Search docs..."
+                :placeholder="$t('docs.nav.searchPlaceholder')"
                 class="bg-transparent border-none outline-none text-[var(--foreground)] text-sm w-full placeholder:text-[var(--muted-foreground)]"
               />
               <kbd class="text-[10px] px-1.5 py-0.5 rounded bg-[var(--color-surface)] border border-[var(--color-border-dark)] text-[var(--muted-foreground)] font-mono shrink-0">⌘K</kbd>
@@ -470,7 +473,7 @@ const validationErrorSample = `{
             <button
               class="flex items-center justify-center w-7 h-7 rounded-md cursor-pointer transition-colors"
               :class="colorMode === 'light' ? 'bg-[var(--color-surface)] shadow-sm text-[var(--color-accent)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
-              aria-label="Light mode"
+              :aria-label="$t('nav.lightMode')"
               @click="colorMode = 'light'"
             >
               <SunIcon class="w-4 h-4" />
@@ -478,7 +481,7 @@ const validationErrorSample = `{
             <button
               class="flex items-center justify-center w-7 h-7 rounded-md cursor-pointer transition-colors"
               :class="colorMode === 'dark' ? 'bg-[var(--color-surface)] shadow-sm text-[var(--color-accent)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
-              aria-label="Dark mode"
+              :aria-label="$t('nav.darkMode')"
               @click="colorMode = 'dark'"
             >
               <MoonIcon class="w-4 h-4" />
@@ -486,7 +489,7 @@ const validationErrorSample = `{
             <button
               class="flex items-center justify-center w-7 h-7 rounded-md cursor-pointer transition-colors"
               :class="colorMode === 'auto' ? 'bg-[var(--color-surface)] shadow-sm text-[var(--color-accent)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'"
-              aria-label="System theme"
+              :aria-label="$t('nav.systemTheme')"
               @click="colorMode = 'auto'"
             >
               <MonitorIcon class="w-4 h-4" />
@@ -497,7 +500,7 @@ const validationErrorSample = `{
             <DropdownMenuTrigger asChild>
               <button
                 class="flex items-center justify-center w-[36px] h-[36px] rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-dark)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer transition-colors shrink-0"
-                aria-label="Change language"
+                :aria-label="$t('nav.changeLanguage')"
               >
                 <LanguagesIcon class="w-4 h-4" />
               </button>
@@ -520,7 +523,7 @@ const validationErrorSample = `{
     <div class="flex-1 min-h-0 max-w-5xl mx-auto px-6 w-full grid grid-cols-1 md:grid-cols-[220px_1fr] gap-10">
     <nav class="space-y-4 py-10">
       <div class="space-y-1">
-        <p class="text-xs uppercase tracking-wide text-[var(--muted-foreground)] mb-2 font-medium">Contents</p>
+        <p class="text-xs uppercase tracking-wide text-[var(--muted-foreground)] mb-2 font-medium">{{ $t('docs.nav.contents') }}</p>
         <a
           v-for="s in filteredSections"
           :key="s.id"
@@ -530,7 +533,7 @@ const validationErrorSample = `{
           <component :is="s.icon" class="w-4 h-4 text-[var(--color-accent)] shrink-0" />
           <span>{{ s.label }}</span>
         </a>
-        <p v-if="filteredSections.length === 0" class="text-xs text-[var(--muted-foreground)] italic px-2 py-1">No matching topics</p>
+        <p v-if="filteredSections.length === 0" class="text-xs text-[var(--muted-foreground)] italic px-2 py-1">{{ $t('docs.nav.noMatches') }}</p>
       </div>
 
       <a
@@ -540,48 +543,79 @@ const validationErrorSample = `{
         class="flex items-center gap-2 text-sm text-[var(--color-accent)] hover:underline cursor-pointer py-1.5 px-2 rounded-md hover:bg-[var(--color-hover)] transition-colors"
       >
         <ExternalLinkIcon class="w-4 h-4 shrink-0" />
-        <span>Full API reference</span>
+        <span>{{ $t('docs.nav.fullApiReference') }}</span>
       </a>
     </nav>
 
     <div class="space-y-16 text-[var(--foreground)] overflow-y-auto py-10">
       <section>
-        <p class="text-xs uppercase tracking-wide text-[var(--color-accent)] mb-2">Developer guide</p>
-        <h1 class="font-heading text-3xl font-bold mb-4">Integrate <span class="notranslate">Klea</span> in minutes</h1>
+        <p class="text-xs uppercase tracking-wide text-[var(--color-accent)] mb-2">{{ $t('docs.page.eyebrow') }}</p>
+        <h1 class="font-heading text-3xl font-bold mb-4">
+          <i18n-t keypath="docs.page.title" tag="span">
+            <template #brand><span class="notranslate">Klea</span></template>
+          </i18n-t>
+        </h1>
         <p class="text-[var(--muted-foreground)]">
-          <span class="notranslate">Klea</span> handles subscriptions and payments for your app. Create an application, generate an API
-          key, define a plan, and call one endpoint to start a subscriber's subscription.
+          <i18n-t keypath="docs.page.intro" tag="span">
+            <template #brand><span class="notranslate">Klea</span></template>
+          </i18n-t>
         </p>
       </section>
 
       <section id="quickstart">
-        <h2 class="font-heading text-2xl font-semibold mb-4">Quickstart</h2>
+        <h2 class="font-heading text-2xl font-semibold mb-4">{{ $t('docs.quickstart.title') }}</h2>
         <ol class="list-decimal list-inside space-y-2 text-[var(--muted-foreground)]">
-          <li><NuxtLink to="/signup" class="text-[var(--color-accent)] hover:underline">Create a <span class="notranslate">Klea</span> account</NuxtLink> — this also creates your first workspace.</li>
-          <li>From the dashboard, create an <strong class="text-[var(--foreground)]">Application</strong> for the app you're integrating.</li>
-          <li>Under that application, generate an <strong class="text-[var(--foreground)]">API key</strong> — the secret is shown once, so store it now.</li>
-          <li>Define at least one <strong class="text-[var(--foreground)]">plan</strong> (price, duration, features) under the application.</li>
-          <li>Call <a href="#list-plans" class="text-[var(--color-accent)] hover:underline">List plans</a> to show pricing, then <a href="#create-subscription" class="text-[var(--color-accent)] hover:underline">Create a subscription</a> when a user picks one.</li>
+          <li>
+            <i18n-t keypath="docs.quickstart.step1" tag="span">
+              <template #link>
+                <NuxtLink to="/signup" class="text-[var(--color-accent)] hover:underline">
+                  <i18n-t keypath="docs.quickstart.step1LinkText" tag="span">
+                    <template #brand><span class="notranslate">Klea</span></template>
+                  </i18n-t>
+                </NuxtLink>
+              </template>
+            </i18n-t>
+          </li>
+          <li>
+            <i18n-t keypath="docs.quickstart.step2" tag="span">
+              <template #application><strong class="text-[var(--foreground)]">{{ $t('docs.terms.application') }}</strong></template>
+            </i18n-t>
+          </li>
+          <li>
+            <i18n-t keypath="docs.quickstart.step3" tag="span">
+              <template #apiKey><strong class="text-[var(--foreground)]">{{ $t('docs.terms.apiKey') }}</strong></template>
+            </i18n-t>
+          </li>
+          <li>
+            <i18n-t keypath="docs.quickstart.step4" tag="span">
+              <template #plan><strong class="text-[var(--foreground)]">{{ $t('docs.terms.plan') }}</strong></template>
+            </i18n-t>
+          </li>
+          <li>
+            <i18n-t keypath="docs.quickstart.step5" tag="span">
+              <template #listPlansLink><a href="#list-plans" class="text-[var(--color-accent)] hover:underline">{{ $t('docs.listPlans.title') }}</a></template>
+              <template #createSubscriptionLink><a href="#create-subscription" class="text-[var(--color-accent)] hover:underline">{{ $t('docs.createSubscription.title') }}</a></template>
+            </i18n-t>
+          </li>
         </ol>
       </section>
 
       <section id="authentication">
-        <h2 class="font-heading text-2xl font-semibold mb-4">Authentication</h2>
+        <h2 class="font-heading text-2xl font-semibold mb-4">{{ $t('docs.authentication.title') }}</h2>
         <p class="text-[var(--muted-foreground)] mb-4">
-          Every request to the public API is authenticated with an API key, sent as a bearer token in
-          the format <code class="bg-[var(--color-surface)] px-1 rounded">{public_id}.{secret}</code> — the two halves generated together when you create the key, joined by a period.
-          Get a key from your application's <strong class="text-[var(--foreground)]">API Keys</strong> tab. The secret is shown exactly once at creation time and can't be
-          retrieved again — if you lose it, revoke the key and generate a new one.
+          <i18n-t keypath="docs.authentication.para1" tag="span">
+            <template #idFormat><code class="bg-[var(--color-surface)] px-1 rounded">{public_id}.{secret}</code></template>
+            <template #apiKeysTab><strong class="text-[var(--foreground)]">{{ $t('docs.terms.apiKeyPlural') }}</strong></template>
+          </i18n-t>
         </p>
         <p class="text-[var(--muted-foreground)] mb-4">
-          Both halves carry an environment prefix, so you can tell at a glance which mode a key belongs to —
-          in a <code class="bg-[var(--color-surface)] px-1 rounded">.env</code> file, a log line, or a support
-          request — without looking it up:
+          <i18n-t keypath="docs.authentication.para2" tag="span">
+            <template #envFile><code class="bg-[var(--color-surface)] px-1 rounded">.env</code></template>
+          </i18n-t>
         </p>
         <DocsCodeBlock :code="keyFormatSample" lang="bash" />
         <p class="text-[var(--muted-foreground)] text-sm mb-4">
-          Send the token exactly as issued, prefixes included — they are part of the credential, not decoration.
-          The environment is taken from the key itself, so a test key can only ever create test data.
+          {{ $t('docs.authentication.para3') }}
         </p>
         <DocsCodeBlock
           code="Authorization: Bearer {public_id}.{secret}"
@@ -590,306 +624,355 @@ const validationErrorSample = `{
       </section>
 
       <section id="environments">
-        <h2 class="font-heading text-2xl font-semibold mb-4">Test vs Live</h2>
+        <h2 class="font-heading text-2xl font-semibold mb-4">{{ $t('docs.environments.title') }}</h2>
         <p class="text-[var(--muted-foreground)]">
-          Every API key and every subscriber/subscription record has an <code class="bg-[var(--color-surface)] px-1 rounded">environment</code>
-          of either <code class="bg-[var(--color-surface)] px-1 rounded">test</code> or <code class="bg-[var(--color-surface)] px-1 rounded">live</code>.
-          Today this is a label for your own filtering and reporting — it is <strong class="text-[var(--foreground)]">not currently enforced</strong> as an
-          isolated sandbox: a test-environment key can read and write live-environment data and vice
-          versa, and no separate test database or mock payment flow exists. Treat the distinction as
-          informational until stated otherwise, and don't rely on it for data isolation.
+          <i18n-t keypath="docs.environments.body" tag="span">
+            <template #envField><code class="bg-[var(--color-surface)] px-1 rounded">environment</code></template>
+            <template #testValue><code class="bg-[var(--color-surface)] px-1 rounded">test</code></template>
+            <template #liveValue><code class="bg-[var(--color-surface)] px-1 rounded">live</code></template>
+            <template #notEnforced><strong class="text-[var(--foreground)]">{{ $t('docs.environments.notEnforced') }}</strong></template>
+          </i18n-t>
         </p>
       </section>
 
       <section id="list-plans">
-        <h2 class="font-heading text-2xl font-semibold mb-4">List plans</h2>
+        <h2 class="font-heading text-2xl font-semibold mb-4">{{ $t('docs.listPlans.title') }}</h2>
         <p class="text-[var(--muted-foreground)] mb-1">
-          <code class="bg-[var(--color-surface)] px-1 rounded">GET /api/public/plans</code> — returns the active plans (with their features) for the application whose key you authenticated with.
+          <i18n-t keypath="docs.listPlans.intro" tag="span">
+            <template #endpoint><code class="bg-[var(--color-surface)] px-1 rounded">GET /api/public/plans</code></template>
+          </i18n-t>
         </p>
         <DocsLanguageTabs :samples="listPlansSamples" />
-        <p class="text-sm font-medium text-[var(--foreground)] mt-6 mb-1">Response — 200</p>
+        <p class="text-sm font-medium text-[var(--foreground)] mt-6 mb-1">{{ $t('docs.common.responseStatus', { status: 200 }) }}</p>
         <DocsCodeBlock :code="listPlansResponse" lang="json" />
       </section>
 
       <section id="create-subscription">
-        <h2 class="font-heading text-2xl font-semibold mb-4">Create a subscription</h2>
+        <h2 class="font-heading text-2xl font-semibold mb-4">{{ $t('docs.createSubscription.title') }}</h2>
         <p class="text-[var(--muted-foreground)] mb-1">
-          <code class="bg-[var(--color-surface)] px-1 rounded">POST /api/public/subscribe</code> — creates the subscriber if new, a pending subscription, a pending transaction, and returns a payment link.
+          <i18n-t keypath="docs.createSubscription.intro" tag="span">
+            <template #endpoint><code class="bg-[var(--color-surface)] px-1 rounded">POST /api/public/subscribe</code></template>
+          </i18n-t>
         </p>
 
         <table class="w-full text-sm mt-4 mb-6 border border-[var(--color-border-dark)] rounded-lg overflow-hidden bg-[var(--color-bg)]">
           <thead class="bg-[var(--color-surface)] text-[var(--muted-foreground)]">
             <tr>
-              <th class="text-left font-medium px-4 py-2">Field</th>
-              <th class="text-left font-medium px-4 py-2">Type</th>
-              <th class="text-left font-medium px-4 py-2">Required</th>
-              <th class="text-left font-medium px-4 py-2">Notes</th>
+              <th class="text-left font-medium px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.field') }}</th>
+              <th class="text-left font-medium px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.type') }}</th>
+              <th class="text-left font-medium px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.required') }}</th>
+              <th class="text-left font-medium px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.notes') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-[var(--color-border-dark)] text-[var(--muted-foreground)]">
             <tr>
               <td class="px-4 py-2 font-mono text-xs text-[var(--foreground)]">plan_id</td>
               <td class="px-4 py-2">integer</td>
-              <td class="px-4 py-2">yes</td>
-              <td class="px-4 py-2">Must belong to your application.</td>
+              <td class="px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.yes') }}</td>
+              <td class="px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.notePlanId') }}</td>
             </tr>
             <tr>
               <td class="px-4 py-2 font-mono text-xs text-[var(--foreground)]">external_id</td>
               <td class="px-4 py-2">string</td>
-              <td class="px-4 py-2">yes</td>
-              <td class="px-4 py-2">Your own identifier for this user.</td>
+              <td class="px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.yes') }}</td>
+              <td class="px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.noteExternalId') }}</td>
             </tr>
             <tr>
               <td class="px-4 py-2 font-mono text-xs text-[var(--foreground)]">phone_number</td>
               <td class="px-4 py-2">string</td>
-              <td class="px-4 py-2">yes</td>
-              <td class="px-4 py-2">Used for the payment provider.</td>
+              <td class="px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.yes') }}</td>
+              <td class="px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.notePhoneNumber') }}</td>
             </tr>
             <tr>
               <td class="px-4 py-2 font-mono text-xs text-[var(--foreground)]">email</td>
               <td class="px-4 py-2">string</td>
-              <td class="px-4 py-2">no</td>
+              <td class="px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.no') }}</td>
               <td class="px-4 py-2">&nbsp;</td>
             </tr>
             <tr>
               <td class="px-4 py-2 font-mono text-xs text-[var(--foreground)]">environment</td>
               <td class="px-4 py-2">"test" | "live"</td>
-              <td class="px-4 py-2">no</td>
-              <td class="px-4 py-2">Defaults to "live". See Test vs Live above.</td>
+              <td class="px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.no') }}</td>
+              <td class="px-4 py-2">{{ $t('docs.createSubscription.fieldsTable.noteEnvironment', { section: $t('docs.environments.title') }) }}</td>
             </tr>
           </tbody>
         </table>
 
         <DocsLanguageTabs :samples="subscribeSamples" />
-        <p class="text-sm font-medium text-[var(--foreground)] mt-6 mb-1">Response — 201</p>
+        <p class="text-sm font-medium text-[var(--foreground)] mt-6 mb-1">{{ $t('docs.common.responseStatus', { status: 201 }) }}</p>
         <DocsCodeBlock :code="subscribeResponse" lang="json" />
         <p class="text-[var(--muted-foreground)] text-sm mt-3">
-          Redirect your user to <code class="bg-[var(--color-surface)] px-1 rounded">data.payment_url</code> (or render <code class="bg-[var(--color-surface)] px-1 rounded">data.qrcode_url</code>) to complete payment.
-          Either can be <code class="bg-[var(--color-surface)] px-1 rounded">null</code> if the payment provider didn't return one — handle that case.
-          The subscription is <code class="bg-[var(--color-surface)] px-1 rounded">pending</code> until payment settles; that's what the webhook below tells you about.
+          <i18n-t keypath="docs.createSubscription.responseNote" tag="span">
+            <template #paymentUrl><code class="bg-[var(--color-surface)] px-1 rounded">data.payment_url</code></template>
+            <template #qrcodeUrl><code class="bg-[var(--color-surface)] px-1 rounded">data.qrcode_url</code></template>
+            <template #nullVal><code class="bg-[var(--color-surface)] px-1 rounded">null</code></template>
+            <template #pendingVal><code class="bg-[var(--color-surface)] px-1 rounded">pending</code></template>
+          </i18n-t>
         </p>
       </section>
 
       <section id="webhooks">
-        <h2 class="font-heading text-2xl font-semibold mb-4">Webhooks</h2>
+        <h2 class="font-heading text-2xl font-semibold mb-4">{{ $t('docs.webhooks.title') }}</h2>
         <p class="text-[var(--muted-foreground)] mb-4">
-          Set a <strong class="text-[var(--foreground)]">webhook URL</strong> on your application (Settings tab) and <span class="notranslate">Klea</span>
-          <code class="bg-[var(--color-surface)] px-1 rounded">POST</code>s to it once a subscriber's payment settles. There is currently one event,
-          <code class="bg-[var(--color-surface)] px-1 rounded">subscription.payment_result</code>. If no webhook URL is configured, nothing is sent — no error is raised.
+          <i18n-t keypath="docs.webhooks.intro" tag="span">
+            <template #webhookUrlLabel><strong class="text-[var(--foreground)]">{{ $t('docs.terms.webhookUrl') }}</strong></template>
+            <template #brand><span class="notranslate">Klea</span></template>
+            <template #postMethod><code class="bg-[var(--color-surface)] px-1 rounded">POST</code></template>
+            <template #eventName><code class="bg-[var(--color-surface)] px-1 rounded">subscription.payment_result</code></template>
+          </i18n-t>
         </p>
-        <p class="text-sm font-medium text-[var(--foreground)] mb-1">Payload</p>
+        <p class="text-sm font-medium text-[var(--foreground)] mb-1">{{ $t('docs.webhooks.payloadLabel') }}</p>
         <DocsCodeBlock :code="webhookPayload" lang="json" />
 
         <p class="text-[var(--muted-foreground)] mt-6 mb-1">
-          Every delivery includes an <code class="bg-[var(--color-surface)] px-1 rounded">X-Klea-Signature</code> header so you can verify it came from <span class="notranslate">Klea</span>.
-          <strong class="text-[var(--foreground)]">Important:</strong> the signature is an HMAC-SHA256 of the transaction's numeric
-          <code class="bg-[var(--color-surface)] px-1 rounded">id</code> as a string — <em>not</em> a hash of the request body — using the
-          <code class="bg-[var(--color-surface)] px-1 rounded">webhook_secret</code> shown on your application's settings. This differs from most webhook
-          signing schemes you may have implemented before, which usually hash the whole payload — get this right or verification will silently fail.
+          <i18n-t keypath="docs.webhooks.verify" tag="span">
+            <template #sigHeader><code class="bg-[var(--color-surface)] px-1 rounded">X-Klea-Signature</code></template>
+            <template #brand><span class="notranslate">Klea</span></template>
+            <template #important><strong class="text-[var(--foreground)]">{{ $t('docs.webhooks.important') }}</strong></template>
+            <template #idField><code class="bg-[var(--color-surface)] px-1 rounded">id</code></template>
+            <template #notWord><em>{{ $t('docs.webhooks.notWord') }}</em></template>
+            <template #secretField><code class="bg-[var(--color-surface)] px-1 rounded">webhook_secret</code></template>
+          </i18n-t>
         </p>
         <DocsLanguageTabs :samples="webhookVerifySamples" />
         <p class="text-[var(--muted-foreground)] text-sm mt-3">
-          There is no automatic retry today if your endpoint is unreachable or errors — treat delivery as
-          best-effort and reconcile against <code class="bg-[var(--color-surface)] px-1 rounded">GET /api/transactions</code> from your dashboard-authenticated session if you need certainty.
+          <i18n-t keypath="docs.webhooks.retryNote" tag="span">
+            <template #transactionsEndpoint><code class="bg-[var(--color-surface)] px-1 rounded">GET /api/transactions</code></template>
+          </i18n-t>
         </p>
       </section>
 
       <section id="entitlements">
-        <h2 class="font-heading text-2xl font-semibold mb-4">Storing entitlements</h2>
+        <h2 class="font-heading text-2xl font-semibold mb-4">{{ $t('docs.entitlements.title') }}</h2>
         <p class="text-[var(--muted-foreground)] mb-4">
-          Klea has no "is this customer subscribed?" endpoint, and you should not call the API on every
-          request anyway. Instead, keep a small table in your own database that the webhook writes to and
-          the rest of your app reads from. One row per customer (the entity you sent as
-          <code class="bg-[var(--color-surface)] px-1 rounded">external_id</code>).
+          <i18n-t keypath="docs.entitlements.intro" tag="span">
+            <template #externalId><code class="bg-[var(--color-surface)] px-1 rounded">external_id</code></template>
+          </i18n-t>
         </p>
         <DocsCodeBlock lang="sql" :code="entitlementsTableSample" />
-        <p class="text-[var(--muted-foreground)] text-sm mt-3 mb-2">Three details that are easy to get wrong:</p>
+        <p class="text-[var(--muted-foreground)] text-sm mt-3 mb-2">{{ $t('docs.entitlements.detailsIntro') }}</p>
         <ul class="list-disc list-inside space-y-2 text-[var(--muted-foreground)] text-sm">
           <li>
-            <strong class="text-[var(--foreground)]">Compute the expiry yourself.</strong> The webhook has no
-            expiry field. Check <code class="bg-[var(--color-surface)] px-1 rounded">billing_period</code> on the
-            plan: for <code class="bg-[var(--color-surface)] px-1 rounded">one_time</code> there is no expiry (the
-            customer keeps access forever); for every other period, take
-            <code class="bg-[var(--color-surface)] px-1 rounded">duration_days</code> (a plain integer number of
-            days — it is <code class="bg-[var(--color-surface)] px-1 rounded">null</code> only for
-            <code class="bg-[var(--color-surface)] px-1 rounded">one_time</code>) and add it to "now" when the
-            payment succeeds.
+            <i18n-t keypath="docs.entitlements.detail1" tag="span">
+              <template #lead><strong class="text-[var(--foreground)]">{{ $t('docs.entitlements.detail1Lead') }}</strong></template>
+              <template #billingPeriod><code class="bg-[var(--color-surface)] px-1 rounded">billing_period</code></template>
+              <template #oneTime><code class="bg-[var(--color-surface)] px-1 rounded">one_time</code></template>
+              <template #durationDays><code class="bg-[var(--color-surface)] px-1 rounded">duration_days</code></template>
+              <template #nullVal><code class="bg-[var(--color-surface)] px-1 rounded">null</code></template>
+            </i18n-t>
           </li>
           <li>
-            <strong class="text-[var(--foreground)]">Store the feature snapshot verbatim.</strong> Persist the
-            <code class="bg-[var(--color-surface)] px-1 rounded">features</code> array from the webhook as JSON.
-            Reading limits from a live API call on every request is slow and breaks when Klea is unreachable.
+            <i18n-t keypath="docs.entitlements.detail2" tag="span">
+              <template #lead><strong class="text-[var(--foreground)]">{{ $t('docs.entitlements.detail2Lead') }}</strong></template>
+              <template #featuresField><code class="bg-[var(--color-surface)] px-1 rounded">features</code></template>
+            </i18n-t>
           </li>
           <li>
-            <strong class="text-[var(--foreground)]">A failed renewal must not revoke access.</strong> If a
-            payment fails while the customer still has a valid paid period, leave the active row alone. Only
-            expiry ends access.
+            <i18n-t keypath="docs.entitlements.detail3" tag="span">
+              <template #lead><strong class="text-[var(--foreground)]">{{ $t('docs.entitlements.detail3Lead') }}</strong></template>
+            </i18n-t>
           </li>
         </ul>
       </section>
 
       <section id="enforcing-access">
-        <h2 class="font-heading text-2xl font-semibold mb-4">Enforcing access</h2>
+        <h2 class="font-heading text-2xl font-semibold mb-4">{{ $t('docs.enforcingAccess.title') }}</h2>
         <p class="text-[var(--muted-foreground)] mb-4">
-          Put every check behind one function so there is a single place that decides what a customer may do.
-          Read from your local table, never from the API.
+          {{ $t('docs.enforcingAccess.intro') }}
         </p>
         <DocsCodeBlock lang="php" :code="featureGateSample" />
         <p class="text-[var(--muted-foreground)] text-sm mt-4 mb-2">
-          Two conventions worth adopting, because they remove whole classes of bug:
+          {{ $t('docs.enforcingAccess.conventionsIntro') }}
         </p>
         <ul class="list-disc list-inside space-y-2 text-[var(--muted-foreground)] text-sm">
           <li>
-            <strong class="text-[var(--foreground)]">Treat <code class="bg-[var(--color-surface)] px-1 rounded">null</code>
-            as unlimited, never as zero.</strong> A plan with an unlimited quota stores
-            <code class="bg-[var(--color-surface)] px-1 rounded">limit: null</code>. Reading that as
-            <code class="bg-[var(--color-surface)] px-1 rounded">0</code> blocks your best-paying customers.
+            <i18n-t keypath="docs.enforcingAccess.rule1" tag="span">
+              <template #lead>
+                <strong class="text-[var(--foreground)]">
+                  <i18n-t keypath="docs.enforcingAccess.rule1Lead" tag="span">
+                    <template #nullVal><code class="bg-[var(--color-surface)] px-1 rounded">null</code></template>
+                  </i18n-t>
+                </strong>
+              </template>
+              <template #limitNull><code class="bg-[var(--color-surface)] px-1 rounded">limit: null</code></template>
+              <template #zero><code class="bg-[var(--color-surface)] px-1 rounded">0</code></template>
+            </i18n-t>
           </li>
           <li>
-            <strong class="text-[var(--foreground)]">Define a free tier in config.</strong> Customers with no
-            subscription should fall back to it, so a missing row is a normal state rather than an error.
+            <i18n-t keypath="docs.enforcingAccess.rule2" tag="span">
+              <template #lead><strong class="text-[var(--foreground)]">{{ $t('docs.enforcingAccess.rule2Lead') }}</strong></template>
+            </i18n-t>
           </li>
         </ul>
         <p class="text-[var(--muted-foreground)] text-sm mt-4">
-          Return a distinguishable response when a limit is hit, so the frontend can prompt an upgrade instead of
-          showing a generic failure:
+          {{ $t('docs.enforcingAccess.upgradeIntro') }}
         </p>
         <DocsCodeBlock lang="json" :code="upgradeRequiredSample" />
       </section>
 
       <section id="payment-flow">
-        <h2 class="font-heading text-2xl font-semibold mb-4">Payment flow &amp; UX</h2>
+        <h2 class="font-heading text-2xl font-semibold mb-4">{{ $t('docs.paymentFlow.title') }}</h2>
         <p class="text-[var(--muted-foreground)] mb-4">
-          <code class="bg-[var(--color-surface)] px-1 rounded">POST /public/subscribe</code> returns a
-          <code class="bg-[var(--color-surface)] px-1 rounded">payment_url</code> — a hosted page where the
-          customer completes payment. Card details are entered there and never touch your servers, which keeps
-          you out of PCI-DSS scope. Do not build your own card form; there is no field to send one.
+          <i18n-t keypath="docs.paymentFlow.intro" tag="span">
+            <template #endpoint><code class="bg-[var(--color-surface)] px-1 rounded">POST /public/subscribe</code></template>
+            <template #paymentUrlField><code class="bg-[var(--color-surface)] px-1 rounded">payment_url</code></template>
+          </i18n-t>
         </p>
         <p class="text-[var(--muted-foreground)] text-sm mb-2">
-          Optionally let the customer pick a channel first. <code class="bg-[var(--color-surface)] px-1 rounded">GET /public/gateways</code>
-          returns the live list with logos; pass the chosen
-          <code class="bg-[var(--color-surface)] px-1 rounded">id</code> as
-          <code class="bg-[var(--color-surface)] px-1 rounded">gateway_id</code> and the hosted page opens on it.
-          Omit it and the customer chooses there instead.
+          <i18n-t keypath="docs.paymentFlow.gatewaysIntro" tag="span">
+            <template #gatewaysEndpoint><code class="bg-[var(--color-surface)] px-1 rounded">GET /public/gateways</code></template>
+            <template #idField><code class="bg-[var(--color-surface)] px-1 rounded">id</code></template>
+            <template #gatewayIdField><code class="bg-[var(--color-surface)] px-1 rounded">gateway_id</code></template>
+          </i18n-t>
         </p>
         <DocsCodeBlock lang="json" :code="gatewaysResponseSample" />
         <p class="text-[var(--muted-foreground)] text-sm mt-4 mb-2">
-          Set a <strong class="text-[var(--foreground)]">Return URL</strong> on your application (Settings →
-          Return URL) and we send the customer's browser back there after they pay. But
-          <strong class="text-[var(--foreground)]">arriving there does not prove the payment succeeded</strong>
-          — a customer can land on it by cancelling or pressing back. The webhook is the only trustworthy
-          signal. So send them somewhere that polls your own entitlement endpoint until it flips to active:
+          <i18n-t keypath="docs.paymentFlow.returnUrl" tag="span">
+            <template #returnUrlLabel><strong class="text-[var(--foreground)]">{{ $t('docs.terms.returnUrl') }}</strong></template>
+            <template #notProof><strong class="text-[var(--foreground)]">{{ $t('docs.paymentFlow.notProof') }}</strong></template>
+          </i18n-t>
         </p>
         <DocsCodeBlock lang="javascript" :code="pollingSample" />
         <p class="text-[var(--muted-foreground)] text-sm mt-3">
-          Mobile-money channels debit a wallet, so collect a phone number for those. Card channels need none —
-          asking for one there just adds friction.
+          {{ $t('docs.paymentFlow.channelsNote') }}
         </p>
       </section>
 
       <section id="integration-checklist">
-        <h2 class="font-heading text-2xl font-semibold mb-4">Integration checklist</h2>
+        <h2 class="font-heading text-2xl font-semibold mb-4">{{ $t('docs.integrationChecklist.title') }}</h2>
         <p class="text-[var(--muted-foreground)] mb-4">
-          A complete integration, in dependency order. Steps 1–4 are dashboard setup; the rest is code.
+          {{ $t('docs.integrationChecklist.intro') }}
         </p>
         <ol class="list-decimal list-inside space-y-2 text-[var(--muted-foreground)] text-sm">
-          <li>Create an <strong class="text-[var(--foreground)]">Application</strong> for the app you're integrating.</li>
-          <li>Create <strong class="text-[var(--foreground)]">Features</strong>, and write the
-            <code class="bg-[var(--color-surface)] px-1 rounded">code</code> values down — they are the contract
-            your app reads, so they must match exactly.</li>
-          <li>Create <strong class="text-[var(--foreground)]">Plans</strong> and attach features with their limits.
-            Leave a limit empty for "unlimited". Make sure each plan is <strong class="text-[var(--foreground)]">active</strong>,
-            or it won't appear in <code class="bg-[var(--color-surface)] px-1 rounded">GET /public/plans</code>.</li>
-          <li>Generate an <strong class="text-[var(--foreground)]">API key</strong> (shown once) and set the
-            <strong class="text-[var(--foreground)]">webhook URL</strong> — saving it generates the signing secret.
-            Copy both into your app's environment; never into frontend code.</li>
-          <li>Create your entitlements table and the webhook receiver. Verify the signature before trusting anything.</li>
-          <li>Build the pricing page from <code class="bg-[var(--color-surface)] px-1 rounded">GET /public/plans</code>
-            rather than hardcoding prices.</li>
-          <li>Add a checkout page that calls <code class="bg-[var(--color-surface)] px-1 rounded">/public/subscribe</code>,
-            opens the payment URL, and polls for activation.</li>
-          <li>Route every limit check through your feature gate.</li>
-          <li>Test the full path with a real payment in test mode before going live.</li>
+          <li>
+            <i18n-t keypath="docs.integrationChecklist.step1" tag="span">
+              <template #application><strong class="text-[var(--foreground)]">{{ $t('docs.terms.application') }}</strong></template>
+            </i18n-t>
+          </li>
+          <li>
+            <i18n-t keypath="docs.integrationChecklist.step2" tag="span">
+              <template #features><strong class="text-[var(--foreground)]">{{ $t('docs.terms.features') }}</strong></template>
+              <template #codeField><code class="bg-[var(--color-surface)] px-1 rounded">code</code></template>
+            </i18n-t>
+          </li>
+          <li>
+            <i18n-t keypath="docs.integrationChecklist.step3" tag="span">
+              <template #plans><strong class="text-[var(--foreground)]">{{ $t('docs.terms.plans') }}</strong></template>
+              <template #active><strong class="text-[var(--foreground)]">{{ $t('docs.integrationChecklist.step3Active') }}</strong></template>
+              <template #plansEndpoint><code class="bg-[var(--color-surface)] px-1 rounded">GET /public/plans</code></template>
+            </i18n-t>
+          </li>
+          <li>
+            <i18n-t keypath="docs.integrationChecklist.step4" tag="span">
+              <template #apiKey><strong class="text-[var(--foreground)]">{{ $t('docs.terms.apiKey') }}</strong></template>
+              <template #webhookUrl><strong class="text-[var(--foreground)]">{{ $t('docs.terms.webhookUrl') }}</strong></template>
+            </i18n-t>
+          </li>
+          <li>{{ $t('docs.integrationChecklist.step5') }}</li>
+          <li>
+            <i18n-t keypath="docs.integrationChecklist.step6" tag="span">
+              <template #plansEndpoint><code class="bg-[var(--color-surface)] px-1 rounded">GET /public/plans</code></template>
+            </i18n-t>
+          </li>
+          <li>
+            <i18n-t keypath="docs.integrationChecklist.step7" tag="span">
+              <template #subscribeEndpoint><code class="bg-[var(--color-surface)] px-1 rounded">/public/subscribe</code></template>
+            </i18n-t>
+          </li>
+          <li>{{ $t('docs.integrationChecklist.step8') }}</li>
+          <li>{{ $t('docs.integrationChecklist.step9') }}</li>
         </ol>
       </section>
 
       <section id="pitfalls">
-        <h2 class="font-heading text-2xl font-semibold mb-4">Common pitfalls</h2>
+        <h2 class="font-heading text-2xl font-semibold mb-4">{{ $t('docs.pitfalls.title') }}</h2>
         <p class="text-[var(--muted-foreground)] mb-4">
-          Each of these has cost a real integration time. They're listed roughly in the order you'll hit them.
+          {{ $t('docs.pitfalls.intro') }}
         </p>
         <div class="space-y-4">
           <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
-            <p class="font-medium text-[var(--foreground)] mb-1">Plans exist but the API returns none</p>
+            <p class="font-medium text-[var(--foreground)] mb-1">{{ $t('docs.pitfalls.item1.title') }}</p>
             <p class="text-[var(--muted-foreground)] text-sm">
-              <code class="bg-[var(--color-surface)] px-1 rounded">GET /public/plans</code> only returns
-              <strong class="text-[var(--foreground)]">active</strong> plans. A plan left as a draft is invisible
-              to your app with no error to explain why.
+              <i18n-t keypath="docs.pitfalls.item1.desc" tag="span">
+                <template #plansEndpoint><code class="bg-[var(--color-surface)] px-1 rounded">GET /public/plans</code></template>
+                <template #active><strong class="text-[var(--foreground)]">{{ $t('docs.pitfalls.item1Active') }}</strong></template>
+              </i18n-t>
             </p>
           </div>
           <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
-            <p class="font-medium text-[var(--foreground)] mb-1">The signature covers the transaction id, not the body</p>
+            <p class="font-medium text-[var(--foreground)] mb-1">{{ $t('docs.pitfalls.item2.title') }}</p>
             <p class="text-[var(--muted-foreground)] text-sm">
-              Most webhook APIs sign the whole payload. This one signs
-              <code class="bg-[var(--color-surface)] px-1 rounded">transaction.id</code> only. Verifying against the
-              JSON body will reject every delivery. Compare with
-              <code class="bg-[var(--color-surface)] px-1 rounded">hash_equals</code>, not
-              <code class="bg-[var(--color-surface)] px-1 rounded">{{ '===' }}</code>.
+              <i18n-t keypath="docs.pitfalls.item2.desc" tag="span">
+                <template #transactionId><code class="bg-[var(--color-surface)] px-1 rounded">transaction.id</code></template>
+                <template #hashEquals><code class="bg-[var(--color-surface)] px-1 rounded">hash_equals</code></template>
+                <template #tripleEquals><code class="bg-[var(--color-surface)] px-1 rounded">{{ '===' }}</code></template>
+              </i18n-t>
             </p>
           </div>
           <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
-            <p class="font-medium text-[var(--foreground)] mb-1">An unset webhook secret fails open</p>
+            <p class="font-medium text-[var(--foreground)] mb-1">{{ $t('docs.pitfalls.item3.title') }}</p>
             <p class="text-[var(--muted-foreground)] text-sm">
-              If your secret is empty, an HMAC computed with an empty key is one anybody can reproduce — so any
-              forged request would be accepted. Reject webhooks outright when the secret is missing, rather than
-              computing a signature with a blank one.
+              {{ $t('docs.pitfalls.item3.desc') }}
             </p>
           </div>
           <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
-            <p class="font-medium text-[var(--foreground)] mb-1">Starting a new payment revokes the current plan</p>
+            <p class="font-medium text-[var(--foreground)] mb-1">{{ $t('docs.pitfalls.item4.title') }}</p>
             <p class="text-[var(--muted-foreground)] text-sm">
-              If you set the entitlement to <em>pending</em> when checkout starts, a customer who abandons payment
-              loses the plan they already paid for. Only downgrade when there is nothing active to protect.
+              <i18n-t keypath="docs.pitfalls.item4.desc" tag="span">
+                <template #pendingWord><em>pending</em></template>
+              </i18n-t>
             </p>
           </div>
           <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
-            <p class="font-medium text-[var(--foreground)] mb-1">Webhooks are not retried</p>
+            <p class="font-medium text-[var(--foreground)] mb-1">{{ $t('docs.pitfalls.item5.title') }}</p>
             <p class="text-[var(--muted-foreground)] text-sm">
-              If your endpoint is down when a payment settles, that notification is gone. Show pending payments as
-              "awaiting confirmation" rather than failed, and reconcile from your dashboard if needed.
+              {{ $t('docs.pitfalls.item5.desc') }}
             </p>
           </div>
           <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
-            <p class="font-medium text-[var(--foreground)] mb-1">Caching a typed object breaks on the second call</p>
+            <p class="font-medium text-[var(--foreground)] mb-1">{{ $t('docs.pitfalls.item6.title') }}</p>
             <p class="text-[var(--muted-foreground)] text-sm">
-              Caching a framework collection in a serializing store (database, Redis, file) hands back an
-              incomplete object on a cache hit. The first request works and every later one fails. Cache plain
-              arrays and re-wrap them after reading.
+              {{ $t('docs.pitfalls.item6.desc') }}
             </p>
           </div>
           <div class="border border-[var(--color-border-dark)] rounded-lg p-4">
-            <p class="font-medium text-[var(--foreground)] mb-1">Boolean features rendered as numbers</p>
+            <p class="font-medium text-[var(--foreground)] mb-1">{{ $t('docs.pitfalls.item7.title') }}</p>
             <p class="text-[var(--muted-foreground)] text-sm">
-              An on/off feature may carry <code class="bg-[var(--color-surface)] px-1 rounded">limit: 1</code>,
-              which renders as "Advanced analytics: 1" if you print limits blindly. Only show a number for quota
-              features.
+              <i18n-t keypath="docs.pitfalls.item7.desc" tag="span">
+                <template #limitOne><code class="bg-[var(--color-surface)] px-1 rounded">limit: 1</code></template>
+              </i18n-t>
             </p>
           </div>
         </div>
       </section>
 
       <section id="errors">
-        <h2 class="font-heading text-2xl font-semibold mb-4">Errors</h2>
+        <h2 class="font-heading text-2xl font-semibold mb-4">{{ $t('docs.errors.title') }}</h2>
         <p class="text-[var(--muted-foreground)] mb-4">
-          Every error response has the shape <code class="bg-[var(--color-surface)] px-1 rounded">{ success: false, message, error? }</code>.
-          For field-validation failures (422), <code class="bg-[var(--color-surface)] px-1 rounded">error</code> is an object keyed by field name:
+          <i18n-t keypath="docs.errors.intro" tag="span">
+            <template #shape><code class="bg-[var(--color-surface)] px-1 rounded">{ success: false, message, error? }</code></template>
+            <template #errorField><code class="bg-[var(--color-surface)] px-1 rounded">error</code></template>
+          </i18n-t>
         </p>
         <DocsCodeBlock :code="validationErrorSample" lang="json" />
-        <p class="text-sm font-medium text-[var(--foreground)] mt-6 mb-2">Common status codes</p>
+        <p class="text-sm font-medium text-[var(--foreground)] mt-6 mb-2">{{ $t('docs.errors.statusCodesLabel') }}</p>
         <ul class="space-y-1 text-[var(--muted-foreground)]">
-          <li><code class="bg-[var(--color-surface)] px-1 rounded">401</code> — missing, malformed, or invalid/revoked API key</li>
-          <li><code class="bg-[var(--color-surface)] px-1 rounded">422</code> — request validation failed, or <code class="bg-[var(--color-surface)] px-1 rounded">plan_id</code> doesn't belong to your application</li>
-          <li><code class="bg-[var(--color-surface)] px-1 rounded">500</code> — something failed on our side (including payment-provider errors during subscribe)</li>
+          <li>
+            <i18n-t keypath="docs.errors.code401" tag="span">
+              <template #code><code class="bg-[var(--color-surface)] px-1 rounded">401</code></template>
+            </i18n-t>
+          </li>
+          <li>
+            <i18n-t keypath="docs.errors.code422" tag="span">
+              <template #code><code class="bg-[var(--color-surface)] px-1 rounded">422</code></template>
+              <template #planId><code class="bg-[var(--color-surface)] px-1 rounded">plan_id</code></template>
+            </i18n-t>
+          </li>
+          <li>
+            <i18n-t keypath="docs.errors.code500" tag="span">
+              <template #code><code class="bg-[var(--color-surface)] px-1 rounded">500</code></template>
+            </i18n-t>
+          </li>
         </ul>
       </section>
     </div>
