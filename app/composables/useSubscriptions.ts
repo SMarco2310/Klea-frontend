@@ -1,4 +1,5 @@
 // app/composables/useSubscriptions.ts
+import { toValue, type MaybeRefOrGetter } from 'vue'
 import type { Plan } from './usePlans'
 
 export interface Subscriber {
@@ -25,7 +26,7 @@ export interface Subscription {
   plan?: Plan
 }
 
-export function useSubscriptions(appId: number | string) {
+export function useSubscriptions(appId: MaybeRefOrGetter<number | string>) {
   const api = useApi()
   const { mode } = useEnvMode()
   const all = ref<Subscription[]>([])
@@ -48,7 +49,7 @@ export function useSubscriptions(appId: number | string) {
   // Subscriptions have no application_id of their own — scoping to an app
   // goes through the plan they were bought on.
   const subscriptions = computed(() =>
-    all.value.filter((s) => s.plan?.application_id === Number(appId) && s.environment === mode.value)
+    all.value.filter((s) => s.plan?.application_id === Number(toValue(appId)) && s.environment === mode.value)
   )
 
   async function cancelSubscription(id: number) {

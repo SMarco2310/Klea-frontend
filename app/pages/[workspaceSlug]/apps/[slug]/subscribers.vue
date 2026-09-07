@@ -10,7 +10,7 @@ import AppHeader from '~/components/dashboard/AppHeader.vue'
 
 const { currentApp } = useApps()
 const appId = computed(() => currentApp.value?.id ?? 0)
-const { subscribers, pending, fetchSubscribers } = useSubscribers(appId.value)
+const { subscribers, pending, fetchSubscribers } = useSubscribers(appId)
 const { t } = useI18n()
 
 watchEffect(() => {

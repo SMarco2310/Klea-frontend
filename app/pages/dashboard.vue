@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Button } from '~/components/ui/button'
+definePageMeta({ middleware: 'auth' })
 const { workspace, fetchWorkspace } = useWorkspace()
 
 // Ensure we have fetched the active workspace

@@ -1,7 +1,8 @@
 // app/composables/useSubscribers.ts
+import type { MaybeRefOrGetter } from 'vue'
 import type { Subscriber } from './useSubscriptions'
 
-export function useSubscribers(appId: number | string) {
+export function useSubscribers(appId: MaybeRefOrGetter<number | string>) {
   const { subscriptions, pending, error, fetchSubscriptions } = useSubscriptions(appId)
 
   // The API has no per-application subscribers endpoint — a subscriber only

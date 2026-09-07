@@ -1,4 +1,6 @@
 // app/composables/useApiKeys.ts
+import { toValue, type MaybeRefOrGetter } from 'vue'
+
 export interface ApiKey {
   id: number
   application_id: number
@@ -10,7 +12,7 @@ export interface ApiKey {
   created_at: string
 }
 
-export function useApiKeys(appId: number | string) {
+export function useApiKeys(appId: MaybeRefOrGetter<number | string>) {
   const api = useApi()
   const { mode } = useEnvMode()
   const all = ref<ApiKey[]>([])
@@ -32,13 +34,13 @@ export function useApiKeys(appId: number | string) {
 
   const apiKeys = computed(() =>
     all.value.filter(
-      (k) => k.application_id === Number(appId) && k.environment === mode.value && !k.revoked_at
+      (k) => k.application_id === Number(toValue(appId)) && k.environment === mode.value && !k.revoked_at
     )
   )
 
   async function createApiKey(name: string) {
     const created = await api.post<ApiKey & { secret: string }>('/api-keys', {
-      application_id: Number(appId),
+      application_id: Number(toValue(appId)),
       name,
       environment: mode.value,
     })

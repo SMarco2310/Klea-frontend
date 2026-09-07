@@ -22,8 +22,11 @@ async function handleSubmit() {
   errorMessage.value = ''
   isSubmitting.value = true
   try {
-    await login(email.value, password.value)
-    await navigateTo('/dashboard')
+    const workspaceSlug = await login(email.value, password.value)
+    // Straight to the workspace when we know it: /dashboard is only an
+    // interstitial that looks the slug up and redirects, costing an extra
+    // page load on every sign-in.
+    await navigateTo(workspaceSlug ? `/${workspaceSlug}/dashboard` : '/dashboard')
   } catch (e) {
     errorMessage.value = extractAuthErrorMessage(e)
   } finally {
@@ -112,6 +115,12 @@ async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
       <span class="text-xs text-slate-500">or log in via</span>
       <div class="h-px bg-white/10 flex-1" />
     </div>
+
+    <!-- Clerk's Smart CAPTCHA (Turnstile) renders here. The instance has
+         captcha_widget_type=smart, and without this element Clerk falls back to
+         the Invisible widget, which fails on localhost and makes OAuth/sign-up
+         abort before a session is ever created. -->
+    <div id="clerk-captcha" class="empty:hidden mb-4" />
 
     <div class="flex items-center gap-4">
       <Button variant="secondary" class="flex-1 cursor-pointer h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg gap-2 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="!isLoaded" @click="handleOAuth('oauth_google')">

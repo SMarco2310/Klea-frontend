@@ -16,7 +16,7 @@ const appId = computed(() => currentApp.value?.id ?? 0)
 const isNew = computed(() => route.params.id === 'new')
 const featureId = computed(() => isNew.value ? null : Number(route.params.id))
 
-const { features, pending, fetchFeatures, createFeature, updateFeature } = useFeatures(appId.value)
+const { features, pending, fetchFeatures, createFeature, updateFeature } = useFeatures(appId)
 const { t } = useI18n()
 
 const name = ref('')

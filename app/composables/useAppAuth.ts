@@ -19,6 +19,8 @@ interface AuthResponse {
   data: {
     user: LaravelUser
     token: string
+    /** Current workspace slug, so sign-in can route straight to its dashboard. */
+    workspace_slug?: string | null
   }
   success: boolean
   message: string
@@ -69,6 +71,9 @@ export function useAppAuth() {
     })
     token.value = res.data.token
     user.value = res.data.user
+    // Returned by the API so the caller can go straight to the workspace
+    // dashboard instead of bouncing through an interstitial lookup page.
+    return res.data.workspace_slug ?? null
   }
 
   async function register(name: string, email: string, password: string, passwordConfirmation: string) {
@@ -78,6 +83,7 @@ export function useAppAuth() {
     })
     token.value = res.data.token
     user.value = res.data.user
+    return res.data.workspace_slug ?? null
   }
 
   async function loginWithClerkToken(sessionToken: string) {
@@ -173,7 +179,18 @@ export function useAppAuth() {
 }
 
 export function extractAuthErrorMessage(err: unknown): string {
-  const fetchError = err as { data?: { message?: string } }
+  const fetchError = err as { data?: { message?: string; error?: Record<string, string[]> | string } }
+
+  // On a 422 the backend puts the generic summary in `message` and the
+  // per-field reasons in `error` ({ email: ['The email has already been
+  // taken.'] }). Surfacing the field message is what tells the user which
+  // input to actually fix.
+  const fieldErrors = fetchError?.data?.error
+  if (fieldErrors && typeof fieldErrors === 'object') {
+    const firstField = Object.values(fieldErrors)[0]
+    if (Array.isArray(firstField) && typeof firstField[0] === 'string') return firstField[0]
+  }
+
   return fetchError?.data?.message || 'Something went wrong. Please try again.'
 }
 

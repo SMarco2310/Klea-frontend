@@ -42,6 +42,23 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css', 'vue-sonner/style.css'],
   vite: {
     plugins: [tailwindcss()],
+    // Vite discovers bare imports lazily, and each new discovery re-runs the
+    // optimizer and rotates the dep browserHash. Any module URL the browser
+    // already holds then 504s ("Outdated Optimize Dep") or arrives with an
+    // empty MIME type, which surfaces as NS_ERROR_CORRUPTED_CONTENT on a
+    // dynamically imported chunk. Listing the deps that were being found in
+    // later passes makes the optimizer bundle them all up front, in one pass.
+    optimizeDeps: {
+      include: [
+        '@lucide/vue',
+        '@vueuse/core',
+        'clsx',
+        'tailwind-merge',
+        'vue-sonner',
+        'class-variance-authority',
+        'reka-ui',
+      ],
+    },
   },
   runtimeConfig: {
     public: {

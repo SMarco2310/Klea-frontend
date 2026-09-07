@@ -27,6 +27,9 @@ function getPasswordError(value: string): string {
 }
 
 async function handleSubmit() {
+  // Guard first: a second submit (double click, Enter held) would otherwise
+  // race the in-flight request and attempt to create the account twice.
+  if (isSubmitting.value) return
   if (!name.value || !email.value || !password.value || !passwordConfirmation.value) return
   errorMessage.value = ''
 
@@ -42,8 +45,11 @@ async function handleSubmit() {
 
   isSubmitting.value = true
   try {
-    await register(name.value, email.value, password.value, passwordConfirmation.value)
-    if (user.value?.current_tenant_id) {
+    const workspaceSlug = await register(name.value, email.value, password.value, passwordConfirmation.value)
+    if (workspaceSlug) {
+      // Skip the /dashboard interstitial when the workspace is already known.
+      await navigateTo(`/${workspaceSlug}/dashboard`)
+    } else if (user.value?.current_tenant_id) {
       await navigateTo('/dashboard')
     } else {
       await navigateTo('/onboarding')
@@ -68,6 +74,11 @@ async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
   }
 
   try {
+    // signIn (not signUp) even on the sign-up page: with Smart CAPTCHA enabled
+    // on this instance, signUp.authenticateWithRedirect never resolves — it
+    // waits on a Turnstile token that is not available at click time. The
+    // signIn OAuth redirect transparently provisions a new account for an
+    // unknown Google/GitHub identity, so it covers sign-up too.
     await signIn.value.authenticateWithRedirect({
       strategy,
       redirectUrl: '/sso-callback',
@@ -137,6 +148,12 @@ async function handleOAuth(strategy: 'oauth_google' | 'oauth_github') {
       <span class="text-xs text-slate-500">or sign up via</span>
       <div class="h-px bg-white/10 flex-1" />
     </div>
+
+    <!-- Clerk's Smart CAPTCHA (Turnstile) renders here. The instance has
+         captcha_widget_type=smart, and without this element Clerk falls back to
+         the Invisible widget, which fails on localhost and makes OAuth/sign-up
+         abort before a session is ever created. -->
+    <div id="clerk-captcha" class="empty:hidden mb-4" />
 
     <div class="flex items-center gap-4">
       <Button variant="secondary" class="flex-1 cursor-pointer h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-lg gap-2" @click="handleOAuth('oauth_google')">

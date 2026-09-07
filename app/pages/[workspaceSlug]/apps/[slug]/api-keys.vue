@@ -13,7 +13,7 @@ import AppHeader from '~/components/dashboard/AppHeader.vue'
 const { currentApp } = useApps()
 const { mode } = useEnvMode()
 const appId = computed(() => currentApp.value?.id ?? 0)
-const { apiKeys, pending, fetchApiKeys, createApiKey, revokeApiKey } = useApiKeys(appId.value)
+const { apiKeys, pending, fetchApiKeys, createApiKey, revokeApiKey } = useApiKeys(appId)
 const { t } = useI18n()
 
 watchEffect(() => {

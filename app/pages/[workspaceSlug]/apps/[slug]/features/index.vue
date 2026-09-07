@@ -10,7 +10,7 @@ import { toast } from 'vue-sonner'
 
 const { currentApp } = useApps()
 const appId = computed(() => currentApp.value?.id ?? 0)
-const { features, pending, fetchFeatures, deleteFeature } = useFeatures(appId.value)
+const { features, pending, fetchFeatures, deleteFeature } = useFeatures(appId)
 const { t } = useI18n()
 
 watchEffect(() => {
